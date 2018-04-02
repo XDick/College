@@ -32,21 +32,23 @@
         >
 
 
-        <FrameLayout
-            android:id="@+id/contentContainer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
+
+
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/fragment"
+                android:layout_marginBottom="60dp" />
+
+
+
+
         <com.ashokvarma.bottomnavigation.BottomNavigationBar
             android:id="@+id/bottom_navigation_bar"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_alignParentBottom="true"
-            >
-
-
-        </com.ashokvarma.bottomnavigation.BottomNavigationBar>
-
+            android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 
@@ -58,8 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:menu="@menu/nav_menu"
-        app:headerLayout="@layout/nav_header"
+
         >
 
     </android.support.design.widget.NavigationView>

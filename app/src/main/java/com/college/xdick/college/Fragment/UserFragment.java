@@ -13,11 +13,12 @@ import com.college.xdick.college.R;
  * Created by Administrator on 2018/4/2.
  */
 
-public  class MainFragment extends Fragment {
-    @Nullable
+public class UserFragment extends Fragment {
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view =inflater.inflate(R.layout.fragment_main,container,false);
+        View view =inflater.inflate(R.layout.fragment_user,container,false);
         return view;
     }
+
 }

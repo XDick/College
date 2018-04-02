@@ -19,7 +19,7 @@
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="XDick"
+        android:text="点击头像以登录"
         android:textColor="#FFF"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"/>
