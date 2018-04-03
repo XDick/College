@@ -3,7 +3,32 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+
+
+        <TextView
+            android:layout_marginTop="50dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|bottom"
+            android:text="SIGN UP"
+            android:textColor="#FFF"
+            android:textSize="75dp" />
+
+    </LinearLayout>
+
+
+
+
+
+
     <LinearLayout
 
         android:orientation="horizontal"
@@ -13,13 +38,13 @@
             android:layout_width="90dp"
             android:layout_gravity="center_vertical"
             android:layout_height="match_parent"
-            android:text="账号" />
+            android:text="账号"
+            android:textColor="#FFF" />
 
 
         <EditText
             android:id="@+id/account_signup"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="200dp"
             android:layout_height="wrap_content" />
     </LinearLayout>
 
@@ -32,13 +57,13 @@
             android:layout_width="90dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:text="密码" />
+            android:text="密码"
+            android:textColor="#FFF"/>
 
 
         <EditText
             android:id="@+id/password_signup"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="200dp"
             android:layout_height="wrap_content" />
     </LinearLayout>
 
@@ -52,20 +77,25 @@
             android:layout_width="90dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:text="邮箱" />
+            android:text="邮箱"
+            android:textColor="#FFF"/>
 
 
         <EditText
             android:id="@+id/email_signup"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:layout_width="200dp"
+
+            android:layout_height="wrap_content"
+            />
     </LinearLayout>
 
         <Button
             android:id="@+id/signup_button"
-            android:layout_width="match_parent"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:text="注册" />
+            android:layout_gravity="center"
+            android:background="#990000"
+            android:text="注册"
+            android:textColor="#FFF"/>
 
 </LinearLayout>
