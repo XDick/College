@@ -77,6 +77,14 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+       /*--------------------------------监听返回键--------------------*/
+ @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(LoginActivity.this,MainActivity.class));
+        finish();
+
+    }
 }
 
 

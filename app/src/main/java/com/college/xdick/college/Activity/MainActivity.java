@@ -28,9 +28,12 @@ import com.college.xdick.college.Fragment.FindFragment;
 import com.college.xdick.college.Fragment.MainFragment;
 import com.college.xdick.college.Fragment.UserFragment;
 import com.college.xdick.college.R;
+import com.college.xdick.college.util.Dynamics;
 import com.college.xdick.college.util.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,15 +44,16 @@ public class MainActivity extends AppCompatActivity {
 
 
     private BottomNavigationBar mBottomNavigationBar;
+    private List<Dynamics>  dynamicsList = new ArrayList<>();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getListData();
         initView();
 
-        Bmob.initialize(this, "b689cf6ecc75e3fafd3588b88ede6fcc");
         replaceFragment(new MainFragment());
 
 
@@ -118,6 +122,12 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
+
+    public List<Dynamics> getListData(){
+        Intent intent= getIntent();
+        dynamicsList = (List<Dynamics>)intent.getSerializableExtra("LISTDATA");
+        return dynamicsList;
+    }
 
     /*--------------------------------监听返回键--------------------*/
    /* @Override

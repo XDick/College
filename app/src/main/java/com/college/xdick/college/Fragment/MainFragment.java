@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.college.xdick.college.Activity.DynamicsActivity;
 import com.college.xdick.college.Activity.LoginActivity;
+import com.college.xdick.college.Activity.MainActivity;
 import com.college.xdick.college.R;
 import com.college.xdick.college.util.Dynamics;
 import com.college.xdick.college.util.MyAdapter;
@@ -55,16 +56,16 @@ public  class MainFragment extends Fragment {
     static private List<Dynamics> dynamicsList= new ArrayList<>();
     private SwipeRefreshLayout swipeRefresh;
     private MyAdapter adapter;
+    static private int flag=0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootview =inflater.inflate(R.layout.fragment_main,container,false);
 
-        if(dynamicsList.isEmpty()){
-        initData();
+        if(flag==0){
+            FirstInitFromActivity();
         }
         initBaseView();
-
         initRecyclerView();
         setHasOptionsMenu(true);
         BmobCheckIfLogin();
@@ -179,6 +180,7 @@ public  class MainFragment extends Fragment {
                 public void onClick(View view) {
                     Intent intent =new Intent(getActivity(),LoginActivity.class);
                     startActivity(intent);
+                    getActivity().finish();
 
                 }
 
@@ -188,6 +190,7 @@ public  class MainFragment extends Fragment {
 
 
     private void initRecyclerView(){
+
         RecyclerView recyclerView = rootview.findViewById(R.id.recyclerview_main);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -202,8 +205,6 @@ public  class MainFragment extends Fragment {
         dynamicsList.clear();
 
       BmobQuery<Dynamics> query = new BmobQuery<Dynamics>();
-
-
 //返回50条数据，如果不加上这条语句，默认返回10条数据
       query.setLimit(99);
 //执行查询方法
@@ -214,10 +215,10 @@ public  class MainFragment extends Fragment {
                   for (Dynamics dynamics : object) {
                       dynamicsList.add(dynamics);}
                   Collections.reverse(dynamicsList); // 倒序排列
-                  Toast.makeText(getContext(),"成功接收内容",Toast.LENGTH_SHORT).show();
+                 // Toast.makeText(getContext(),"成功接收内容",Toast.LENGTH_SHORT).show();
 
               }else{
-                  Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
+                  Toast.makeText(getContext(),"网络不佳",Toast.LENGTH_SHORT).show();
               }
           }
       });
@@ -261,7 +262,7 @@ public  class MainFragment extends Fragment {
           public void run() {
               try{
                   initData();
-                  Thread.sleep(3000);
+                  Thread.sleep(2000);
               }
               catch (InterruptedException e){
                   e.printStackTrace();
@@ -278,5 +279,16 @@ public  class MainFragment extends Fragment {
       }).start();
     }
 
+
+    private  void FirstInitFromActivity(){
+        MainActivity activity = (MainActivity) getActivity();
+        if (activity.getListData().isEmpty()){
+            Toast.makeText(getContext(),"糟糕，没加载出来TAT",Toast.LENGTH_SHORT).show();
+        }
+        if(dynamicsList.isEmpty()){
+            dynamicsList = activity.getListData();
+        }
+        flag++;
+    }
 
 }
