@@ -15,7 +15,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,13 +30,15 @@ import com.college.xdick.college.Activity.LoginActivity;
 import com.college.xdick.college.Activity.MainActivity;
 import com.college.xdick.college.R;
 import com.college.xdick.college.util.Dynamics;
-import com.college.xdick.college.util.MyAdapter;
+import com.college.xdick.college.util.DynamicsAdapter;
 import com.college.xdick.college.util.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.listener.ConnectListener;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
@@ -55,7 +57,7 @@ public  class MainFragment extends Fragment {
     private  User bmobUser = BmobUser.getCurrentUser(User.class);
     static private List<Dynamics> dynamicsList= new ArrayList<>();
     private SwipeRefreshLayout swipeRefresh;
-    private MyAdapter adapter;
+    private DynamicsAdapter adapter;
     static private int flag=0;
 
     @Override
@@ -69,6 +71,7 @@ public  class MainFragment extends Fragment {
         initRecyclerView();
         setHasOptionsMenu(true);
         BmobCheckIfLogin();
+        IMconnectBomob();
 
 
 
@@ -194,7 +197,7 @@ public  class MainFragment extends Fragment {
         RecyclerView recyclerView = rootview.findViewById(R.id.recyclerview_main);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new MyAdapter(dynamicsList);
+        adapter = new DynamicsAdapter(dynamicsList);
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
@@ -245,8 +248,13 @@ public  class MainFragment extends Fragment {
                 break;
 
                 case R.id.add:
+                    if(bmobUser!=null){
                     Intent intent = new Intent(getContext(), DynamicsActivity.class);
-                    startActivity(intent);
+                    startActivity(intent);}
+                    else
+                    {Toast.makeText(getContext(),"请先登录",Toast.LENGTH_SHORT).show();
+                    }
+                    break;
 
             default:
                 break;
@@ -289,6 +297,33 @@ public  class MainFragment extends Fragment {
             dynamicsList = activity.getListData();
         }
         flag++;
+    }
+
+    private void IMconnectBomob() {
+
+        //TODO 连接：3.1、登录成功、注册成功或处于登录状态重新打开应用后执行连接IM服务器的操作
+
+        if (bmobUser != null) {
+
+
+            if (!TextUtils.isEmpty(bmobUser.getObjectId())) {
+                BmobIM.connect(bmobUser.getObjectId(), new ConnectListener() {
+                    @Override
+                    public void done(String uid, BmobException e) {
+                        if (e == null) {
+
+                            Toast.makeText(getContext(), "连接成功", Toast.LENGTH_SHORT).show();
+                            //连接成功
+                        } else {
+                            //连接失败
+                            Toast.makeText(getContext(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }
+
+        else{}
     }
 
 }

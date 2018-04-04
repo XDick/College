@@ -1,14 +1,17 @@
 package com.college.xdick.college.util;
 
-import android.media.Image;
-import android.support.v4.widget.DrawerLayout;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.college.xdick.college.Activity.AskChatActivity;
+import com.college.xdick.college.Activity.AskChatActivity;
+import com.college.xdick.college.IM_util.AddFriendMessage;
+import com.college.xdick.college.IM_util.Friend;
 import com.college.xdick.college.R;
 
 import java.util.List;
@@ -17,9 +20,10 @@ import java.util.List;
  * Created by Administrator on 2018/4/3.
  */
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHolder> {
 
        private List<Dynamics> mDynamicsList;
+       private Context mContext;
 
 
        static class ViewHolder extends RecyclerView.ViewHolder{
@@ -37,15 +41,32 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
        }
 
 
-       public MyAdapter(List<Dynamics> dynamics){
+       public DynamicsAdapter(List<Dynamics> dynamics){
            mDynamicsList = dynamics;
        }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if(mContext == null){
+            mContext = parent.getContext();
+        }
+
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.class_dynamics,parent,false);
-        ViewHolder holder = new ViewHolder(view);
+                .inflate(R.layout.item_dynamics,parent,false);
+        final ViewHolder holder = new ViewHolder(view);
+
+        holder.username.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+              /*  int position = holder.getAdapterPosition();
+                Dynamics dynamics = mDynamicsList.get(position);*/
+                Intent intent = new Intent(mContext , AskChatActivity.class);
+                mContext.startActivity(intent);
+
+            }
+        });
+
+
            return holder;
     }
 

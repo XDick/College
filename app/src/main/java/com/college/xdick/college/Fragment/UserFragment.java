@@ -15,6 +15,7 @@ import com.college.xdick.college.Activity.LoginActivity;
 import com.college.xdick.college.R;
 import com.college.xdick.college.util.User;
 
+import cn.bmob.newim.BmobIM;
 import cn.bmob.v3.BmobUser;
 
 /**
@@ -46,6 +47,7 @@ public class UserFragment extends Fragment {
                     Toast.makeText(getActivity(),"已退出登录",Toast.LENGTH_SHORT).show();
                     exitUserInfo();
                     button.setVisibility(View.INVISIBLE);
+                    BmobIM.getInstance().disConnect();
 
 
                 }

@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,8 +38,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.listener.ConnectListener;
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getListData();
         initView();
-
         replaceFragment(new MainFragment());
+        //IMconnectBomob();
 
 
     }
@@ -128,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
         dynamicsList = (List<Dynamics>)intent.getSerializableExtra("LISTDATA");
         return dynamicsList;
     }
+
+
 
     /*--------------------------------监听返回键--------------------*/
    /* @Override
