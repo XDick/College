@@ -29,7 +29,7 @@
     <EditText
         android:id="@+id/dynamics_title_edittext"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="75dp"
         android:hint="输入你的标题"
         android:textSize="20dp"
 
@@ -40,7 +40,7 @@
     <EditText
         android:id="@+id/dynamics_content_edittext"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:hint="输入你的文本"
         android:textSize="20dp"
 

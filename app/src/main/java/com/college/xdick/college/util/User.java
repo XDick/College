@@ -10,7 +10,15 @@ import cn.bmob.v3.datatype.BmobFile;
 public class User extends BmobUser {
 
     private BmobFile head;
+    private String Avatar;
 
+    public String getAvatar() {
+        return Avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        Avatar = avatar;
+    }
 
     public BmobFile getHead() {
         return head;

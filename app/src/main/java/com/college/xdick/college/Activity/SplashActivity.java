@@ -36,7 +36,7 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle arg0) {
         final View view = View.inflate(this, R.layout.activity_splash, null);
         setContentView(view);
-        Bmob.initialize(this, "b689cf6ecc75e3fafd3588b88ede6fcc");
+
         if(!ifshow()){
            startActivity(new Intent(SplashActivity.this,MainActivity.class));
            finish();

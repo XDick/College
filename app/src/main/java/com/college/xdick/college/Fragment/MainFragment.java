@@ -58,7 +58,8 @@ public  class MainFragment extends Fragment {
     static private List<Dynamics> dynamicsList= new ArrayList<>();
     private SwipeRefreshLayout swipeRefresh;
     private DynamicsAdapter adapter;
-    static private int flag=0;
+    static private int flag,flag2 = 0;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -72,12 +73,6 @@ public  class MainFragment extends Fragment {
         setHasOptionsMenu(true);
         BmobCheckIfLogin();
         IMconnectBomob();
-
-
-
-
-
-
 
         return rootview;
     }
@@ -304,26 +299,30 @@ public  class MainFragment extends Fragment {
         //TODO 连接：3.1、登录成功、注册成功或处于登录状态重新打开应用后执行连接IM服务器的操作
 
         if (bmobUser != null) {
-
-
             if (!TextUtils.isEmpty(bmobUser.getObjectId())) {
+
+                if(flag2==0){
                 BmobIM.connect(bmobUser.getObjectId(), new ConnectListener() {
                     @Override
                     public void done(String uid, BmobException e) {
                         if (e == null) {
 
                             Toast.makeText(getContext(), "连接成功", Toast.LENGTH_SHORT).show();
+                            flag2=1;
                             //连接成功
                         } else {
                             //连接失败
-                            Toast.makeText(getContext(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "失败" + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
-            }
+            }}
         }
 
-        else{}
+        else{
+
+            flag2=0;
+        }
     }
 
 }

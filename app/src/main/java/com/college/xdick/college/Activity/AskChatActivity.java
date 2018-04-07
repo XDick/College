@@ -7,12 +7,17 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.college.xdick.college.R;
 import com.college.xdick.college.util.User;
 
+import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.bean.BmobIMUserInfo;
+import cn.bmob.newim.listener.ConversationListener;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
 
 /**
  * Created by Administrator on 2018/4/4 0004.
@@ -43,21 +48,36 @@ public class AskChatActivity extends Activity {
         accetp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(AskChatActivity.this,
-                        ChatActivity.class));
+              startChatting();
                 finish();
             }
         });
     }
 
     /**
-     * 发送添加好友的请求
+     * 发送添加好友的请求a
      */
     //TODO 好友管理：9.7、发送添加好友请求
-    private void sendAddFriendMessage() {
-        User currentUser = BmobUser.getCurrentUser(User.class);
-        BmobIMUserInfo info = new BmobIMUserInfo();
-        info.setUserId(currentUser.getObjectId().toString());
-        info.setName(currentUser.getUsername());
+    private void startChatting() {
+        BmobIM.getInstance().startPrivateConversation( new BmobIMUserInfo("4d820b1379","a",""), new ConversationListener() {
+            @Override
+            public void done(BmobIMConversation c, BmobException e) {
+                if(e==null){
+                    //在此跳转到聊天页面
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("c", c);
+           Intent intent = new Intent(AskChatActivity.this,
+                   ChatActivity.class);
+                 intent.putExtras(bundle);
+                    startActivity(intent);
+                    Toast.makeText(AskChatActivity.this
+                            ,"successful",Toast.LENGTH_SHORT).show();
+                }else{
+                   Toast.makeText(AskChatActivity.this
+                           ,e.getMessage()+"("+e.getErrorCode()+")",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 }

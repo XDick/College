@@ -55,16 +55,16 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                 .inflate(R.layout.item_dynamics,parent,false);
         final ViewHolder holder = new ViewHolder(view);
 
-        holder.username.setOnClickListener(new View.OnClickListener(){
+       /* holder.username.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-              /*  int position = holder.getAdapterPosition();
-                Dynamics dynamics = mDynamicsList.get(position);*/
+              *//*  int position = holder.getAdapterPosition();
+                Dynamics dynamics = mDynamicsList.get(position);*//*
                 Intent intent = new Intent(mContext , AskChatActivity.class);
                 mContext.startActivity(intent);
 
             }
-        });
+        });*/
 
 
            return holder;

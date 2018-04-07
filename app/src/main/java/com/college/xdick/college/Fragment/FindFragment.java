@@ -13,9 +13,15 @@ import android.view.ViewGroup;
 import com.college.xdick.college.R;
 import com.college.xdick.college.IM_util.Friend;
 import com.college.xdick.college.IM_util.FriendAdapter;
+import com.college.xdick.college.util.User;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 
 /**
  * Created by Administrator on 2018/4/2.
@@ -29,6 +35,22 @@ public class FindFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootview =inflater.inflate(R.layout.fragment_find,container,false);
         initRecyclerView();
+       final Friend friend = new Friend();
+         User user1 = new User();
+         user1.setUsername("SUGAR");
+        friend.setFriendUser(user1);
+        friendList.add(friend);
+
+        User user2 = new User();
+        user2.setUsername("李凯凯");
+        friend.setFriendUser(user2);
+        friendList.add(friend);
+
+        User user3 = new User();
+        user3.setUsername("a");
+        friend.setFriendUser(user3);
+        friendList.add(friend);
+
 
         return rootview;
 

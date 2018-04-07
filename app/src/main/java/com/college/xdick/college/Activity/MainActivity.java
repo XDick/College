@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         getListData();
         initView();
         replaceFragment(new MainFragment());
-        //IMconnectBomob();
 
 
     }
