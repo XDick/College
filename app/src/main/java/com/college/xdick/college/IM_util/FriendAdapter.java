@@ -24,7 +24,7 @@ import cn.bmob.v3.listener.FindListener;
 
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder> {
 
-    private List<FriendList> mFriendList;
+    private List<Friend> mFriendList;
     private Context mContext;
     private String userId;
 
@@ -44,7 +44,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     }
 
 
-    public FriendAdapter(List<FriendList> friend){
+    public FriendAdapter(List<Friend> friend){
         mFriendList = friend;
     }
 
@@ -63,8 +63,8 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
             @Override
             public void onClick(View v){
                 int position = holder.getAdapterPosition();
-               FriendList friend = mFriendList.get(position);
-                String myFriendName=friend.getName();
+               Friend friend = mFriendList.get(position);
+                String myFriendName=friend.getUser().getUsername();
                 String FriendID = getFriendId(myFriendName);
                 Intent intent = new Intent(mContext , AskChatActivity.class);
                 intent.putExtra("FRIEND_ID",FriendID);
@@ -79,9 +79,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(FriendAdapter.ViewHolder holder, int position) {
-        FriendList friendList = mFriendList.get(position);
+        Friend friendList = mFriendList.get(position);
 
-        String friendName=friendList.getName();
+        String friendName=friendList.getUser().getUsername();
         holder.friendNameTextView.setText(friendName);
 
 

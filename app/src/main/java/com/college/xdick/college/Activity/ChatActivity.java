@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -33,6 +34,7 @@ import cn.bmob.newim.core.BmobIMClient;
 import cn.bmob.newim.event.MessageEvent;
 import cn.bmob.newim.listener.MessageListHandler;
 import cn.bmob.newim.listener.MessageSendListener;
+import cn.bmob.newim.listener.MessagesQueryListener;
 import cn.bmob.newim.notification.BmobNotificationManager;
 import cn.bmob.v3.exception.BmobException;
 
@@ -47,7 +49,9 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
     private Button send;
     private MsgAdapter adapter;
     private Toolbar toolbar;
-    BmobIMConversation conversation;
+    private BmobIMConversation conversation;
+   private LinearLayoutManager layoutManager;
+   private TextView title ;
 
     private List<BmobIMMessage> msgList = new ArrayList<>();
 
@@ -55,25 +59,33 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
-
         BaseIMoperation();
+
         initView();
 
-
+        initAllChattingRecord();
 
     }
-
+   /* @Override
+    public void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        //Toolbar 必须在onCreate()之后设置标题文本，否则默认标签将覆盖我们的设置
+        if (toolbar != null) {
+            toolbar.setTitle(conversation.getConversationTitle());
+        }
+    }*/
 
     private void initView(){
 
 
         toolbar = findViewById(R.id.toolbar_chat);
         setSupportActionBar(toolbar);
+        title = findViewById(R.id.title_chat);
+        title.setText(conversation.getConversationTitle());
         inputText = findViewById(R.id.input_text);
         send = findViewById(R.id.send);
         msgRecyclerView = findViewById(R.id.msg_recycler_view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager = new LinearLayoutManager(this);
         msgRecyclerView.setLayoutManager(layoutManager);
         adapter = new MsgAdapter(msgList);
         msgRecyclerView.setAdapter(adapter);
@@ -152,6 +164,7 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
         BmobIM.getInstance().addMessageListHandler(this);
         // 有可能锁屏期间，在聊天界面出现通知栏，这时候需要清除通知
         BmobNotificationManager.getInstance(this).cancelNotification();
+
         super.onResume();
     }
 
@@ -190,6 +203,27 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
         super.onPause();
     }
 
+
+    private void initAllChattingRecord(){
+        //首次加载，可设置msg为null，下拉刷新的时候，可用消息表的第一个msg作为刷新的起始时间点，默认按照消息时间的降序排列
+//TODO 消息：5.2、查询指定会话的消息记录
+        conversation.queryMessages(null,20,new MessagesQueryListener() {
+            @Override
+            public void done(List<BmobIMMessage> list, BmobException e) {
+                //sw_refresh.setRefreshing(false);
+                if (e == null) {
+                    if (null != list && list.size() > 0) {
+                        adapter.addMessages(list);
+                        adapter.notifyDataSetChanged();
+                        layoutManager.scrollToPositionWithOffset(list.size() - 1, 0);
+                    }
+                } else {
+                   // toast(e.getMessage() + "(" + e.getErrorCode() + ")");
+                }
+            }
+        });
+
+    }
 
 }
 

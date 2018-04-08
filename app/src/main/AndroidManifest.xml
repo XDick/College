@@ -28,6 +28,8 @@
 
 
 
+
+
     <application
         android:name=".IM_util.BmobIMApplication"
         android:allowBackup="true"
