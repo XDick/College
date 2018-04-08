@@ -54,12 +54,14 @@ public class AskChatActivity extends Activity {
         });
     }
 
-    /**
-     * 发送添加好友的请求a
-     */
-    //TODO 好友管理：9.7、发送添加好友请求
+
     private void startChatting() {
-        BmobIM.getInstance().startPrivateConversation( new BmobIMUserInfo("4d820b1379","a",""), new ConversationListener() {
+
+        Intent intent = getIntent();
+         String id = intent . getStringExtra("FRIEND_ID");
+        String name = intent . getStringExtra("FRIEND_NAME");
+
+        BmobIM.getInstance().startPrivateConversation( new BmobIMUserInfo(id,name,""), new ConversationListener() {
             @Override
             public void done(BmobIMConversation c, BmobException e) {
                 if(e==null){

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.college.xdick.college.Activity.AskChatActivity;
 import com.college.xdick.college.R;
@@ -23,10 +24,10 @@ import cn.bmob.v3.listener.FindListener;
 
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder> {
 
-    private List<Friend> mFriendList;
+    private List<FriendList> mFriendList;
     private Context mContext;
-    private String  friendName;
     private String userId;
+
 
 
     static class ViewHolder extends RecyclerView.ViewHolder{
@@ -43,7 +44,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     }
 
 
-    public FriendAdapter(List<Friend> friend){
+    public FriendAdapter(List<FriendList> friend){
         mFriendList = friend;
     }
 
@@ -62,11 +63,15 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
             @Override
             public void onClick(View v){
                 int position = holder.getAdapterPosition();
-               Friend friend = mFriendList.get(position);
-
+               FriendList friend = mFriendList.get(position);
+                String myFriendName=friend.getName();
+                String FriendID = getFriendId(myFriendName);
                 Intent intent = new Intent(mContext , AskChatActivity.class);
-                intent.putExtra("ID",userId);
+                intent.putExtra("FRIEND_ID",FriendID);
+                intent.putExtra("FRIEND_NAME",myFriendName);
+                Toast.makeText(mContext,"你在和"+myFriendName+"聊天,ID:"+FriendID,Toast.LENGTH_SHORT).show();
                 mContext.startActivity(intent);
+
             }
         });
         return holder;
@@ -74,8 +79,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(FriendAdapter.ViewHolder holder, int position) {
-        Friend friend = mFriendList.get(position);
-        friendName=friend.getFriendUser().getUsername();
+        FriendList friendList = mFriendList.get(position);
+
+        String friendName=friendList.getName();
         holder.friendNameTextView.setText(friendName);
 
 
@@ -87,9 +93,10 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     }
 
 
-    public String getFriendInfo(){
+    public String getFriendId(String friendName){
         BmobQuery<BmobUser> query = new BmobQuery<BmobUser>();
-        query.addWhereEqualTo("username", friendName);
+
+        query.addWhereEqualTo("username",  friendName);
         query.findObjects(new FindListener<BmobUser>() {
             @Override
             public void done(List<BmobUser> object,BmobException e) {
@@ -105,7 +112,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
             }
         });
 
-      return userId;
+return  userId;
 
     }
 }
