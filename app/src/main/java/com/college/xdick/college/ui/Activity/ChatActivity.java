@@ -1,7 +1,7 @@
-package com.college.xdick.college.Activity;
+package com.college.xdick.college.ui.Activity;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,16 +9,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.college.xdick.college.IM_util.MsgAdapter;
+import com.college.xdick.college.adapter.MsgAdapter;
 import com.college.xdick.college.R;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +25,6 @@ import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMTextMessage;
-import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.newim.core.BmobIMClient;
 import cn.bmob.newim.event.MessageEvent;
 import cn.bmob.newim.listener.MessageListHandler;
@@ -145,6 +140,9 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
 
     @Override
     public void onMessageReceive(List<MessageEvent> list) {
+
+        //BmobNotificationManager.getInstance(this).showNotification(null,conversation.getConversationTitle() , null, null,new Intent(ChatActivity.this,ChatActivity.class));
+
         //当注册页面消息监听时候，有消息（包含离线消息）到来时会回调该方法
         for (int i = 0; i < list.size(); i++) {
             addMessage2Chat(list.get(i));

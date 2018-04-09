@@ -1,7 +1,7 @@
 package com.college.xdick.college.IM_util;
 
 
-import com.college.xdick.college.util.User;
+import com.college.xdick.college.bean.User;
 
 import cn.bmob.newim.listener.BmobListener1;
 import cn.bmob.v3.exception.BmobException;

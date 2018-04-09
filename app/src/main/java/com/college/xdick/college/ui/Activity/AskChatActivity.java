@@ -1,4 +1,4 @@
-package com.college.xdick.college.Activity;
+package com.college.xdick.college.ui.Activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.college.xdick.college.R;
-import com.college.xdick.college.util.User;
+import com.college.xdick.college.bean.User;
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMConversation;

@@ -1,4 +1,4 @@
-package com.college.xdick.college.util;
+package com.college.xdick.college.bean;
 
 import java.io.Serializable;
 

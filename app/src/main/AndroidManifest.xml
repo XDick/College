@@ -66,15 +66,15 @@
             android:value="b689cf6ecc75e3fafd3588b88ede6fcc" />
 
 
-    <activity android:name=".Activity.MainActivity"/>
-        <activity android:name=".Activity.LoginActivity"/>
-        <activity android:name=".Activity.SignupActivity"/>
-        <activity android:name=".Activity.DynamicsActivity"/>
-        <activity android:name=".Activity.ChatActivity"/>
-        <activity android:name=".Activity.AskChatActivity"
+    <activity android:name=".ui.Activity.MainActivity"/>
+        <activity android:name=".ui.Activity.LoginActivity"/>
+        <activity android:name=".ui.Activity.SignupActivity"/>
+        <activity android:name=".ui.Activity.DynamicsActivity"/>
+        <activity android:name=".ui.Activity.ChatActivity"/>
+        <activity android:name=".ui.Activity.AskChatActivity"
             android:theme="@style/DialogActivity"/>
 
-        <activity android:name=".Activity.SplashActivity">
+        <activity android:name=".ui.Activity.SplashActivity">
 
         <intent-filter >
             <action android:name="android.intent.action.MAIN" />

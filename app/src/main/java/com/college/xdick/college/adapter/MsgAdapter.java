@@ -1,11 +1,12 @@
-package com.college.xdick.college.IM_util;
+package com.college.xdick.college.adapter;
 
 import android.content.Context;
+import android.nfc.Tag;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -14,12 +15,16 @@ import com.college.xdick.college.R;
 import java.util.Arrays;
 import java.util.List;
 
+import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMMessageType;
+import cn.bmob.newim.bean.BmobIMUserInfo;
+import cn.bmob.newim.listener.MessagesQueryListener;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
 
-import static cn.bmob.newim.core.BmobIMClient.getContext;
+import static org.greenrobot.eventbus.EventBus.TAG;
 
 /**
  * Created by Administrator on 2018/4/4 0004.
@@ -142,7 +147,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
 
         LinearLayout leftLayout,rightLayout;
 
-        TextView leftMsg,rightMsg;
+        TextView leftMsg,rightMsg,time;
 
 
 
@@ -153,6 +158,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
             rightLayout = view.findViewById(R.id.right_layout);
             leftMsg = view. findViewById(R.id.left_msg);
             rightMsg = view.findViewById(R.id.right_msg);
+            time=view.findViewById(R.id.msg_time);
         }
     }
 
@@ -165,7 +171,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_msg,
                 parent,false);
-
+        currentUid = BmobUser.getCurrentUser().getObjectId();
         return new ViewHolder(view);
     }
 
@@ -173,15 +179,30 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         BmobIMMessage msg = mMsgList.get(position);
-        holder.leftLayout.setVisibility(View.GONE);
-        holder.rightMsg.setVisibility(View.VISIBLE);
-        holder.rightMsg.setText(msg.getContent());
-    }
+      //String createTime =  String.valueOf(msg.getCreateTime());
+      // holder.time.setText(createTime);
+      // BmobIMConversation conversation =msg.getBmobIMConversation();
+       // BmobIMUserInfo info = new BmobIMUserInfo(conversation.getConversationId(),conversation.getConversationTitle(),null);
+
+        if(msg.getFromId().equals( currentUid)){
+            holder.leftLayout.setVisibility(View.GONE);
+            holder.rightMsg.setVisibility(View.VISIBLE);
+            holder.rightMsg.setText(msg.getContent());
+
+        }
+        else {
+
+            holder.rightLayout.setVisibility(View.GONE);
+            holder.leftMsg.setVisibility(View.VISIBLE);
+            holder.leftMsg.setText(msg.getContent());
+        }}
+
 
     @Override
     public int getItemCount() {
         return mMsgList.size();
     }
+
 
 
 

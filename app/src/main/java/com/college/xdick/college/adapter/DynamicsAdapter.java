@@ -1,4 +1,4 @@
-package com.college.xdick.college.util;
+package com.college.xdick.college.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,8 +9,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.college.xdick.college.Activity.AskChatActivity;
+import com.college.xdick.college.ui.Activity.AskChatActivity;
 import com.college.xdick.college.R;
+import com.college.xdick.college.bean.Dynamics;
 
 import java.util.List;
 
@@ -65,7 +66,8 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                 int position = holder.getAdapterPosition();
                 Dynamics dynamics = mDynamicsList.get(position);
                 String myFriendName= dynamics.getUser();
-                String FriendID = getFriendId(myFriendName);
+               getFriendId(myFriendName);
+                String FriendID = userId;
                 Intent intent = new Intent(mContext , AskChatActivity.class);
                 intent.putExtra("FRIEND_ID",FriendID);
                 intent.putExtra("FRIEND_NAME",myFriendName);
@@ -97,9 +99,8 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
 
 
-    public String getFriendId(String friendName){
+    public void getFriendId(String friendName){
         BmobQuery<BmobUser> query = new BmobQuery<BmobUser>();
-
         query.addWhereEqualTo("username",  friendName);
         query.findObjects(new FindListener<BmobUser>() {
             @Override
@@ -107,16 +108,17 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                 if(e==null){
                     for(BmobUser user :object){
                         userId= user.getObjectId();
+                        Toast.makeText(mContext,"找到ID："+userId,Toast.LENGTH_SHORT).show();
                     }
 
                 }
                 else{
-
+                       Toast.makeText(mContext,e.getMessage(),Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        return  userId;
+
 
     }
 }

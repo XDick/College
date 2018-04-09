@@ -1,6 +1,10 @@
 package com.college.xdick.college.IM_util;
 
 import android.content.Context;
+import android.content.Intent;
+
+import com.college.xdick.college.ui.Activity.ChatActivity;
+import com.college.xdick.college.ui.Activity.MainActivity;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -48,6 +52,14 @@ public class MyMessageHandler extends BmobIMMessageHandler {
                 }else{//SDK内部内部支持的消息类型
                     if (BmobNotificationManager.getInstance(context).isShowNotification()){
                         //如果需要显示通知栏，可以使用BmobNotificationManager类提供的方法，也可以自己写通知栏显示方法
+                        BmobNotificationManager.getInstance(context).showNotification(null,"新消息" , null, null,new Intent(context,MainActivity.class));
+
+     /*   for(MessageEvent messageEvent:list){
+            BmobNotificationManager.getInstance(this)
+                    .showNotification(null,
+                            messageEvent.getMessage().getBmobIMConversation().getConversationTitle() ,
+                            messageEvent.getMessage().getContent(), null,new Intent(MainActivity.this,MainActivity.class));
+                    }   */
                     }else{//直接发送消息事件
                         //Logger.i("当前处于应用内，发送event");
                         EventBus.getDefault().post(event);
@@ -65,6 +77,7 @@ public class MyMessageHandler extends BmobIMMessageHandler {
     public void onOfflineReceive(final OfflineMessageEvent event) {
         //每次调用connect方法时会查询一次离线消息，如果有，此方法会被调用
         Map<String,List<MessageEvent>> map =event.getEventMap();
+        //BmobNotificationManager.getInstance(context).showNotification(null,"新消息" , null, null,new Intent(context,MainActivity.class));
         //Logger.i("离线消息属于"+map.size()+"个用户");
         for (Map.Entry<String, List<MessageEvent>> entry : map.entrySet()) {
             List<MessageEvent> list =entry.getValue();

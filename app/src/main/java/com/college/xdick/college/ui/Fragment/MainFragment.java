@@ -1,4 +1,4 @@
-package com.college.xdick.college.Fragment;
+package com.college.xdick.college.ui.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,13 +25,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.college.xdick.college.Activity.DynamicsActivity;
-import com.college.xdick.college.Activity.LoginActivity;
-import com.college.xdick.college.Activity.MainActivity;
+import com.college.xdick.college.ui.Activity.DynamicsActivity;
+import com.college.xdick.college.ui.Activity.LoginActivity;
+import com.college.xdick.college.ui.Activity.MainActivity;
 import com.college.xdick.college.R;
-import com.college.xdick.college.util.Dynamics;
-import com.college.xdick.college.util.DynamicsAdapter;
-import com.college.xdick.college.util.User;
+import com.college.xdick.college.bean.Dynamics;
+import com.college.xdick.college.adapter.DynamicsAdapter;
+import com.college.xdick.college.bean.User;
 
 import java.util.ArrayList;
 import java.util.Collections;

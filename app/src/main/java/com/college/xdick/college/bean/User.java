@@ -1,4 +1,4 @@
-package com.college.xdick.college.util;
+package com.college.xdick.college.bean;
 
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;

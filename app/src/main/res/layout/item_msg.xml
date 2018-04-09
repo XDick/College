@@ -5,6 +5,12 @@
     android:orientation="vertical"
     android:padding="10dp">
 
+       <TextView
+          android:id="@+id/msg_time"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_gravity="center"/>
+
     <LinearLayout
         android:id="@+id/left_layout"
         android:layout_height="wrap_content"

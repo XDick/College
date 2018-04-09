@@ -1,21 +1,19 @@
-package com.college.xdick.college.Activity;
+package com.college.xdick.college.ui.Activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.college.xdick.college.R;
-import com.college.xdick.college.util.Dynamics;
-import com.college.xdick.college.util.User;
+import com.college.xdick.college.bean.Dynamics;
+import com.college.xdick.college.bean.User;
 
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;

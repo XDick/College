@@ -1,4 +1,4 @@
-package com.college.xdick.college.Activity;
+package com.college.xdick.college.ui.Activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,14 +9,13 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.college.xdick.college.R;
-import com.college.xdick.college.util.Dynamics;
+import com.college.xdick.college.bean.Dynamics;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;

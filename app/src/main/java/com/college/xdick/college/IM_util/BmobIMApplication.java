@@ -38,7 +38,7 @@ public class BmobIMApplication extends Application {
             Bmob.initialize(this, "b689cf6ecc75e3fafd3588b88ede6fcc");
             //Bmob 服务器的初始化也放在Application
             BmobIM.init(this);
-            BmobIM.registerDefaultMessageHandler(new MyMessageHandler());
+            BmobIM.registerDefaultMessageHandler(new MyMessageHandler(this));
         }
     }
 

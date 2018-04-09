@@ -1,50 +1,30 @@
-package com.college.xdick.college.Activity;
+package com.college.xdick.college.ui.Activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.ashokvarma.bottomnavigation.TextBadgeItem;
-import com.college.xdick.college.Fragment.FindFragment;
-import com.college.xdick.college.Fragment.MainFragment;
-import com.college.xdick.college.Fragment.UserFragment;
+import com.college.xdick.college.ui.Fragment.FindFragment;
+import com.college.xdick.college.ui.Fragment.MainFragment;
+import com.college.xdick.college.ui.Fragment.UserFragment;
 import com.college.xdick.college.R;
-import com.college.xdick.college.util.Dynamics;
-import com.college.xdick.college.util.User;
+import com.college.xdick.college.bean.Dynamics;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import cn.bmob.newim.BmobIM;
-import cn.bmob.newim.listener.ConnectListener;
-import cn.bmob.v3.Bmob;
-import cn.bmob.v3.BmobUser;
-import cn.bmob.v3.exception.BmobException;
+import cn.bmob.newim.event.MessageEvent;
+import cn.bmob.newim.listener.MessageListHandler;
+import cn.bmob.newim.notification.BmobNotificationManager;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
 
     private BottomNavigationBar mBottomNavigationBar;
@@ -145,8 +125,18 @@ public class MainActivity extends AppCompatActivity {
     }*/
 
 
+    @Override
+    protected void onResume() {
+
+        //进入应用后，通知栏应取消
+        BmobNotificationManager.getInstance(this).cancelNotification();
+        super.onResume();
+    }
 
 
 
 
-}
+
+
+
+    }

@@ -1,6 +1,5 @@
-package com.college.xdick.college.Fragment;
+package com.college.xdick.college.ui.Fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,9 +10,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.college.xdick.college.Activity.LoginActivity;
 import com.college.xdick.college.R;
-import com.college.xdick.college.util.User;
+import com.college.xdick.college.bean.User;
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.v3.BmobUser;

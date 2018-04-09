@@ -3,12 +3,12 @@ package com.college.xdick.college.IM_util;
 import android.text.TextUtils;
 
 
-import com.college.xdick.college.util.User;
+import com.college.xdick.college.bean.Friend;
+import com.college.xdick.college.bean.User;
 
 import java.util.List;
 
 
-import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMUserInfo;

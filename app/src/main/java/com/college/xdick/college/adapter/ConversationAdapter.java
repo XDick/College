@@ -1,4 +1,4 @@
-package com.college.xdick.college.IM_util;
+package com.college.xdick.college.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,8 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.college.xdick.college.Activity.AskChatActivity;
-import com.college.xdick.college.Activity.ChatActivity;
+import com.college.xdick.college.ui.Activity.ChatActivity;
 import com.college.xdick.college.R;
 
 import java.util.List;

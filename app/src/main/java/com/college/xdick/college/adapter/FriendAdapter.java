@@ -1,5 +1,5 @@
 
-package com.college.xdick.college.IM_util;
+package com.college.xdick.college.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,13 +10,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.college.xdick.college.Activity.AskChatActivity;
+import com.college.xdick.college.bean.Friend;
+import com.college.xdick.college.ui.Activity.AskChatActivity;
 import com.college.xdick.college.R;
-import com.college.xdick.college.util.DynamicsAdapter;
 
 import java.util.List;
 
-import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;

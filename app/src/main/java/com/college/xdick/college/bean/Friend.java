@@ -1,6 +1,4 @@
-package com.college.xdick.college.IM_util;
-
-import com.college.xdick.college.util.User;
+package com.college.xdick.college.bean;
 
 import cn.bmob.v3.BmobObject;
 
