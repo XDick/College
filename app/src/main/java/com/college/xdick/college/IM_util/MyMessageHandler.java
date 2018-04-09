@@ -39,6 +39,13 @@ public class MyMessageHandler extends BmobIMMessageHandler {
 
     @Override
     public void onMessageReceive(final MessageEvent event) {
+
+
+            BmobNotificationManager.getInstance(context)
+                    .showNotification(null,
+                            event.getMessage().getBmobIMConversation().getConversationTitle() ,
+                            event.getMessage().getContent(), null,new Intent(context,MainActivity.class));
+
         //当接收到服务器发来的消息时，此方法被调用
         //可以统一在此检测更新会话及用户信息
         UserModel.getInstance().updateUserInfo(event, new UpdateCacheListener() {
@@ -52,13 +59,9 @@ public class MyMessageHandler extends BmobIMMessageHandler {
                 }else{//SDK内部内部支持的消息类型
                     if (BmobNotificationManager.getInstance(context).isShowNotification()){
                         //如果需要显示通知栏，可以使用BmobNotificationManager类提供的方法，也可以自己写通知栏显示方法
-                        BmobNotificationManager.getInstance(context).showNotification(null,"新消息" , null, null,new Intent(context,MainActivity.class));
 
-     /*   for(MessageEvent messageEvent:list){
-            BmobNotificationManager.getInstance(this)
-                    .showNotification(null,
-                            messageEvent.getMessage().getBmobIMConversation().getConversationTitle() ,
-                            messageEvent.getMessage().getContent(), null,new Intent(MainActivity.this,MainActivity.class));
+
+     /*
                     }   */
                     }else{//直接发送消息事件
                         //Logger.i("当前处于应用内，发送event");

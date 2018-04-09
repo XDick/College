@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
@@ -20,15 +21,17 @@ import com.college.xdick.college.bean.Dynamics;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.event.MessageEvent;
 import cn.bmob.newim.listener.MessageListHandler;
 import cn.bmob.newim.notification.BmobNotificationManager;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity implements MessageListHandler {
 
 
     private BottomNavigationBar mBottomNavigationBar;
     private List<Dynamics>  dynamicsList = new ArrayList<>();
+    private TextBadgeItem mBadgeItem;
 
 
     @Override
@@ -52,8 +55,14 @@ public class MainActivity extends AppCompatActivity  {
 
 
     public void setBottomNav() {
-        TextBadgeItem mBadgeItem = new TextBadgeItem().setBackgroundColor(Color.RED).setText("99");
-        ;
+     mBadgeItem = new TextBadgeItem().setBorderWidth(4)
+                .setAnimationDuration(200)
+                .setBackgroundColorResource(R.color.red)
+                .setHideOnSelect(false)
+                .hide();
+
+
+
         mBottomNavigationBar.setMode(BottomNavigationBar.MODE_FIXED);
         mBottomNavigationBar.setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC);
         // mBottomNavigationBar.setInActiveColor("#FFFFFF");
@@ -61,7 +70,7 @@ public class MainActivity extends AppCompatActivity  {
         // mBottomNavigationBar.setBarBackgroundColor(R.color.colorPrimaryDark);
 
         mBottomNavigationBar.addItem(new BottomNavigationItem(R.drawable.main, "首页").setActiveColor(R.color.colorPrimary))
-                .addItem(new BottomNavigationItem(R.drawable.find, "发现").setActiveColor(R.color.colorPrimary))
+                .addItem(new BottomNavigationItem(R.drawable.find, "发现").setActiveColor(R.color.colorPrimary).setBadgeItem(mBadgeItem))
                 .addItem(new BottomNavigationItem(R.drawable.user, "我").setActiveColor(R.color.colorPrimary))
                 .setFirstSelectedPosition(0)
                 .initialise();
@@ -127,16 +136,32 @@ public class MainActivity extends AppCompatActivity  {
 
     @Override
     protected void onResume() {
-
+        setBadgeItem();
+        BmobIM.getInstance().addMessageListHandler(this);
         //进入应用后，通知栏应取消
         BmobNotificationManager.getInstance(this).cancelNotification();
         super.onResume();
     }
 
-
-
-
-
-
-
+    @Override
+    protected void onPause() {
+        BmobIM.getInstance().removeMessageListHandler(this);
+        super.onPause();
     }
+
+    @Override
+    public void onMessageReceive(List<MessageEvent> list) {
+
+        setBadgeItem();
+    }
+
+
+    public void setBadgeItem(){
+        long num = BmobIM.getInstance().getAllUnReadCount();;
+       if(num ==0){
+           mBadgeItem.hide();
+       } else{mBadgeItem.show();
+        mBadgeItem.setText(String.valueOf(num));}
+    }
+
+}

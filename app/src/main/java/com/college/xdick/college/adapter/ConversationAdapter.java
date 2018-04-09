@@ -14,13 +14,20 @@ import android.widget.Toast;
 import com.college.xdick.college.ui.Activity.ChatActivity;
 import com.college.xdick.college.R;
 
+import org.greenrobot.eventbus.Subscribe;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMUserInfo;
+import cn.bmob.newim.event.MessageEvent;
+import cn.bmob.newim.event.OfflineMessageEvent;
 import cn.bmob.newim.listener.ConversationListener;
+import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 
 /**
@@ -37,7 +44,7 @@ public class ConversationAdapter extends RecyclerView.Adapter< ConversationAdapt
 
     static class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView title_TextView,content_TextView;
+        TextView title_TextView,content_TextView,time_TextView;
         LinearLayout linearLayout ;
 
 
@@ -47,6 +54,7 @@ public class ConversationAdapter extends RecyclerView.Adapter< ConversationAdapt
             title_TextView = view.findViewById(R.id.title_find);
             content_TextView = view.findViewById(R.id.content_find);
             linearLayout = view.findViewById(R.id.parent_conversation);
+            time_TextView=view.findViewById(R.id.conversation_time);
 
         }
     }
@@ -101,17 +109,43 @@ public class ConversationAdapter extends RecyclerView.Adapter< ConversationAdapt
 
     @Override
     public void onBindViewHolder( ConversationAdapter.ViewHolder holder, int position) {
-       BmobIMConversation conversation = ConversationList.get(position);
-
+         BmobIMConversation conversation = ConversationList.get(position);
+         long count =BmobIM.getInstance().getUnReadCount(conversation.getConversationId());
         String title=conversation.getConversationTitle();
         List<BmobIMMessage> content= conversation.getMessages();
+
+
+        long t=Long.valueOf(conversation.getUpdateTime());
+        SimpleDateFormat sdf= new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        String time = sdf.format(new Date(t));//long转化成Date
+
+
         holder.title_TextView.setText(title);
 
        for(BmobIMMessage str : content){
         holder.content_TextView.setText(str.getContent());
-        break;
-    }}
+        break;}
+        holder. time_TextView.setText(time);
+
+            if(count!=0){
+                holder.title_TextView.setText(title+"<"+count+">");
+                holder.title_TextView.setBackgroundResource(R.color.red);
+            }
+
+
+    }
 
     @Override
     public int getItemCount() {
-        return ConversationList.size();}}
+        return ConversationList.size();}
+
+
+
+
+
+
+
+
+
+
+}

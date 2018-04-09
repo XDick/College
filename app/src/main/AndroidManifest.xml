@@ -70,7 +70,8 @@
         <activity android:name=".ui.Activity.LoginActivity"/>
         <activity android:name=".ui.Activity.SignupActivity"/>
         <activity android:name=".ui.Activity.DynamicsActivity"/>
-        <activity android:name=".ui.Activity.ChatActivity"/>
+        <activity android:name=".ui.Activity.ChatActivity"
+         />
         <activity android:name=".ui.Activity.AskChatActivity"
             android:theme="@style/DialogActivity"/>
 

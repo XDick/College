@@ -6,7 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -53,6 +55,7 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_chat);
         BaseIMoperation();
 
@@ -78,6 +81,12 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
         title = findViewById(R.id.title_chat);
         title.setText(conversation.getConversationTitle());
         inputText = findViewById(R.id.input_text);
+        inputText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                msgRecyclerView.scrollToPosition(msgList.size()-1);
+            }
+        });
         send = findViewById(R.id.send);
         msgRecyclerView = findViewById(R.id.msg_recycler_view);
         layoutManager = new LinearLayoutManager(this);
@@ -103,40 +112,40 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
 
 
     private void sendIMMsg(){
-        String content = inputText.getText().toString();
-        BmobIMTextMessage msg =new BmobIMTextMessage();
-        msg.setContent(content);
-     //可随意设置额外信息
-        Map<String,Object> map =new HashMap<>();
-        map.put("level", "1");
-        msg.setExtraMap(map);
-        conversation.sendMessage(msg, new MessageSendListener() {
-            @Override
-            public void onStart(BmobIMMessage msg) {
-                super.onStart(msg);
+      final  String content = inputText.getText().toString();
 
-               /* if(!"".equals(content)) {
-                    msg.setContent(content);*/
 
-                    msgRecyclerView.scrollToPosition(msgList.size()-1);
-                    msgList.add(msg);
-                    adapter.notifyItemInserted(msgList.size()-1);
+            BmobIMTextMessage msg = new BmobIMTextMessage();
+            msg.setContent(content);
+
+            conversation.sendMessage(msg, new MessageSendListener() {
+                @Override
+                public void onStart(BmobIMMessage msg) {
+                    super.onStart(msg);
+
+                    if (!"".equals(content)) {
+                        msg.setContent(content);
+                        msgRecyclerView.scrollToPosition(msgList.size() - 1);
+                        msgList.add(msg);
+                        adapter.notifyItemInserted(msgList.size() - 1);
+                        Log.d("a", "执行3");
+                    }
                     //当有新消息 刷新ListVIEW中的显示
                 }
 
-            @Override
-            public void done(BmobIMMessage msg, BmobException e) {
-                    msgRecyclerView.scrollToPosition(msgList.size()-1);
-                     adapter.notifyDataSetChanged();
+                @Override
+                public void done(BmobIMMessage msg, BmobException e) {
+                    msgRecyclerView.scrollToPosition(msgList.size() - 1);
+                    adapter.notifyDataSetChanged();
                     //讲ListView定位到最后一行
                     inputText.setText("");
-                if (e != null) {
-                   Toast.makeText(ChatActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                    if (e != null) {
+                        Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        }
 
-    }
 
     @Override
     public void onMessageReceive(List<MessageEvent> list) {
@@ -178,7 +187,7 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
             }
             msgRecyclerView.scrollToPosition(msgList.size()-1);
         } else {
-            //Logger.i("不是与当前聊天对象的消息");
+           Log.d("a","不是与当前聊天对象的消息");
         }
     }
 
@@ -205,7 +214,7 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
     private void initAllChattingRecord(){
         //首次加载，可设置msg为null，下拉刷新的时候，可用消息表的第一个msg作为刷新的起始时间点，默认按照消息时间的降序排列
 //TODO 消息：5.2、查询指定会话的消息记录
-        conversation.queryMessages(null,20,new MessagesQueryListener() {
+        conversation.queryMessages(null,999,new MessagesQueryListener() {
             @Override
             public void done(List<BmobIMMessage> list, BmobException e) {
                 //sw_refresh.setRefreshing(false);

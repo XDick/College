@@ -9,6 +9,7 @@ import com.college.xdick.college.bean.User;
 import java.util.List;
 
 
+import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMUserInfo;
@@ -198,11 +199,11 @@ public class UserModel extends BaseModel {
         final BmobIMUserInfo info = event.getFromUserInfo();
         final BmobIMMessage msg = event.getMessage();
         String username = info.getName();
-        String avatar = info.getAvatar();
+        //String avatar = info.getAvatar();
         String title = conversation.getConversationTitle();
         String icon = conversation.getConversationIcon();
         //SDK内部将新会话的会话标题用objectId表示，因此需要比对用户名和私聊会话标题，后续会根据会话类型进行判断
-      /*  if (!username.equals(title) || !avatar.equals(icon)) {
+      if (!username.equals(title)/* || !avatar.equals(icon)*/) {
             UserModel.getInstance().queryUserInfo(info.getUserId(), new QueryUserListener() {
                 @Override
                 public void done(User s, BmobException e) {
@@ -227,7 +228,7 @@ public class UserModel extends BaseModel {
             });
         } else {
             listener.done(null);
-        }*/
+        }
     }
 
 

@@ -12,7 +12,9 @@ import android.widget.TextView;
 
 import com.college.xdick.college.R;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import cn.bmob.newim.BmobIM;
@@ -31,43 +33,15 @@ import static org.greenrobot.eventbus.EventBus.TAG;
  */
 
 public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
-    //文本
-    private final int TYPE_RECEIVER_TXT = 0;
-    private final int TYPE_SEND_TXT = 1;
-    //图片
-    private final int TYPE_SEND_IMAGE = 2;
-    private final int TYPE_RECEIVER_IMAGE = 3;
-    //位置
-    private final int TYPE_SEND_LOCATION = 4;
-    private final int TYPE_RECEIVER_LOCATION = 5;
-    //语音
-    private final int TYPE_SEND_VOICE =6;
-    private final int TYPE_RECEIVER_VOICE = 7;
-    //视频
-    private final int TYPE_SEND_VIDEO =8;
-    private final int TYPE_RECEIVER_VIDEO = 9;
 
-    //同意添加好友成功后的样式
-    private final int TYPE_AGREE = 10;
 
-    /**
-     * 显示时间间隔:10分钟
-     */
-    private final long TIME_INTERVAL = 10 * 60 * 1000;
+
     private List<BmobIMMessage> mMsgList;
-    private String currentUid="";
+
     BmobIMConversation c;
 
 
-    public MsgAdapter(Context context,BmobIMConversation c) {
-        try {
-            currentUid = BmobUser.getCurrentUser().getObjectId();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        this.c =c;
 
-    }
 
 
     public int findPosition(BmobIMMessage message) {
@@ -122,25 +96,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
         return this.mMsgList == null?null:(position >= this.mMsgList.size()?null:this.mMsgList.get(position));
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        BmobIMMessage message = mMsgList.get(position);
-        if(message.getMsgType().equals(BmobIMMessageType.IMAGE.getType())){
-            return message.getFromId().equals(currentUid) ? TYPE_SEND_IMAGE: TYPE_RECEIVER_IMAGE;
-        }else if(message.getMsgType().equals(BmobIMMessageType.LOCATION.getType())){
-            return message.getFromId().equals(currentUid) ? TYPE_SEND_LOCATION: TYPE_RECEIVER_LOCATION;
-        }else if(message.getMsgType().equals(BmobIMMessageType.VOICE.getType())){
-            return message.getFromId().equals(currentUid) ? TYPE_SEND_VOICE: TYPE_RECEIVER_VOICE;
-        }else if(message.getMsgType().equals(BmobIMMessageType.TEXT.getType())){
-            return message.getFromId().equals(currentUid) ? TYPE_SEND_TXT: TYPE_RECEIVER_TXT;
-        }else if(message.getMsgType().equals(BmobIMMessageType.VIDEO.getType())){
-            return message.getFromId().equals(currentUid) ? TYPE_SEND_VIDEO: TYPE_RECEIVER_VIDEO;
-        }else if(message.getMsgType().equals("agree")) {//显示欢迎
-            return TYPE_AGREE;
-        }else{
-            return -1;
-        }
-    }
+
 
 
     static class ViewHolder extends RecyclerView.ViewHolder{
@@ -171,31 +127,43 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_msg,
                 parent,false);
-        currentUid = BmobUser.getCurrentUser().getObjectId();
         return new ViewHolder(view);
     }
 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        holder.leftLayout.setVisibility(View.VISIBLE);
+        holder.rightLayout.setVisibility(View.VISIBLE);
+
+        String currentUid="";
+        currentUid = BmobUser.getCurrentUser().getObjectId();
         BmobIMMessage msg = mMsgList.get(position);
-      //String createTime =  String.valueOf(msg.getCreateTime());
-      // holder.time.setText(createTime);
-      // BmobIMConversation conversation =msg.getBmobIMConversation();
-       // BmobIMUserInfo info = new BmobIMUserInfo(conversation.getConversationId(),conversation.getConversationTitle(),null);
+        Log.d(TAG,"位置:"+position+"消息是"+msg.getContent()+"id:"+msg.getFromId()+"当前ID"+currentUid);
+        long time=Long.valueOf(msg.getCreateTime());
+        SimpleDateFormat sdf= new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        String createTime = sdf.format(new Date(time));
+        holder.time.setText(createTime);
 
-        if(msg.getFromId().equals( currentUid)){
-            holder.leftLayout.setVisibility(View.GONE);
-            holder.rightMsg.setVisibility(View.VISIBLE);
+
+
+        if(msg.getFromId().equals(currentUid)) {
+
             holder.rightMsg.setText(msg.getContent());
+            holder.leftLayout.setVisibility(View.GONE);
 
-        }
-        else {
 
-            holder.rightLayout.setVisibility(View.GONE);
-            holder.leftMsg.setVisibility(View.VISIBLE);
+
+           Log.d(TAG,"左边消失，右边出现消息是"+msg.getContent()+"id:"+msg.getFromId()+"当前ID"+currentUid);
+       }
+       else {
+
             holder.leftMsg.setText(msg.getContent());
-        }}
+            holder.rightLayout.setVisibility(View.GONE);
+
+           Log.d(TAG,"右边消失，左边出现,消息是"+msg.getContent()+"id:"+msg.getFromId()+"当前ID"+currentUid);
+        }
+    }
 
 
     @Override
