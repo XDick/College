@@ -14,16 +14,12 @@ import android.widget.Toast;
 import com.college.xdick.college.adapter.ConversationAdapter;
 import com.college.xdick.college.R;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.event.MessageEvent;
-import cn.bmob.newim.event.OfflineMessageEvent;
 import cn.bmob.newim.listener.MessageListHandler;
 import cn.bmob.v3.BmobUser;
 
@@ -31,13 +27,13 @@ import cn.bmob.v3.BmobUser;
  * Created by Administrator on 2018/4/2.
  */
 
-public class FindFragment extends Fragment implements MessageListHandler {
+public class MessageFragment extends Fragment implements MessageListHandler {
     View rootview;
     private List<BmobIMConversation> conversationList = new ArrayList<>();
     private ConversationAdapter adapter;
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootview =inflater.inflate(R.layout.fragment_find,container,false);
+        rootview =inflater.inflate(R.layout.fragment_message,container,false);
         initAllConversation();
         initRecyclerView();
         return rootview;
@@ -46,7 +42,7 @@ public class FindFragment extends Fragment implements MessageListHandler {
     }
     private void initRecyclerView(){
 
-        RecyclerView recyclerView = rootview.findViewById(R.id.recyclerview_main);
+        RecyclerView recyclerView = rootview.findViewById(R.id.recyclerview_message);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new ConversationAdapter(conversationList);
@@ -56,16 +52,24 @@ public class FindFragment extends Fragment implements MessageListHandler {
     }
 
 
-    private void initAllConversation(){
-        if(BmobUser.getCurrentUser()!=null){
-        List<BmobIMConversation> list = BmobIM.getInstance().loadAllConversation();
-        for(BmobIMConversation c:list){
-            conversationList.add(c);
-        }}
-else{
-        Toast.makeText(getContext(),"请先登录",Toast.LENGTH_SHORT).show();}
-    }
+    private void initAllConversation() {
+        if (BmobUser.getCurrentUser() != null) {
+            List<BmobIMConversation> list = BmobIM.getInstance().loadAllConversation();
+            if (list != null) {
+                for (BmobIMConversation c : list) {
+                    conversationList.add(c);
+                }
 
+            }
+            else{
+               // Toast.makeText(getContext(), "检查网络", Toast.LENGTH_SHORT).show();
+            }
+            }
+            else
+                {
+            Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     public void onResume() {

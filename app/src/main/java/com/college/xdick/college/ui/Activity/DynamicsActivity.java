@@ -13,7 +13,8 @@ import android.widget.Toast;
 
 import com.college.xdick.college.R;
 import com.college.xdick.college.bean.Dynamics;
-import com.college.xdick.college.bean.User;
+import com.college.xdick.college.bean.MyUser;
+
 
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
@@ -64,7 +65,7 @@ public class DynamicsActivity extends AppCompatActivity {
                 Dynamics dynamics = new Dynamics();
                 dynamics.setContent(content);
                 dynamics.setTitle(title);
-                dynamics.setUser(BmobUser.getCurrentUser(User.class).getUsername());
+                dynamics.setUser(BmobUser.getCurrentUser(MyUser.class).getUsername());
                 dynamics.save(new SaveListener<String>() {
 
                 @Override

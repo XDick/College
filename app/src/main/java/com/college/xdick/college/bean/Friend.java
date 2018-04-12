@@ -8,23 +8,23 @@ import cn.bmob.v3.BmobObject;
 
 public class Friend extends BmobObject {
     //用户
-    private User user;
+    private MyUser user;
     //好友
-    private User friendUser;
+    private MyUser friendUser;
 
-    public User getUser() {
+    public MyUser getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(MyUser user) {
         this.user = user;
     }
 
-    public User getFriendUser() {
+    public MyUser getFriendUser() {
         return friendUser;
     }
 
-    public void setFriendUser(User friendUser) {
+    public void setFriendUser(MyUser friendUser) {
         this.friendUser = friendUser;
     }
 }

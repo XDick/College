@@ -1,5 +1,6 @@
 package com.college.xdick.college.ui.Activity;
 
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +10,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.college.xdick.college.R;
-import com.college.xdick.college.bean.Dynamics;
+
+import com.college.xdick.college.bean.MyActivity;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,7 +30,7 @@ import cn.bmob.v3.listener.FindListener;
 public class SplashActivity extends Activity {
     static boolean ifshow = true;
     private static final int sleepTime = 2000;
-   private List<Dynamics> dynamicsList= new ArrayList<>();
+   private List<MyActivity> acList= new ArrayList<>();
 
 
 
@@ -35,60 +38,50 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle arg0) {
         final View view = View.inflate(this, R.layout.activity_splash, null);
         setContentView(view);
-
-        if(!ifshow()){
-           startActivity(new Intent(SplashActivity.this,MainActivity.class));
-           finish();
-        }
-        if(ifshow){
-        initData();}
-
         super.onCreate(arg0);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        new Thread(new Runnable() {
-            public void run() {
-                long start = System.currentTimeMillis();
-                long costTime = System.currentTimeMillis() - start;
-                //等待sleeptime时长
-                if (sleepTime - costTime > 0) {
-                    try {
-                        Thread.sleep(sleepTime - costTime);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+        if(!ifshow()){
+            startActivity(new Intent(SplashActivity.this,MainActivity.class));
+            finish();
+        }
+       else{
+            initData();
+        }
 
-                ifshow= false;
-                //进入主页面
-               Intent intent = new Intent(SplashActivity.this,MainActivity.class);
-               List<Dynamics> list = dynamicsList;
-               intent.putExtra("LISTDATA",(Serializable) list);
-                startActivity(intent);
-                finish();
-            }
-        }).start();
+
+
+
     }
 
 
     private void initData(){
-        BmobQuery<Dynamics> query = new BmobQuery<Dynamics>();
+        ifshow= false;
+        //进入主页面
+        BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
 //返回50条数据，如果不加上这条语句，默认返回10条数据
         query.setLimit(99);
 //执行查询方法
-        query.findObjects(new FindListener<Dynamics>() {
+        query.findObjects(new FindListener<MyActivity>() {
             @Override
-            public void done(List<Dynamics> object, BmobException e) {
+            public void done(List<MyActivity> object, BmobException e) {
                 if(e==null){
-                    for (Dynamics dynamics : object) {
-                        dynamicsList.add(dynamics);}
-                    Collections.reverse(dynamicsList); // 倒序排列
+                    for (MyActivity ac : object) {
+                        acList.add(ac);}
+                    Collections.reverse(acList); // 倒序排列
+                    Intent intent = new Intent(SplashActivity.this,MainActivity.class);
+                    List<MyActivity> list = acList;
+                    intent.putExtra("LISTDATA",(Serializable) list);
+                    startActivity(intent);
+                    finish();
                     //Toast.makeText(SplashActivity.this,"成功接收内容",Toast.LENGTH_SHORT).show();
 
                 }else{
+                    Intent intent = new Intent(SplashActivity.this,MainActivity.class);
+                    startActivity(intent);
                     Toast.makeText(SplashActivity.this,"网络不佳",Toast.LENGTH_SHORT).show();
                 }
             }

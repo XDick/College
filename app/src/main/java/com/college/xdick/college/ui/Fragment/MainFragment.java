@@ -25,13 +25,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.college.xdick.college.bean.MyUser;
 import com.college.xdick.college.ui.Activity.DynamicsActivity;
 import com.college.xdick.college.ui.Activity.LoginActivity;
 import com.college.xdick.college.ui.Activity.MainActivity;
 import com.college.xdick.college.R;
 import com.college.xdick.college.bean.Dynamics;
 import com.college.xdick.college.adapter.DynamicsAdapter;
-import com.college.xdick.college.bean.User;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,25 +55,22 @@ public  class MainFragment extends Fragment {
     private DrawerLayout mDrawerLayout;
     private View headview;
     private TextView username;
-    private  User bmobUser = BmobUser.getCurrentUser(User.class);
+    private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
     static private List<Dynamics> dynamicsList= new ArrayList<>();
     private SwipeRefreshLayout swipeRefresh;
     private DynamicsAdapter adapter;
-    static private int flag,flag2 = 0;
+
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootview =inflater.inflate(R.layout.fragment_main,container,false);
 
-        if(flag==0){
-            FirstInitFromActivity();
-        }
+
         initBaseView();
         initRecyclerView();
         setHasOptionsMenu(true);
-        BmobCheckIfLogin();
-        IMconnectBomob();
+
 
         return rootview;
     }
@@ -86,11 +84,12 @@ public  class MainFragment extends Fragment {
 
 
 
-    private void initBaseView(){
-        Toolbar toolbar =rootview.findViewById(R.id.toolbar_main);
+    private void initBaseView() {
+        Toolbar toolbar = rootview.findViewById(R.id.toolbar_main);
+        toolbar.setTitle("");
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
-        swipeRefresh =rootview.findViewById(R.id.swipe_refresh_main);
+        swipeRefresh = rootview.findViewById(R.id.swipe_refresh_main);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -99,92 +98,17 @@ public  class MainFragment extends Fragment {
             }
         });
 
-        mDrawerLayout = rootview.findViewById(R.id.drawer_layout);
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeAsUpIndicator(R.drawable.drawer);
-        navigationView =rootview.findViewById(R.id.nav_view);
-        headview = navigationView.inflateHeaderView(R.layout.nav_header);
-        navigationView.inflateMenu(R.menu.nav_menu);
-        headview = navigationView.getHeaderView(0);
-        username =headview.findViewById(R.id.username);
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-
-             switch (item.getItemId()){
-
-                case R.id.me:
-
-                break;
-
-                default:
-                    break;
-
-             }
-
-                mDrawerLayout.closeDrawers();
-                return true;
-            }
-        });
-    }
-
-
-    private void showUserInfo(){
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                username.setText(bmobUser.getUsername());
-            }
-        });
-    }
-    private void exitUserInfo(){
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                username.setText("点击头像以登录");
-            }
-        });
     }
 
 
 
-    private void BmobCheckIfLogin(){
 
 
-        if(bmobUser != null){
-            showUserInfo();
 
-            headview.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent();
-                /* 开启Pictures画面Type设定为image */
-                    intent.setType("image/*");
-                /* 使用Intent.ACTION_GET_CONTENT这个Action */
-                    intent.setAction(Intent.ACTION_GET_CONTENT);
-                /* 取得相片后返回本画面 */
-                    startActivityForResult(intent, 1);
 
-                }}
 
-            );
 
-        }else{
-            headview.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view) {
-                    Intent intent =new Intent(getActivity(),LoginActivity.class);
-                    startActivity(intent);
-                    getActivity().finish();
-
-                }
-
-            });
-        }
-    }
 
 
     private void initRecyclerView(){
@@ -238,9 +162,7 @@ public  class MainFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
-            case android.R.id.home:
-                mDrawerLayout.openDrawer(GravityCompat.START);
-                break;
+
 
                 case R.id.add:
                     if(bmobUser!=null){
@@ -264,6 +186,7 @@ public  class MainFragment extends Fragment {
           @Override
           public void run() {
               try{
+                 
                   initData();
                   Thread.sleep(2000);
               }
@@ -283,46 +206,6 @@ public  class MainFragment extends Fragment {
     }
 
 
-    private  void FirstInitFromActivity(){
-        MainActivity activity = (MainActivity) getActivity();
-        if (activity.getListData().isEmpty()){
-            Toast.makeText(getContext(),"糟糕，没加载出来TAT",Toast.LENGTH_SHORT).show();
-        }
-        if(dynamicsList.isEmpty()){
-            dynamicsList = activity.getListData();
-        }
-        flag++;
-    }
 
-    private void IMconnectBomob() {
-
-        //TODO 连接：3.1、登录成功、注册成功或处于登录状态重新打开应用后执行连接IM服务器的操作
-
-        if (bmobUser != null) {
-            if (!TextUtils.isEmpty(bmobUser.getObjectId())) {
-
-                if(flag2==0){
-                BmobIM.connect(bmobUser.getObjectId(), new ConnectListener() {
-                    @Override
-                    public void done(String uid, BmobException e) {
-                        if (e == null) {
-
-                            Toast.makeText(getContext(), "连接成功", Toast.LENGTH_SHORT).show();
-                            flag2=1;
-                            //连接成功
-                        } else {
-                            //连接失败
-                            Toast.makeText(getContext(), "失败" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }}
-        }
-
-        else{
-
-            flag2=0;
-        }
-    }
 
 }

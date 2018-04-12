@@ -4,7 +4,8 @@ import android.text.TextUtils;
 
 
 import com.college.xdick.college.bean.Friend;
-import com.college.xdick.college.bean.User;
+import com.college.xdick.college.bean.MyUser;
+
 
 import java.util.List;
 
@@ -63,12 +64,12 @@ public class UserModel extends BaseModel {
             listener.done(null, new BmobException(CODE_NULL, "两次输入的密码不一致，请重新输入"));
             return;
         }
-        final User user = new User();
+        final MyUser user = new MyUser();
         user.setUsername(username);
         user.setPassword(password);
-        user.signUp(new SaveListener<User>() {
+        user.signUp(new SaveListener<MyUser>() {
             @Override
-            public void done(User user, BmobException e) {
+            public void done(MyUser user, BmobException e) {
                 if (e == null) {
                     listener.done(null, null);
                 } else {
@@ -94,12 +95,12 @@ public class UserModel extends BaseModel {
             listener.done(null, new BmobException(CODE_NULL, "请填写密码"));
             return;
         }
-        final User user = new User();
+        final MyUser user = new MyUser();
         user.setUsername(username);
         user.setPassword(password);
-        user.login(new SaveListener<User>() {
+        user.login(new SaveListener<MyUser>() {
             @Override
-            public void done(User user, BmobException e) {
+            public void done(MyUser user, BmobException e) {
                 if (e == null) {
                     listener.done(getCurrentUser(), null);
                 } else {
@@ -121,8 +122,8 @@ public class UserModel extends BaseModel {
      *
      * @return
      */
-    public User getCurrentUser() {
-        return BmobUser.getCurrentUser(User.class);
+    public MyUser getCurrentUser() {
+        return BmobUser.getCurrentUser(MyUser.class);
     }
 
 
@@ -133,8 +134,8 @@ public class UserModel extends BaseModel {
      * @param limit
      * @param listener
      */
-    public void queryUsers(String username, final int limit, final FindListener<User> listener) {
-        BmobQuery<User> query = new BmobQuery<>();
+    public void queryUsers(String username, final int limit, final FindListener<MyUser> listener) {
+        BmobQuery<MyUser> query = new BmobQuery<>();
         //去掉当前用户
         try {
             BmobUser user = BmobUser.getCurrentUser();
@@ -145,9 +146,9 @@ public class UserModel extends BaseModel {
         query.addWhereContains("username", username);
         query.setLimit(limit);
         query.order("-createdAt");
-        query.findObjects(new FindListener<User>() {
+        query.findObjects(new FindListener<MyUser>() {
             @Override
-            public void done(List<User> list, BmobException e) {
+            public void done(List<MyUser> list, BmobException e) {
                 if (e == null) {
                     if (list != null && list.size() > 0) {
                         listener.done(list, e);
@@ -168,12 +169,12 @@ public class UserModel extends BaseModel {
      * @param listener
      */
     public void queryUserInfo(String objectId, final QueryUserListener listener) {
-        BmobQuery<User> query = new BmobQuery<>();
+        BmobQuery<MyUser> query = new BmobQuery<>();
         query.addWhereEqualTo("objectId", objectId);
         query.findObjects(
-                new FindListener<User>() {
+                new FindListener<MyUser>() {
                     @Override
-                    public void done(List<User> list, BmobException e) {
+                    public void done(List<MyUser> list, BmobException e) {
                         if (e == null) {
 
                             if (list != null && list.size() > 0) {
@@ -206,7 +207,7 @@ public class UserModel extends BaseModel {
       if (!username.equals(title)/* || !avatar.equals(icon)*/) {
             UserModel.getInstance().queryUserInfo(info.getUserId(), new QueryUserListener() {
                 @Override
-                public void done(User s, BmobException e) {
+                public void done(MyUser s, BmobException e) {
                     if (e == null) {
                         String name = s.getUsername();
                         String avatar = s.getAvatar();
@@ -233,9 +234,9 @@ public class UserModel extends BaseModel {
 
 
     //TODO 好友管理：9.12、添加好友
-    public void agreeAddFriend(User friend, SaveListener<String> listener) {
+    public void agreeAddFriend(MyUser friend, SaveListener<String> listener) {
         Friend f = new Friend();
-        User user = BmobUser.getCurrentUser(User.class);
+        MyUser user = BmobUser.getCurrentUser(MyUser.class);
         f.setUser(user);
         f.setFriendUser(friend);
         f.save(listener);
@@ -249,7 +250,7 @@ public class UserModel extends BaseModel {
     //TODO 好友管理：9.2、查询好友
     public void queryFriends(final FindListener<Friend> listener) {
         BmobQuery<Friend> query = new BmobQuery<>();
-        User user = BmobUser.getCurrentUser(User.class);
+        MyUser user = BmobUser.getCurrentUser(MyUser.class);
         query.addWhereEqualTo("user", user);
         query.include("friendUser");
         query.order("-updatedAt");

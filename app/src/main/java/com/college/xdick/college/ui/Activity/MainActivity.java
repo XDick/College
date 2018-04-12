@@ -1,19 +1,25 @@
 package com.college.xdick.college.ui.Activity;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.ashokvarma.bottomnavigation.TextBadgeItem;
-import com.college.xdick.college.ui.Fragment.FindFragment;
+
+import com.college.xdick.college.bean.MyActivity;
+
+import com.college.xdick.college.bean.MyUser;
+import com.college.xdick.college.ui.Fragment.ActivityFragment;
+import com.college.xdick.college.ui.Fragment.MessageFragment;
 import com.college.xdick.college.ui.Fragment.MainFragment;
+import com.college.xdick.college.ui.Fragment.SearchFragment;
 import com.college.xdick.college.ui.Fragment.UserFragment;
 import com.college.xdick.college.R;
 import com.college.xdick.college.bean.Dynamics;
@@ -23,14 +29,17 @@ import java.util.List;
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.event.MessageEvent;
+import cn.bmob.newim.listener.ConnectListener;
 import cn.bmob.newim.listener.MessageListHandler;
 import cn.bmob.newim.notification.BmobNotificationManager;
+import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
 
 public class MainActivity extends AppCompatActivity implements MessageListHandler {
 
 
     private BottomNavigationBar mBottomNavigationBar;
-    private List<Dynamics>  dynamicsList = new ArrayList<>();
+    private List<MyActivity>  acList = new ArrayList<>();
     private TextBadgeItem mBadgeItem;
 
 
@@ -40,7 +49,8 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
         setContentView(R.layout.activity_main);
         getListData();
         initView();
-        replaceFragment(new MainFragment());
+        IMconnectBomob();
+        replaceFragment(new ActivityFragment());
 
 
     }
@@ -66,12 +76,14 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
         mBottomNavigationBar.setMode(BottomNavigationBar.MODE_FIXED);
         mBottomNavigationBar.setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC);
         // mBottomNavigationBar.setInActiveColor("#FFFFFF");
-        mBottomNavigationBar.setActiveColor(R.color.colorPrimaryDark);
+        mBottomNavigationBar.setActiveColor(R.color.colorPrimary);
         // mBottomNavigationBar.setBarBackgroundColor(R.color.colorPrimaryDark);
 
-        mBottomNavigationBar.addItem(new BottomNavigationItem(R.drawable.main, "首页").setActiveColor(R.color.colorPrimary))
-                .addItem(new BottomNavigationItem(R.drawable.find, "发现").setActiveColor(R.color.colorPrimary).setBadgeItem(mBadgeItem))
-                .addItem(new BottomNavigationItem(R.drawable.user, "我").setActiveColor(R.color.colorPrimary))
+        mBottomNavigationBar.addItem(new BottomNavigationItem(R.drawable.main, "首页"))
+                .addItem(new BottomNavigationItem( R.drawable.find,"发现"))
+                .addItem(new BottomNavigationItem(R.drawable.search, "搜索"))
+                .addItem(new BottomNavigationItem(R.drawable.message, "消息").setBadgeItem(mBadgeItem))
+                .addItem(new BottomNavigationItem(R.drawable.user, "我"))
                 .setFirstSelectedPosition(0)
                 .initialise();
 
@@ -80,13 +92,23 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
             public void onTabSelected(int position) {//未选中 -> 选中
                 switch (position) {
                     case 0:
-                        replaceFragment(new MainFragment());
+                        replaceFragment(new ActivityFragment());
                         break;
                     case 1:
-                        replaceFragment(new FindFragment());
+                        replaceFragment(new MainFragment());
+
                         break;
                     case 2:
+
+                        replaceFragment(new SearchFragment());
+                        break;
+                    case 3 :
+
+                        replaceFragment(new MessageFragment());
+                        break;
+                    case 4 :
                         replaceFragment(new UserFragment());
+
                         break;
                     default:
                         break;
@@ -115,10 +137,10 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
     }
 
 
-    public List<Dynamics> getListData(){
+    public List<MyActivity> getListData(){
         Intent intent= getIntent();
-        dynamicsList = (List<Dynamics>)intent.getSerializableExtra("LISTDATA");
-        return dynamicsList;
+       acList = (List<MyActivity>)intent.getSerializableExtra("LISTDATA");
+        return acList;
     }
 
 
@@ -133,6 +155,12 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
         }
     }*/
 
+    @Override
+    protected void onStart() {
+        setBadgeItem();
+        super.onStart();
+
+    }
 
     @Override
     protected void onResume() {
@@ -157,11 +185,35 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
 
 
     public void setBadgeItem(){
-        long num = BmobIM.getInstance().getAllUnReadCount();;
+        long num = BmobIM.getInstance().getAllUnReadCount();
        if(num ==0){
            mBadgeItem.hide();
        } else{mBadgeItem.show();
         mBadgeItem.setText(String.valueOf(num));}
+    }
+    private void IMconnectBomob() {
+
+        //TODO 连接：3.1、登录成功、注册成功或处于登录状态重新打开应用后执行连接IM服务器的操作
+        MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
+                    if (bmobUser != null) {
+                        if (!TextUtils.isEmpty(bmobUser.getObjectId())) {
+                    BmobIM.connect(bmobUser.getObjectId(), new ConnectListener() {
+                        @Override
+                        public void done(String uid, BmobException e) {
+                            if (e == null) {
+                                Toast.makeText(MainActivity.this, "连接成功", Toast.LENGTH_SHORT).show();
+                                //连接成功
+                            } else {
+                                //连接失败
+                                Toast.makeText(MainActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+        }
+
+
+
     }
 
 }

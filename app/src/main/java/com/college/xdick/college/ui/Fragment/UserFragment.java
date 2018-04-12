@@ -11,7 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.college.xdick.college.R;
-import com.college.xdick.college.bean.User;
+import com.college.xdick.college.bean.MyUser;
+
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.v3.BmobUser;
@@ -22,7 +23,7 @@ import cn.bmob.v3.BmobUser;
 
 public class UserFragment extends Fragment {
     private View rooview;
-    private User bmobUser = BmobUser.getCurrentUser(User.class);
+    private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
     TextView user;
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

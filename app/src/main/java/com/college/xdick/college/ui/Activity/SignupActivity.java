@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.college.xdick.college.R;
-import com.college.xdick.college.bean.User;
+import com.college.xdick.college.bean.MyUser;
 
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
@@ -42,13 +42,13 @@ public class SignupActivity  extends AppCompatActivity {
                 String password = passwordEdit.getText().toString();
                 String email = emailEdit.getText().toString();
 
-                BmobUser bu = new BmobUser();
+                MyUser bu = new MyUser();
                 bu.setUsername(account);
                 bu.setPassword(password);
                 bu.setEmail(email);
-                bu.signUp(new SaveListener<User>() {
+                bu.signUp(new SaveListener<MyUser>() {
                     @Override
-                    public void done(User s, BmobException e) {
+                    public void done(MyUser s, BmobException e) {
                         if(e==null){
                             Toast.makeText(SignupActivity.this,"注册成功", Toast.LENGTH_SHORT).show();
                             Intent intent =new Intent(SignupActivity.this,LoginActivity.class);

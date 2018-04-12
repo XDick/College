@@ -10,7 +10,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.college.xdick.college.R;
-import com.college.xdick.college.bean.User;
+import com.college.xdick.college.bean.MyUser;
+
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMConversation;
@@ -24,7 +25,7 @@ import cn.bmob.v3.exception.BmobException;
  */
 
 public class AskChatActivity extends Activity {
-    private User bmobUser = BmobUser.getCurrentUser(User.class);
+    private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

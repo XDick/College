@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+
+
+
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:id="@+id/toolbar_setac"
+            android:background="?attr/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <EditText
+        android:id="@+id/setac_title_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:hint="输入你的活动标题"
+        android:textSize="20dp" />
+
+
+
+    <EditText
+        android:id="@+id/setac_time_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入你的时间"
+        android:textSize="20dp"
+
+        />
+
+
+    <EditText
+        android:id="@+id/setac_place_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入你的地点"
+        android:textSize="20dp"
+
+        />
+
+
+    <EditText
+        android:id="@+id/setac_content_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入内容"
+        android:textSize="20dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/ac_upload_pic_button"
+        android:text="上传图片"/>
+
+
+
+
+</LinearLayout>

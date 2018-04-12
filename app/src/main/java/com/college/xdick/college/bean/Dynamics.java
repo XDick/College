@@ -9,7 +9,7 @@ import cn.bmob.v3.datatype.BmobFile;
  * Created by Administrator on 2018/4/2.
  */
 
-public class Dynamics extends BmobObject implements Serializable {
+public class Dynamics extends BmobObject  {
 
    private String title;
     private String user;

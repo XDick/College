@@ -51,8 +51,8 @@ public class ConversationAdapter extends RecyclerView.Adapter< ConversationAdapt
 
         public ViewHolder(View view){
             super(view);
-            title_TextView = view.findViewById(R.id.title_find);
-            content_TextView = view.findViewById(R.id.content_find);
+            title_TextView = view.findViewById(R.id.title_message);
+            content_TextView = view.findViewById(R.id.content_message);
             linearLayout = view.findViewById(R.id.parent_conversation);
             time_TextView=view.findViewById(R.id.conversation_time);
 
@@ -91,8 +91,7 @@ public class ConversationAdapter extends RecyclerView.Adapter< ConversationAdapt
                                     ChatActivity.class);
                             intent.putExtras(bundle);
                             mContext.startActivity(intent);
-                            Toast.makeText(mContext
-                                    ,"successful",Toast.LENGTH_SHORT).show();
+                          //  Toast.makeText(mContext,"successful",Toast.LENGTH_SHORT).show();
                         }else{
                             Toast.makeText(mContext
                                     ,e.getMessage()+"("+e.getErrorCode()+")",Toast.LENGTH_SHORT).show();

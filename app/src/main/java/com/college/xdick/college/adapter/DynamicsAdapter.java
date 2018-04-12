@@ -13,6 +13,8 @@ import com.college.xdick.college.ui.Activity.AskChatActivity;
 import com.college.xdick.college.R;
 import com.college.xdick.college.bean.Dynamics;
 
+
+
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
@@ -27,6 +29,7 @@ import cn.bmob.v3.listener.FindListener;
 public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHolder> {
 
        private List<Dynamics> mDynamicsList;
+
        private Context mContext;
 
 
@@ -52,46 +55,48 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if(mContext == null){
+
+
+           if(mContext == null){
             mContext = parent.getContext();
         }
 
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_dynamics,parent,false);
-        final ViewHolder holder = new ViewHolder(view);
+                        .inflate(R.layout.item_dynamics,parent,false);
+       final ViewHolder holder = new ViewHolder(view);
 
-
-
-
-        holder.username.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                int position = holder.getAdapterPosition();
-                Dynamics dynamics = mDynamicsList.get(position);
-                final String FriendName = dynamics.getUser();
-                Toast.makeText(mContext,"要开始聊天了：）",Toast.LENGTH_SHORT).show();
-                startChatting(dynamics,FriendName);
-
-            }
-        });
-
+                 holder.username.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v) {
+                        int position = holder.getAdapterPosition();
+                        Dynamics dynamics = mDynamicsList.get(position);
+                        final String FriendName = dynamics.getUser();
+                        Toast.makeText(mContext, "要开始聊天了：）", Toast.LENGTH_SHORT).show();
+                        startChatting(dynamics, FriendName);
+                    }
+                });
 
            return holder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Dynamics dynamics = mDynamicsList.get(position);
+
+           Dynamics dynamics = mDynamicsList.get(position);
         holder.content.setText(dynamics.getContent());
         holder.title.setText(dynamics.getTitle());
         holder.username.setText(dynamics.getUser());
         holder.time.setText(dynamics.getCreatedAt());
 
-    }
+        }
+
+
 
     @Override
     public int getItemCount() {
-        return mDynamicsList.size();
+        if(mDynamicsList!=null){
+           return mDynamicsList.size();}
+           return 0;
     }
 
 

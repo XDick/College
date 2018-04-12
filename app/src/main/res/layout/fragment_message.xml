@@ -14,7 +14,7 @@
         <android.support.v7.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:id="@+id/toolbar_find"
+            android:id="@+id/toolbar_message"
             android:background="?attr/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
@@ -22,7 +22,7 @@
 
 
             <TextView
-                android:id="@+id/title_find"
+                android:id="@+id/title_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -44,7 +44,7 @@
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/recyclerview_main"
+            android:id="@+id/recyclerview_message"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
