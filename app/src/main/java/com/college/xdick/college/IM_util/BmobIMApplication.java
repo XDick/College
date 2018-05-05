@@ -1,13 +1,21 @@
 package com.college.xdick.college.IM_util;
 
 import android.app.Application;
+import android.text.TextUtils;
+import android.widget.Toast;
+
+import com.college.xdick.college.bean.MyUser;
+import com.college.xdick.college.ui.Activity.MainActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
 import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.listener.ConnectListener;
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
 
 /**
  * Created by Administrator on 2018/4/4 0004.
@@ -38,6 +46,7 @@ public class BmobIMApplication extends Application {
             Bmob.initialize(this, "b689cf6ecc75e3fafd3588b88ede6fcc");
             //Bmob 服务器的初始化也放在Application
             BmobIM.init(this);
+            IMconnectBomob();
             BmobIM.registerDefaultMessageHandler(new MyMessageHandler(this));
         }
     }
@@ -58,4 +67,31 @@ public class BmobIMApplication extends Application {
             return null;
         }
     }
+
+
+    private void IMconnectBomob() {
+
+        //TODO 连接：3.1、登录成功、注册成功或处于登录状态重新打开应用后执行连接IM服务器的操作
+        MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
+        if (bmobUser != null) {
+            if (!TextUtils.isEmpty(bmobUser.getObjectId())) {
+                BmobIM.connect(bmobUser.getObjectId(), new ConnectListener() {
+                    @Override
+                    public void done(String uid, BmobException e) {
+                        if (e == null) {
+                            //Toast.makeText(MainActivity.this, "连接成功", Toast.LENGTH_SHORT).show();
+                            //连接成功
+                        } else {
+                            //连接失败
+                            //Toast.makeText(MainActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }
+
+
+
+    }
+
 }

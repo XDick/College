@@ -71,7 +71,6 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                         int position = holder.getAdapterPosition();
                         Dynamics dynamics = mDynamicsList.get(position);
                         final String FriendName = dynamics.getUser();
-                        Toast.makeText(mContext, "要开始聊天了：）", Toast.LENGTH_SHORT).show();
                         startChatting(dynamics, FriendName);
                     }
                 });

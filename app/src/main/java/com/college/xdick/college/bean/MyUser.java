@@ -13,6 +13,20 @@ public class MyUser extends BmobUser {
 
     private String school;
 
+    private Boolean ifConfirm = false;
+
+    private String[] like;
+
+    private String[] join;
+
+    public Boolean getIfConfirm() {
+        return ifConfirm;
+    }
+
+    public void setIfConfirm(Boolean ifConfirm) {
+        this.ifConfirm = ifConfirm;
+    }
+
     public String getSchool() {
         return school;
     }
@@ -25,7 +39,24 @@ public class MyUser extends BmobUser {
         return avatar;
     }
 
-    public void setAvatar(String head) {
-        this.avatar = head;
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+
+    public String[] getLike() {
+        return like;
+    }
+
+    public void setLike(String[] like) {
+        this.like = like;
+    }
+
+    public String[] getJoin() {
+        return join;
+    }
+
+    public void setJoin(String[] join) {
+        this.join = join;
     }
 }

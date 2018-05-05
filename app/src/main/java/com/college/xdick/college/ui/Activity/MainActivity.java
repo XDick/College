@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
         setContentView(R.layout.activity_main);
         getListData();
         initView();
-        IMconnectBomob();
+
         replaceFragment(new ActivityFragment());
 
 
@@ -191,29 +191,6 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
        } else{mBadgeItem.show();
         mBadgeItem.setText(String.valueOf(num));}
     }
-    private void IMconnectBomob() {
 
-        //TODO 连接：3.1、登录成功、注册成功或处于登录状态重新打开应用后执行连接IM服务器的操作
-        MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
-                    if (bmobUser != null) {
-                        if (!TextUtils.isEmpty(bmobUser.getObjectId())) {
-                    BmobIM.connect(bmobUser.getObjectId(), new ConnectListener() {
-                        @Override
-                        public void done(String uid, BmobException e) {
-                            if (e == null) {
-                                Toast.makeText(MainActivity.this, "连接成功", Toast.LENGTH_SHORT).show();
-                                //连接成功
-                            } else {
-                                //连接失败
-                                Toast.makeText(MainActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                }
-        }
-
-
-
-    }
 
 }

@@ -59,6 +59,7 @@ public  class MainFragment extends Fragment {
     static private List<Dynamics> dynamicsList= new ArrayList<>();
     private SwipeRefreshLayout swipeRefresh;
     private DynamicsAdapter adapter;
+    private static int flag=0;
 
 
 
@@ -66,10 +67,15 @@ public  class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootview =inflater.inflate(R.layout.fragment_main,container,false);
 
-
         initBaseView();
+        if(flag==0) {
+            initData();
+            flag=1;
+        }
         initRecyclerView();
+
         setHasOptionsMenu(true);
+
 
 
         return rootview;
@@ -86,7 +92,7 @@ public  class MainFragment extends Fragment {
 
     private void initBaseView() {
         Toolbar toolbar = rootview.findViewById(R.id.toolbar_main);
-        toolbar.setTitle("");
+        toolbar.setTitle("吐槽墙");
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         swipeRefresh = rootview.findViewById(R.id.swipe_refresh_main);
@@ -138,6 +144,9 @@ public  class MainFragment extends Fragment {
                       dynamicsList.add(dynamics);}
                   Collections.reverse(dynamicsList); // 倒序排列
                  // Toast.makeText(getContext(),"成功接收内容",Toast.LENGTH_SHORT).show();
+
+                    initRecyclerView();
+
 
               }else{
                   Toast.makeText(getContext(),"网络不佳",Toast.LENGTH_SHORT).show();

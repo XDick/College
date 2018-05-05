@@ -38,6 +38,7 @@ import com.college.xdick.college.R;
 import com.college.xdick.college.adapter.ActivityAdapter;
 
 import com.college.xdick.college.bean.MyActivity;
+import com.college.xdick.college.bean.MyCircleBanner;
 import com.college.xdick.college.bean.MyUser;
 
 import com.college.xdick.college.ui.Activity.DynamicsActivity;
@@ -111,6 +112,7 @@ public class ActivityFragment extends Fragment {
 
     private void initBaseView(){
         Toolbar toolbar =rootview.findViewById(R.id.toolbar_ac);
+        toolbar.setTitle("自己找活动");
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         swipeRefresh =rootview.findViewById(R.id.swipe_refresh_ac);
@@ -139,7 +141,6 @@ public class ActivityFragment extends Fragment {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
 
                 switch (item.getItemId()){
 
@@ -186,6 +187,21 @@ public class ActivityFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
        adapter = new ActivityAdapter(activityList);
+        View header = LayoutInflater.from(getContext()).inflate(R.layout.item_banner, recyclerView, false);
+        MyCircleBanner mBanner = header.findViewById(R.id.banner1);
+
+// 设置数据源
+        List<String> mInfos = new ArrayList<>();
+        mInfos.add("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525524410260&di=11f8a52e59eb0e9f69712638c84378eb&imgtype=0&src=http%3A%2F%2Fwww.psjia.com%2Fuploads%2Fallimg%2F141018%2F20103513U-1.jpg");
+        mInfos.add("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525524435385&di=c06d5f3f9c461f083fac9869fc63211e&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0128255966e88fa8012193a3081d0c.jpg");
+        mInfos.add("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525524455341&di=83b5ae0736791cffde21b34e76d4962e&imgtype=0&src=http%3A%2F%2Fpic26.photophoto.cn%2F20130218%2F0017030048084638_b.jpg");
+       mInfos.add("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525524493057&di=2051a5df3d3443dbc6634cfbf8605751&imgtype=0&src=http%3A%2F%2Fpic32.nipic.com%2F20130814%2F3961389_185504091311_2.jpg");
+       mInfos.add("https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=1815436007,1600791990&fm=27&gp=0.jpg");
+        // 使用mBanner的接口，直接自动播放
+        mBanner.play(mInfos);
+
+
+        adapter.addHeaderView(header);
         recyclerView.setAdapter(adapter);
 
     }
@@ -293,8 +309,6 @@ public class ActivityFragment extends Fragment {
                                                  */
                                                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                                                 intent.setType("image/*");
-                                                intent.putExtra("crop", true);
-                                                intent.putExtra("return-data", true);
                                                 startActivityForResult(intent, 0);
 
                                             }
@@ -344,7 +358,7 @@ public class ActivityFragment extends Fragment {
                     @Override
                     public void done(BmobException e) {
 
-                              bmobUser.setAvatar(picturePath);
+                              bmobUser.setAvatar(bmobFile.getFileUrl());
                         bmobUser.update(bmobUser.getObjectId(),new UpdateListener() {
                             @Override
                             public void done(BmobException e) {

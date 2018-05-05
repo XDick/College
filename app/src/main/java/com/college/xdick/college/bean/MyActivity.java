@@ -18,8 +18,8 @@ public class MyActivity extends BmobObject implements Serializable {
     String place;
     String content;
     String cover;
-
     String gps;
+    String hostID;
 
     public String getGps() {
         return gps;
@@ -94,5 +94,13 @@ public class MyActivity extends BmobObject implements Serializable {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public String getHostID() {
+        return hostID;
+    }
+
+    public void setHostID(String hostID) {
+        this.hostID = hostID;
     }
 }

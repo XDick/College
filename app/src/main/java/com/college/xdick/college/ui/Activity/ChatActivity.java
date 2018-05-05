@@ -77,7 +77,9 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
 
 
         toolbar = findViewById(R.id.toolbar_chat);
+         toolbar.setTitle("");
         setSupportActionBar(toolbar);
+
         title = findViewById(R.id.title_chat);
         title.setText(conversation.getConversationTitle());
         inputText = findViewById(R.id.input_text);

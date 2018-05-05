@@ -2,6 +2,8 @@ package com.college.xdick.college.ui.Activity;
 
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 
@@ -23,7 +25,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.college.xdick.college.R;
@@ -35,6 +39,7 @@ import com.college.xdick.college.bean.MyUser;
 import com.college.xdick.college.util.FileUtil;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.Set;
 
 
@@ -72,7 +77,17 @@ public class SetActivitiyActivity extends AppCompatActivity {
         contentE = findViewById(R.id.setac_content_edittext);
         uploadButton = findViewById(R.id.ac_upload_pic_button);
 
+
+        timeE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
         Toolbar toolbar =findViewById(R.id.toolbar_setac);
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if(actionBar!=null){ actionBar.setDisplayHomeAsUpEnabled(true);}
@@ -139,6 +154,7 @@ public class SetActivitiyActivity extends AppCompatActivity {
                                 activity.setTime(time);
                                 activity.setContent(content);
                                 activity.setPlace(place);
+                                activity.setHostID(BmobUser.getCurrentUser(MyUser.class).getObjectId());
                                 activity.setHostBy(BmobUser.getCurrentUser(MyUser.class).getUsername());
                                 activity.save(new SaveListener<String>() {
 
@@ -248,5 +264,7 @@ public class SetActivitiyActivity extends AppCompatActivity {
         }
         return uri;
     }
+
+
 
 }
