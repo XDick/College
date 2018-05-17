@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+>
 
 
     <android.support.design.widget.CoordinatorLayout
@@ -23,50 +35,256 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:scaleType="centerCrop"
+        android:layout_margin="20dp"
+        android:id="@+id/ac_upload_pic_imageview"
+        android:background="@drawable/recycler_decoration"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/ac_upload_pic_title"
+        android:text="添加封面"
+        android:textColor="#a1a1a1"
+        android:textSize="20dp"/>
+
+</FrameLayout>
+
+
     <EditText
         android:id="@+id/setac_title_edittext"
         android:layout_width="match_parent"
-        android:layout_height="75dp"
-        android:hint="输入你的活动标题"
-        android:textSize="20dp" />
+        android:layout_height="wrap_content"
+        android:hint="标题"
+        android:textSize="30dp"
+        android:background="@null"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
 
 
 
-    <EditText
-        android:id="@+id/setac_time_edittext"
+        android:textStyle="bold"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="center"
+        android:background="#eaeaea"
+        android:layout_margin="15dp"/>
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="输入你的时间"
-        android:textSize="20dp"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:id="@+id/setac_lable">
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="主标签(必选一个)"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="center"
+            android:background="#eaeaea"
+            android:layout_margin="10dp"/>
+        <com.donkingliang.labels.LabelsView
+            android:layout_margin="10dp"
+            android:id="@+id/setac_main_labels"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:labelBackground="@drawable/label_bg"
+            app:labelTextColor="@drawable/label_text_color"
+            app:labelTextSize="14sp"
+            app:labelTextPaddingBottom="5dp"
+            app:labelTextPaddingLeft="10dp"
+            app:labelTextPaddingRight="10dp"
+            app:labelTextPaddingTop="5dp"
+            app:lineMargin="10dp"
+            app:wordMargin="10dp"
+            app:selectType="MULTI"
+            app:maxSelect="1" />
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="副标签"/>
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:background="@drawable/label_bg2"
+    android:layout_gravity="right|center"
+    android:orientation="vertical"
+    android:layout_marginLeft="30dp"
+    android:layout_height="wrap_content">
+       <TextView
+
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:id="@+id/setac_createtag_text"
+           android:layout_gravity="center"
+           android:layout_margin="8dp"
+           android:textColor="#ff6363"
+           android:text="没有合适的？创建标签"
+          />
+</LinearLayout>
+       <EditText
+           android:layout_width="0dp"
+           android:layout_weight="1"
+           android:layout_height="wrap_content"
+           android:layout_gravity="center"
+           android:layout_marginLeft="20dp"
+           android:hint="标签"
+           android:maxLines="1"
+           android:background="@null"
+           android:id="@+id/setac_createtag_edit"
+           android:visibility="gone"
+          />
+           <Button
+          android:layout_marginRight="10dp"
+               android:id="@+id/setac_createtag_button"
+               android:visibility="gone"
+           android:layout_width="30dp"
+           android:layout_height="30dp"
+           android:layout_gravity="right|center"
+           android:background="@drawable/send"/>
+   </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="center"
+            android:background="#eaeaea"
+            android:layout_margin="10dp"/>
+
+
+        <com.donkingliang.labels.LabelsView
+            android:layout_margin="10dp"
+            android:id="@+id/setac_add_labels"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:labelBackground="@drawable/label_bg"
+            app:labelTextColor="@drawable/label_text_color"
+            app:labelTextSize="14sp"
+            app:labelTextPaddingBottom="5dp"
+            app:labelTextPaddingLeft="10dp"
+            app:labelTextPaddingRight="10dp"
+            app:labelTextPaddingTop="5dp"
+            app:lineMargin="10dp"
+            app:wordMargin="10dp"
+            app:selectType="MULTI"
+            app:maxSelect="1" />
+
+
+
+    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/setac_choosetag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recycler_decoration"
+            android:orientation="vertical"
+            android:layout_gravity="bottom"
+            android:layout_margin="10dp"
+            >
+
+            <TextView
+                android:id="@+id/setac_choosetag_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="选择标签"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+               />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="center"
+        android:background="#eaeaea"
+        android:layout_margin="15dp"/>
+
+
+    <TextView
+
+        android:id="@+id/setac_time_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="选择时间(15天内)"
+        android:textSize="15dp"
+        android:textColor="#ffb4b4"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
 
         />
 
-
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="center"
+        android:background="#eaeaea"
+        android:layout_margin="15dp"/>
     <EditText
         android:id="@+id/setac_place_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="输入你的地点"
+        android:hint="地点"
+        android:background="@null"
         android:textSize="20dp"
-
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="center"
+        android:background="#eaeaea"
+        android:layout_margin="15dp"/>
 
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:id="@+id/setac_content_linearlayout">
     <EditText
         android:id="@+id/setac_content_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="输入内容"
-        android:textSize="20dp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:id="@+id/ac_upload_pic_button"
-        android:text="上传图片"/>
-
-
+        android:layout_weight="8"
+        android:hint="内容"
+        android:background="@null"
+        android:textSize="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        />
+   </LinearLayout>
 
 
 </LinearLayout>
+
+</ScrollView>

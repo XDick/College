@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
@@ -10,43 +10,16 @@
     <FrameLayout
         android:id="@+id/fragment_ac"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="50dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+
         />
-
-
-
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:orientation="horizontal"
-    android:layout_gravity="bottom"
-    android:background="@drawable/border_view"
-    >
-
-
-    <ImageView
-        android:id="@+id/activity_like_imageview"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_margin="10dp"
-        android:background="@drawable/like_f"/>
-
-    <ImageView
-        android:id="@+id/activity_edit_comment_imageview"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_margin="10dp"
-        android:background="@drawable/comment"/>
-
-</LinearLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:visibility="gone"
         android:layout_gravity="bottom"
+        android:visibility="gone"
         android:id="@+id/activity_startedit"
         android:background="@drawable/border_view">
         <EditText
@@ -65,5 +38,67 @@
 
     </LinearLayout>
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:orientation="horizontal"
+    android:id="@+id/activity_statusbar"
+    android:layout_gravity="bottom"
+    android:background="@drawable/border_view"
+    >
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</FrameLayout>
+    <ImageView
+        android:id="@+id/activity_like_imageview"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/like_f" />
+
+    <ImageView
+        android:id="@+id/activity_edit_comment_imageview"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/comment" />
+    </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_vertical|right">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_marginEnd="10dp"
+        android:textColor="#a1a1a1"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/activity_like_count"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:textColor="#a1a1a1"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/activity_comment_count"/>
+        </LinearLayout>
+
+        </LinearLayout>
+</LinearLayout>
+
+
+
+
+
+</LinearLayout>

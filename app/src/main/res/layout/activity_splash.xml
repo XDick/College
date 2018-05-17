@@ -7,12 +7,10 @@
     android:background="@color/colorPrimary">
 
 
-    <TextView
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="COLLEGE"
-        android:textSize="50dp"
-        android:textColor="#FFF"
+         android:background="@drawable/findme"
         android:layout_marginTop="50dp"/>
 </LinearLayout>

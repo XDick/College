@@ -1,4 +1,4 @@
-package com.college.xdick.college.IM_util;
+package com.college.xdick.findme.IM_util;
 
 import android.text.TextUtils;
 

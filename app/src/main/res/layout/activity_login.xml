@@ -13,14 +13,14 @@
         android:layout_height="200dp">
 
 
-        <TextView
+        <ImageView
             android:layout_marginTop="50dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|bottom"
-            android:text="COLLEGE"
-            android:textColor="#FFF"
-            android:textSize="75dp" />
+           android:background="@drawable/findme"
+
+            />
 
     </LinearLayout>
 
@@ -42,7 +42,7 @@
         android:layout_width="90dp"
         android:layout_gravity="center"
         android:layout_height="wrap_content"
-        android:text="用户名"
+        android:text="账号"
 
         android:textColor="#FFF"/>
 
@@ -57,7 +57,9 @@
         android:id="@+id/account_login"
         android:layout_height="wrap_content"
         android:layout_width="200dp"
-        android:hint="用户名"
+        android:hint="用户名/手机号"
+        android:textColor="#ffcdcd"
+        android:textSize="14dp"
         android:inputType="text"
        />
 
@@ -81,8 +83,10 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:counterEnabled="true"
-            app:counterMaxLength="11"
+
+            app:passwordToggleEnabled="true"
+
+            app:passwordToggleDrawable="@drawable/passwordeye"
             android:id="@+id/textInputLayout_password"
 
 
@@ -92,6 +96,8 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:hint="密码"
+            android:textColor="#ffcdcd"
+            android:textSize="14dp"
             android:inputType="textPassword"/>
         </android.support.design.widget.TextInputLayout>
 
@@ -105,7 +111,7 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="#990000"
+        android:background="#b3042d"
         android:text="登录"
         android:textColor="#FFF"
         />
@@ -117,7 +123,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="#990000"
+            android:background="#b3042d"
             android:text="注册"
             android:textColor="#FFF" />
 

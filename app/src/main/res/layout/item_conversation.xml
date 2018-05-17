@@ -17,6 +17,7 @@
 
         <ImageView
            android:background="@drawable/head"
+            android:id="@+id/conversation_avatar"
             android:layout_width="60dp"
             android:layout_height="60dp" />
         <LinearLayout
@@ -69,6 +70,7 @@
         android:id="@+id/content_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:maxLines="1"
         android:textSize="10dp"
         android:layout_marginLeft="20dp" />
 
