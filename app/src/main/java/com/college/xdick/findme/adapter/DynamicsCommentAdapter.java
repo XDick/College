@@ -21,6 +21,7 @@ import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.ChatActivity;
 import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
+import com.college.xdick.findme.ui.Activity.UserCenterActivity;
 
 import java.util.List;
 
@@ -31,6 +32,9 @@ import cn.bmob.newim.listener.ConversationListener;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.QueryListener;
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
+
+import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
 /**
  * Created by Administrator on 2018/5/3.
@@ -39,7 +43,17 @@ import cn.bmob.v3.listener.QueryListener;
 public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsCommentAdapter.ViewHolder> {
 
     private List<DynamicsComment> mCommentList;
+    private int ITEM_TYPE_NORMAL = 0;
+    private int ITEM_TYPE_HEADER = 1;
+    private int ITEM_TYPE_FOOTER = 2;
+    private int ITEM_TYPE_EMPTY = 3;
+
+
+
     private Context mContext;
+    private View mHeaderView;
+    private View mFooterView;
+    private View mEmptyView;
 
 
 
@@ -75,8 +89,14 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
         if(mContext == null){
             mContext = parent.getContext();
         }
-
-        View view = LayoutInflater.from(parent.getContext())
+        if (viewType == ITEM_TYPE_HEADER) {
+            return new ViewHolder(mHeaderView);
+        } else if (viewType == ITEM_TYPE_EMPTY) {
+            return new ViewHolder(mEmptyView);
+        } else if (viewType == ITEM_TYPE_FOOTER) {
+            return new ViewHolder(mFooterView);
+        } else {
+            View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_dynamics_comment,parent,false);
        final   ViewHolder holder = new  DynamicsCommentAdapter.ViewHolder(view);
 
@@ -103,31 +123,58 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
            public void onClick(View v) {
                int position = holder.getAdapterPosition();
                DynamicsComment comment = mCommentList.get(position);
-               String id = comment.getReplyuserId();
-               String name = comment.getReplyusername();
-               startChatting(id,name);
+               final String id = comment.getReplyuserId();
+               final  String name = comment.getReplyusername();
+               BmobQuery<MyUser> query = new BmobQuery<>();
+               query.getObject(id, new QueryListener<MyUser>() {
+                   @Override
+                   public void done(MyUser myUser, BmobException e) {
+
+                       if (e==null){
+                               Intent intent = new Intent(mContext, UserCenterActivity.class);
+                               intent.putExtra("USER",myUser);
+                               mContext.startActivity(intent);}
+
+
+                   }
+               });
+
            }
        });
 
-        holder.avatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int position = holder.getAdapterPosition();
-                DynamicsComment comment = mCommentList.get(position);
-                String id = comment.getUserID();
-                String name = comment.getUserName();
-               startChatting(id,name);
-            }
-        });
 
-        return holder;
+
+        return holder;}
     }
+    @Override
+    public int getItemViewType(int position) {
+        if (null != mHeaderView && position == 0) {
+            return ITEM_TYPE_HEADER;
+        }
+        if (null != mFooterView
+                && position == getItemCount() - 1) {
+            return ITEM_TYPE_FOOTER;
+        }
+        if (null != mEmptyView && mCommentList.size() == 0){
+            return ITEM_TYPE_EMPTY;
+        }
+        return ITEM_TYPE_NORMAL;
 
+    }
     @Override
     public void onBindViewHolder(final  DynamicsCommentAdapter.ViewHolder holder, int position) {
+        int type = getItemViewType(position);
+
+        if (type == ITEM_TYPE_HEADER
+                || type == ITEM_TYPE_FOOTER
+                || type == ITEM_TYPE_EMPTY) {
+            return;
+        }
 
 
-        DynamicsComment comment = mCommentList.get(position);
+        int realPos = getRealItemPosition(position);
+
+        DynamicsComment comment = mCommentList.get(realPos);
         String fromwho,fromcontent;
 
 
@@ -150,11 +197,20 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
         query.getObject(comment.getUserID(), new QueryListener<MyUser>() {
 
             @Override
-            public void done(MyUser object, BmobException e) {
+            public void done(final MyUser object, BmobException e) {
                 if(e==null){
 
+                    holder.avatar.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-                    Glide.with(mContext).load(object.getAvatar()).into(holder.avatar);
+                                    Intent intent = new Intent(mContext, UserCenterActivity.class);
+                                    intent.putExtra("USER",object);
+                                    mContext.startActivity(intent);
+
+                        }
+                    });
+                    Glide.with(mContext).load(object.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
 
 
                 }else{
@@ -167,37 +223,52 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
 
 
     }
+
+
+    private int getRealItemPosition(int position) {
+        if (null != mHeaderView) {
+            return position - 1;
+        }
+        return position;
+    }
+
 
 
 
     @Override
     public int getItemCount() {
-        if (mCommentList != null) {
-            return mCommentList.size();
+        if (mCommentList!=null) {
+
+            int itemCount =mCommentList.size();
+            if (null != mEmptyView && itemCount == 0) {
+                itemCount++;
+            }
+            if (null != mHeaderView) {
+                itemCount++;
+            }
+            if (null != mFooterView) {
+                itemCount++;
+            }
+            return itemCount;
         }
+
         return 0;
     }
 
-    private void startChatting(String id,String name){
-        BmobIM.getInstance().startPrivateConversation( new BmobIMUserInfo(id,name,""), new ConversationListener() {
-            @Override
-            public void done(BmobIMConversation c, BmobException e) {
-                if(e==null){
-                    //在此跳转到聊天页面
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("c", c);
-                    Intent intent = new Intent(mContext,
-                            ChatActivity.class);
-                    intent.putExtras(bundle);
-                    mContext.startActivity(intent);
-
-                }else{
-                    Toast.makeText(mContext
-                            ,e.getMessage()+"("+e.getErrorCode()+")",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
+    public void addHeaderView(View view) {
+        mHeaderView = view;
+        notifyItemInserted(0);
     }
+
+    public void addFooterView(View view) {
+        mFooterView = view;
+        notifyItemInserted(getItemCount() - 1);
+    }
+
+    public void setEmptyView(View view) {
+        mEmptyView = view;
+        notifyDataSetChanged();
+    }
+
 
 }

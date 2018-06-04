@@ -3,12 +3,20 @@
     xmlns:dots="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:SearchView="http://schemas.android.com/tools">
+
+
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
+        <km.lmy.searchview.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="5dp"
+            SearchView:hintText="输入用户名、活动名、地方名..." />
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -23,17 +31,21 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:layout_scrollFlags="scroll|enterAlways|snap">
 
-
             <ImageView
-                android:layout_width="120dp"
-                android:layout_height="50dp"
+                android:layout_width="100dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:background="@drawable/findme"/>
+                android:id="@+id/logo"
+                android:background="@drawable/findme"
+                android:textStyle="bold"/>
 
 
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
+
+
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_gravity="center"
@@ -45,7 +57,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#ff8383"
+                android:textColor="#484848"
                 android:textSize="20sp"
                 android:text="Loading"/>
 
@@ -55,7 +67,7 @@
                 android:id="@+id/dots"
 
                 android:textSize="45sp"
-                android:textColor="#ff8383"
+                android:textColor="#484848"
                 dots:autoplay="false"
                 dots:period="1000"/>
         </LinearLayout>

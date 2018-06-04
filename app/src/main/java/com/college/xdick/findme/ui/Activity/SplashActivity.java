@@ -35,7 +35,6 @@ import cn.bmob.v3.listener.QueryListener;
 public class SplashActivity extends Activity {
     static boolean ifshow = true;
     private static final int sleepTime = 2000;
-   private List<MyActivity> acList= new ArrayList<>();
    private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
 
 
@@ -72,6 +71,7 @@ public class SplashActivity extends Activity {
             public void done(Long aLong, BmobException e) {
 
                     BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
+                    List<BmobQuery<MyActivity>> queries = new ArrayList<>();
 //返回50条数据，如果不加上这条语句，默认返回10条数据
                     if (bmobUser != null) {
                       /*  String gps[] = bmobUser.getGps();
@@ -82,33 +82,27 @@ public class SplashActivity extends Activity {
                 if (e == null) {
                     query.addWhereGreaterThan("date", aLong * 1000L - 1.5*60 * 60 * 24 * 1000);
                 }
-                    query.setLimit(99);
+                 String tag[] = bmobUser.getTag();
+                    for (int i =0; i<tag.length;i++){
+                        BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
+                        q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
+                        queries.add(q);
+                    }
+
+
+                     query.setLimit(10);
+                     query.or(queries);
+                  query.order("-createdAt");
 //执行查询方法
                     query.findObjects(new FindListener<MyActivity>() {
                         @Override
                         public void done(List<MyActivity> object, BmobException e) {
                             if (e == null) {
-                                for (MyActivity ac : object) {
-                                    if (bmobUser != null) {
-                                        String acTag[] = ac.getTag();
-                                        String tag[] = bmobUser.getTag();
-                                        int ArrayLength = acTag.length;
-                                        if (Arrays.toString(tag).contains(acTag[0]) || Arrays.toString(tag).contains(acTag[ArrayLength - 1])) {
-                                            acList.add(ac);
-                                        }
-                                    } else {
-                                        acList.add(ac);
-
-                                    }
 
 
-                                }
 
-
-                                Collections.reverse(acList); // 倒序排列
                                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                                List<MyActivity> list = acList;
-                                intent.putExtra("LISTDATA", (Serializable) list);
+                                intent.putExtra("LISTDATA", (Serializable)object);
                                 startActivity(intent);
                                 finish();
                                 //Toast.makeText(SplashActivity.this,"成功接收内容",Toast.LENGTH_SHORT).show();
@@ -118,7 +112,7 @@ public class SplashActivity extends Activity {
                                 startActivity(intent);
                                 List<MyActivity> list = new ArrayList<>();
                                 intent.putExtra("LISTDATA", (Serializable) list);
-                                Toast.makeText(SplashActivity.this, "网络不佳", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

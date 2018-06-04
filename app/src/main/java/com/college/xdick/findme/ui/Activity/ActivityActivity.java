@@ -1,9 +1,7 @@
 package com.college.xdick.findme.ui.Activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,12 +20,14 @@ import android.widget.Toast;
 
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Comment;
+import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Fragment.StartactivityFragment;
 
 import java.util.Arrays;
 import java.util.List;
 
+import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
@@ -58,6 +58,7 @@ public class ActivityActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
+
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.activity_activity);
          imm = (InputMethodManager) getSystemService (Context.INPUT_METHOD_SERVICE);
@@ -79,7 +80,8 @@ public class ActivityActivity extends AppCompatActivity {
         likecount = findViewById(R.id.activity_like_count);
         commentcount = findViewById(R.id.activity_comment_count);
         final Intent intent =getIntent();
-        activityId = intent.getStringExtra("ACTIVITY_ID");
+        final MyActivity activity = (MyActivity)intent.getSerializableExtra("ACTIVITY");
+        activityId =activity.getObjectId();
         initLike();
         comment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,18 +101,23 @@ public class ActivityActivity extends AppCompatActivity {
         });
 
         ifLike();
+
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(!ifLike) {
-                    myUser.add("like", activityId);
+                    myUser.addUnique("like",activityId);
                     myUser.update(new UpdateListener() {
                         @Override
                         public void done(BmobException e) {
                             if (e == null) {
                                 like.setBackground(ActivityActivity.this.getResources().getDrawable(R.drawable.like_t));
-
                                 ifLike = true;
+                                MyActivity myActivity = new MyActivity();
+                                myActivity.setObjectId(activity.getObjectId());
+                                myActivity.setDate(activity.getDate());
+                                myActivity.addUnique("likeUser",myUser.getObjectId());
+                                myActivity.update();
                                 Toast.makeText(ActivityActivity.this, "成功收藏", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(ActivityActivity.this, "失败", Toast.LENGTH_SHORT).show();
@@ -129,7 +136,11 @@ public class ActivityActivity extends AppCompatActivity {
 
                             if(e==null){
                                 like.setBackground(ActivityActivity.this.getResources().getDrawable(R.drawable.like_f));
-
+                                MyActivity myActivity = new MyActivity();
+                                myActivity.setObjectId(activity.getObjectId());
+                                myActivity.setDate(activity.getDate());
+                                myActivity.removeAll("likeUser",Arrays.asList(myUser.getObjectId()));
+                                myActivity.update();
                                 ifLike = false;
                                 Toast.makeText(ActivityActivity.this, "取消收藏", Toast.LENGTH_SHORT).show();
                             }
@@ -160,16 +171,22 @@ public class ActivityActivity extends AppCompatActivity {
 
 
 
+
+
+
                    replyComment.save(new SaveListener<String>() {
                        @Override
                        public void done(String s, BmobException e) {
                            if(e==null){
                                Toast.makeText(ActivityActivity.this,"回复成功",Toast.LENGTH_SHORT).show();
+                               myfragment.sendMessage(myUser.getUsername()+"回复了你:"+editComment.getText().toString()
+                                       ,new BmobIMUserInfo(replyComment.getReplyuserId(),replyComment.getReplyusername(),null));
                                editComment.setText("");
                                startEdit.setVisibility(View.GONE);
                                statusbar.setVisibility(View.VISIBLE);
                                myfragment.commentList.clear();
-                               myfragment.initData();
+
+                               myfragment.initComment();
                                ifReply=false;
 
 
@@ -185,7 +202,7 @@ public class ActivityActivity extends AppCompatActivity {
                else {
 
 
-                Comment comment = new Comment();
+                final Comment comment = new Comment();
 
                 comment.setUserName(myUser.getUsername());
                 comment.setUserID(myUser.getObjectId());
@@ -196,11 +213,15 @@ public class ActivityActivity extends AppCompatActivity {
                     public void done(String s, BmobException e) {
                         if(e==null){
                             Toast.makeText(ActivityActivity.this,"评论成功",Toast.LENGTH_SHORT).show();
+                            myfragment.sendMessage(myUser.getUsername()+"评论了你:"+editComment.getText().toString()
+                                    ,new BmobIMUserInfo(myfragment.activity.getHost().getObjectId(),
+                                            myfragment.activity.getHostName(),null));
                             editComment.setText("");
                             startEdit.setVisibility(View.GONE);
                             statusbar.setVisibility(View.VISIBLE);
                             myfragment.commentList.clear();
-                            myfragment.initData();
+
+                            myfragment.initComment();
                         }else{
                             Toast.makeText(ActivityActivity.this,"评论失败",Toast.LENGTH_SHORT).show();
                         }
@@ -252,7 +273,7 @@ public class ActivityActivity extends AppCompatActivity {
     }
 
     private void ifLike(){
-        if(Arrays.toString(myUser.getLike()).indexOf(activityId) < 0){
+        if(!Arrays.toString(myUser.getLike()).contains(activityId) ){
             ifLike= false;
         }
         else

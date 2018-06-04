@@ -10,63 +10,145 @@
     android:focusable="true">
 
 
-
-    <TextView
-        android:id="@+id/title_main"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-         android:layout_margin="10dp"
-        android:textColor="#101010"
-        android:textSize="20dp"
-        android:textStyle="bold" />
-
     <LinearLayout
-       android:orientation="horizontal"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="6dp">
+        android:layout_marginTop="12dp">
 
+
+        <ImageView
+            android:layout_height="40dp"
+            android:layout_width="40dp"
+            android:id="@+id/avatar_main"
+            android:layout_margin="8dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
             <TextView
                 android:id="@+id/username_main"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:gravity="center_vertical"
-                android:textColor="#6c6c6c"
-                android:textSize="12dp" />
-        </LinearLayout>
-        <LinearLayout
-
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+                android:layout_marginTop="5dp"
+                android:gravity="center"
+                android:textColor="#0464e2"
+                android:textSize="15dp" />
             <TextView
+                android:id="@+id/time_main"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:id="@+id/reply_main"
-                android:layout_gravity="right|center_vertical"
-                android:textColor="#6c6c6c"/>
+                android:textSize="11dp"
+                android:textColor="#6c6c6c"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#353535"
+                android:textSize="15dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="4dp"
+                android:maxLines="9"
+                android:id="@+id/content_main"/>
+
+        <com.jaeger.ninegridimageview.NineGridImageView
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="12dp"
+                android:layout_width="match_parent"
+                android:id="@+id/nineGrid"
+                app:imgGap="4dp"
+                app:showStyle="fill"
+                app:singleImgSize="120dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_weight="4.5"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:id="@+id/like"
+                        android:background="@drawable/thumb_up"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="10dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/likecount"
+                        android:text="0"
+                        android:layout_marginLeft="3dp"
+                        android:textSize="10sp"
+                        android:textColor="#7b7b7b"
+                        android:layout_gravity="center"
+                        />
+                </LinearLayout>
+
+                <LinearLayout
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/comment2"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_gravity="center"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/reply_main"
+                        android:text="0"
+                        android:textSize="10sp"
+                        android:layout_marginLeft="3dp"
+                        android:layout_gravity="center"
+                        android:textColor="#7b7b7b"/>
+
+
+                </LinearLayout>
+            </LinearLayout>
+
+
+
         </LinearLayout>
+
+
+
+
+
 
     </LinearLayout>
 
 
-    <TextView
-        android:id="@+id/time_main"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="11dp"
-        android:textColor="#6c6c6c"
-        />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

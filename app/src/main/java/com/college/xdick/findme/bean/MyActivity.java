@@ -8,18 +8,22 @@ import cn.bmob.v3.BmobObject;
  * Created by Administrator on 2018/4/11.
  */
 
-public class MyActivity extends BmobObject implements Serializable {
+public class MyActivity extends BmobObject implements Serializable ,Comparable<MyActivity>{
 
     String title;
-    String hostName;
-    String hostSchool;
-    String time;
-    String place;
-    String content;
-    String cover;
-    String[] gps;
-    MyUser host;
-    int join;
+      String hostName;
+     String hostSchool;
+     String time;
+     String place;
+     String content;
+     String cover;
+     String[] gps;
+     MyUser host;
+     String[]joinUser;
+     String[] likeUser;
+
+     String[] picture;
+
     String[] tag;
     long date;
 
@@ -47,13 +51,7 @@ public class MyActivity extends BmobObject implements Serializable {
         this.tag = tag;
     }
 
-    public int getJoin() {
-        return join;
-    }
 
-    public void setJoin(int join) {
-        this.join = join;
-    }
 
     public String getTitle() {
         return title;
@@ -118,5 +116,39 @@ public class MyActivity extends BmobObject implements Serializable {
 
     public void setDate(long date) {
         this.date = date;
+    }
+
+    public String[] getJoinUser() {
+        return joinUser;
+    }
+
+    public void setJoinUser(String[] joinUser) {
+        this.joinUser = joinUser;
+    }
+
+    public String[] getLikeUser() {
+        return likeUser;
+    }
+
+    public void setLikeUser(String[] likeUser) {
+        this.likeUser = likeUser;
+    }
+
+
+    public String[] getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String[] picture) {
+        this.picture = picture;
+    }
+
+    @Override
+    public int compareTo(MyActivity activity) {
+        //自定义比较方法，如果认为此实体本身大则返回1，否则返回-1
+        if(this.date >= activity.getDate()){
+            return 1;
+        }
+        return -1;
     }
 }

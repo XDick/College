@@ -3,6 +3,8 @@ package com.college.xdick.findme.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.view.LayoutInflater;
+import android.view.View;
 
 import com.college.xdick.findme.ui.Fragment.ActivityFragment;
 import com.college.xdick.findme.ui.Fragment.ActivitygpsFragment;
@@ -20,6 +22,7 @@ public class MyFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
         super(fm);
         this.tabTilte = tabTitle;
     }
+
 
     @Override
     public Fragment getItem(int position) {
@@ -40,4 +43,8 @@ public class MyFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
     }
 
 
+
+
 }
+
+

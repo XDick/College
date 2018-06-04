@@ -418,8 +418,10 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
                 if(content.length()!=0&&title.length()!=0
                         &&place.length()!=0&&date.length()!=0&& ifchooseMain&&date.contains("年")){
                     Toast.makeText(SetActivitiyActivity.this, "发起中...", Toast.LENGTH_SHORT).show();
-                if(picturePath!=null) {
+
+                    if(picturePath!=null) {
                     final BmobFile bmobFile = new BmobFile(new File(picturePath));
+                        finish();
                     bmobFile.uploadblock(new UploadFileListener() {
 
                         @Override
@@ -441,9 +443,6 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
                                 activity.setHostSchool(user.getSchool());
                                 activity.setDate(time);
 
-
-
-
                                 activity.save(new SaveListener<String>() {
 
                                     @Override
@@ -456,7 +455,7 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
                                                     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd" );
                                                     String date=sdf.format(new Date(aLong * 1000L));
                                                     user.setSetAcTime(date);
-                                                    user.add("join",objectId);
+                                                    user.addUnique("setAc",objectId);
                                                     user.update(new UpdateListener() {
                                                         @Override
                                                         public void done(BmobException e) {
@@ -522,7 +521,7 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
                                               });
                                           }
                                             Toast.makeText(SetActivitiyActivity.this, "发起成功", Toast.LENGTH_SHORT).show();
-                                            finish();
+
 
                                         } else {
                                             Toast.makeText(SetActivitiyActivity.this, "发起失败"+e.getMessage(), Toast.LENGTH_SHORT).show();

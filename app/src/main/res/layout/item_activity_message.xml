@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.mcxtzhang.swipemenulib.SwipeMenuLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:clickable="true"
+    app:ios="true"
+    app:leftSwipe="true"
+    app:swipeEnable="true">
+
+
+<android.support.v7.widget.CardView android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="4dp"
+
+    android:id="@+id/cardview_ac"
+    android:foreground="?attr/selectableItemBackground"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <LinearLayout
+       android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp">
+
+
+        <ImageView
+            android:layout_width = "60dp"
+            android:layout_height = "60dp"
+            android:scaleType="centerCrop"
+            android:layout_gravity="center"
+            android:id="@+id/cover_ac"/>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginLeft="12dp"
+    android:orientation="vertical">
+
+        <TextView
+            android:layout_marginTop="5dp"
+            android:id="@+id/title_ac"
+            android:maxLines="2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            />
+    <TextView
+        android:layout_marginTop="5dp"
+        android:id="@+id/content_ac"
+        android:maxLines="2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textSize="10dp"
+        />
+
+    <TextView
+        android:layout_marginTop="5dp"
+        android:id="@+id/acname_ac"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#2758e1"
+        android:textSize="10dp"
+        />
+    <TextView
+        android:layout_marginTop="5dp"
+        android:id="@+id/time_ac"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textSize="10dp"
+        />
+
+
+
+
+</LinearLayout>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
+
+
+    <Button
+        android:id="@+id/delete"
+        android:layout_width="80dp"
+
+        android:layout_gravity="center"
+        android:layout_height="match_parent"
+        android:background="#ff3838"
+        android:text="删除"
+        android:textColor="@android:color/white"/>
+</com.mcxtzhang.swipemenulib.SwipeMenuLayout>

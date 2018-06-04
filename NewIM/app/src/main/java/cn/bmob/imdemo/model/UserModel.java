@@ -1,4 +1,4 @@
-package com.college.xdick.findme.IM_util;
+package com.college.xdick.findme.BmobIM;
 
 import android.text.TextUtils;
 

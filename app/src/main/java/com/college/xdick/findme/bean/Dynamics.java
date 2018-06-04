@@ -1,5 +1,7 @@
 package com.college.xdick.findme.bean;
 
+import java.io.Serializable;
+
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
 
@@ -7,13 +9,13 @@ import cn.bmob.v3.datatype.BmobFile;
  * Created by Administrator on 2018/4/2.
  */
 
-public class Dynamics extends BmobObject  {
+public class Dynamics extends BmobObject implements Serializable {
 
-   private String title;
     private String user;
     private String userId;
     private String content;
-
+    private String[] picture;
+    private String[] like;
     private int replycount=0;
 
 
@@ -45,13 +47,7 @@ public class Dynamics extends BmobObject  {
     }
 
 
-    public String getTitle() {
-        return title;
-    }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     public String getUserId() {
         return userId;
@@ -68,6 +64,23 @@ public class Dynamics extends BmobObject  {
     public void setReplycount(int replycount) {
         this.replycount = replycount;
     }
+
+    public String[] getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String[] picture) {
+        this.picture = picture;
+    }
+
+    public String[] getLike() {
+        return like;
+    }
+
+    public void setLike(String[] like) {
+        this.like = like;
+    }
+
 
 
 }

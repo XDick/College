@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyUser;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -148,10 +149,26 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
         currentUid = BmobUser.getCurrentUser().getObjectId();
         BmobIMMessage msg = mMsgList.get(position);
         Log.d(TAG,"位置:"+position+"消息是"+msg.getContent()+"id:"+msg.getFromId()+"当前ID"+currentUid);
-        long time=Long.valueOf(msg.getCreateTime());
-        SimpleDateFormat sdf= new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-        String createTime = sdf.format(new Date(time));
-        holder.time.setText(createTime);
+        long t=Long.valueOf(msg.getCreateTime());
+        SimpleDateFormat sdf1= new SimpleDateFormat("yyyy/MM/dd HH:mm");
+
+        String time1 = sdf1.format(new Date(t));//long转化成Date
+
+        final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        String  nowtime = sdf.format(new Date());
+
+        String  rawdate =sdf.format(new Date(t));
+
+        String time = time1.substring(time1.indexOf(" ")+1);
+
+        if (nowtime.equals(rawdate)){
+            holder.time.setText(time);
+        }
+        else{
+
+            holder.time.setText(time1);
+        }
 
 
         Glide.with(mContext).load(msg.getBmobIMConversation().getConversationIcon()).into(holder.avatar_you);

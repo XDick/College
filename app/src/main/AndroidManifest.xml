@@ -15,6 +15,7 @@
     <!-- 设备休眠 -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
     <!-- sd卡存储-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -34,10 +35,13 @@
 
 
 
+
+
+
     <application
-        android:name="com.college.xdick.findme.IM_util.BmobIMApplication"
+        android:name="com.college.xdick.findme.BmobIM.BmobIMApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -47,7 +51,14 @@
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="1LeFUCWmIl8gEuD2p5skN4TsinQ6U9ro	"/>
 
-
+        <!--监听网络状态-->
+        <receiver android:name=".Broadcast.NetWorkChangReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+                <action android:name="android.net.wifi.STATE_CHANGE" />
+            </intent-filter>
+        </receiver>
 
         <!--TODO 集成：1.5、配置IM SDK需要的广播和服务-->
         <receiver android:name="cn.bmob.newim.core.ConnectChangeReceiver" >
@@ -75,15 +86,14 @@
             android:name="Bmob_APP_KEY"
             android:value="b689cf6ecc75e3fafd3588b88ede6fcc" />
 
-
+    <activity android:name=".ui.Activity.UserCenterActivity"/>
     <activity android:name="com.college.xdick.findme.ui.Activity.MainActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.LoginActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.SignupActivity"/>
-        <activity android:name="com.college.xdick.findme.ui.Activity.DynamicsActivity"/>
+        <activity android:name="com.college.xdick.findme.ui.Activity.SetDynamicsActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.ChatActivity" />
-
+         <activity android:name=".ui.Activity.SearchActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.InterestActivity" />
-
         <activity android:name="com.college.xdick.findme.ui.Activity.SetActivitiyActivity"/>
        <activity android:name="com.college.xdick.findme.ui.Activity.ActivityActivity" />
         <activity android:name="com.college.xdick.findme.ui.Activity.NewsActivity"/>
@@ -93,11 +103,21 @@
         <activity android:name="com.linchaolong.android.imagepicker.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
         <activity android:name=".ui.Activity.MainDynamicsActivity"/>
-            <activity android:name=".ui.Activity.SettingActivity"/>
+        <activity android:name=".ui.Activity.SettingUserActivity"/>
+        <activity android:name=".ui.Activity.HostNotifyActivity"/>
+       <activity android:name=".ui.Activity.SearchActivityActivity"/>
+        <activity android:name=".ui.Activity.SearchUserActivity"/>
+
+
+
+
         <activity
             android:name="cn.bmob.v3.update.UpdateDialogActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
+        <activity android:name=".ui.Activity.MyJoinActivity"/>
+        <activity android:name=".ui.Activity.MySetActivity"/>
+        <activity android:name=".ui.Activity.MyLikeActivity"/>
 
         <activity android:name="com.college.xdick.findme.ui.Activity.SplashActivity">
         <intent-filter >
@@ -124,5 +144,7 @@
                  tools:replace="android:resource"
                 android:resource="@xml/file_paths" />
         </provider>
+
+
     </application>
 </manifest>

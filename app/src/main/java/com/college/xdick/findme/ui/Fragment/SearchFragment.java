@@ -1,5 +1,6 @@
 package com.college.xdick.findme.ui.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,10 +20,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.college.xdick.findme.MyClass.BackHandlerHelper;
+import com.college.xdick.findme.MyClass.FragmentBackHandler;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.FindNewsAdapter;
 import com.college.xdick.findme.bean.FindNews;
 import com.college.xdick.findme.bean.MyCircleBanner;
+import com.college.xdick.findme.ui.Activity.SearchActivity;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,13 +36,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.bmob.v3.b.V;
+import km.lmy.searchview.SearchView;
 import pl.tajchert.waitingdots.DotsTextView;
 
 /**
  * Created by Administrator on 2018/4/10.
  */
 
-public class SearchFragment extends Fragment {
+public class SearchFragment extends Fragment implements FragmentBackHandler {
     @Nullable
    private static List<FindNews> newsList = new ArrayList<>();
     private FindNewsAdapter adapter;
@@ -48,6 +54,12 @@ public class SearchFragment extends Fragment {
     private LinearLayout loadlayout;
     private RecyclerView recyclerView;
     private   List<String> mInfos = new ArrayList<>();
+    private SearchView searchView;
+
+
+
+
+
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
        rootView =inflater.inflate(R.layout.fragment_search,container,false);
         initBaseView();
@@ -79,6 +91,11 @@ public class SearchFragment extends Fragment {
         });
         dots =  rootView.findViewById(R.id.dots);
         loadlayout=  rootView.findViewById(R.id.loading_layout);
+
+
+        setSearch();
+
+
     }
 
 
@@ -99,6 +116,8 @@ public class SearchFragment extends Fragment {
              }
 
             case R.id.menu_search:
+
+                searchView.open();
 
 
             default:
@@ -124,6 +143,8 @@ public class SearchFragment extends Fragment {
         mInfos.add( "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525619368239&di=4ada85418df0fe74ab3196663a4f9e25&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2Fa6efce1b9d16fdfae6becffcbe8f8c5495ee7bd5.jpg");
         mInfos.add( "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525619350732&di=27952991e7142a797a600fbb39e0e72f&imgtype=0&src=http%3A%2F%2Fb.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2F342ac65c103853430a74d9149513b07eca808848.jpg");
         //adapter.addHeaderView(header);
+        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty, recyclerView, false);
+         adapter.setEmptyView(empty);
         adapter.addFooterView(footer);
         recyclerView.setAdapter(adapter);
         mBanner.play(mInfos);
@@ -213,14 +234,48 @@ public class SearchFragment extends Fragment {
 
                 }
 
-
-
-
-
-
-
 } }).start();
-
-
     }
+
+
+
+
+    private void setSearch() {
+
+        searchView = rootView.findViewById(R.id.searchView);
+        searchView.setOnSearchActionListener(new SearchView.OnSearchActionListener() {
+            @Override
+            public void onSearchAction(String s) {
+              searchView.addOneHistory(searchView.getEditTextView().getText().toString());
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                intent.putExtra("SEARCH",searchView.getEditTextView().getText().toString());
+                startActivity(intent);
+                searchView.close();
+            }
+        });
+
+        searchView.setHistoryItemClickListener(new SearchView.OnHistoryItemClickListener() {
+            @Override
+            public void onClick(String s, int i) {
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                intent.putExtra("SEARCH",s);
+                startActivity(intent);
+                searchView.close();
+            }
+        });
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if(searchView.isOpen()){
+            searchView.close();
+            return true;
+        }
+
+
+        return BackHandlerHelper.handleBackPress(this);
+    }
+
+
+
 }

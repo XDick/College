@@ -1,20 +1,14 @@
 package com.college.xdick.findme.ui.Fragment;
 
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,37 +16,30 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.MyClass.WaveView3;
 import com.college.xdick.findme.R;
-import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
-import com.college.xdick.findme.ui.Activity.InterestActivity;
 import com.college.xdick.findme.ui.Activity.LoginActivity;
-import com.college.xdick.findme.ui.Activity.MainActivity;
 import com.college.xdick.findme.ui.Activity.MyInterestActivity;
-import com.college.xdick.findme.ui.Activity.SetActivitiyActivity;
-import com.college.xdick.findme.ui.Activity.SettingActivity;
-import com.college.xdick.findme.ui.Activity.SignupActivity;
-import com.college.xdick.findme.util.FileUtil;
-import com.college.xdick.findme.util.SelectSchoolUtil;
+import com.college.xdick.findme.ui.Activity.MyJoinActivity;
+import com.college.xdick.findme.ui.Activity.MyLikeActivity;
+import com.college.xdick.findme.ui.Activity.MySetActivity;
+import com.college.xdick.findme.ui.Activity.SettingUserActivity;
+import com.college.xdick.findme.ui.Activity.UserCenterActivity;
 import com.linchaolong.android.imagepicker.ImagePicker;
 import com.linchaolong.android.imagepicker.cropper.CropImage;
 import com.linchaolong.android.imagepicker.cropper.CropImageView;
+import com.zyyoona7.popup.EasyPopup;
+import com.zyyoona7.popup.XGravity;
+import com.zyyoona7.popup.YGravity;
 
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import cn.bmob.newim.BmobIM;
-import cn.bmob.v3.BmobQuery;
-import cn.bmob.v3.BmobSMS;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.FindListener;
-import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadFileListener;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
@@ -67,21 +54,18 @@ public class UserFragment extends Fragment {
     private View rooview;
     private String picturePath;
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
-    private TextView user,setcountText,joincountText;
+    private TextView user,setcountText,joincountText,likecountText,dynamicscountText;
     private ImageView avatar,setting;
     private ImagePicker imagePicker;
-    private LinearLayout maytag;
+    private LinearLayout maytag,userset,userjoin,userlike,userexit,usersetting,userdynamics;
     private WaveView3 waveView3;
-    private List<MyActivity> setActivityList=new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rooview =inflater.inflate(R.layout.fragment_user,container,false);
         startImagePicker();
         initView();
-        initMySetAc();
         BmobCheckIfLogin();
-
         return rooview;
     }
 
@@ -92,12 +76,79 @@ public class UserFragment extends Fragment {
         setting = rooview.findViewById(R.id.setting);
         joincountText = rooview.findViewById(R.id.user_join_count);
         setcountText = rooview.findViewById(R.id.user_set_count);
+        userset = rooview.findViewById(R.id.user_set);
+        userjoin = rooview.findViewById(R.id.user_join);
+        userlike=rooview.findViewById(R.id.user_like);
+        likecountText = rooview.findViewById(R.id.user_like_count);
+        dynamicscountText = rooview.findViewById(R.id.user_dynamics_count);
+        userdynamics = rooview.findViewById(R.id.user_dynamics);
+
+
+
+        userdynamics.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               Intent intent = new Intent(getActivity(), UserCenterActivity.class);
+               intent.putExtra("USER",bmobUser);
+                startActivity(intent);
+            }
+        });
+
+
+
+        final EasyPopup easyPopup =EasyPopup.create()
+                .setContentView(getContext(),R.layout.popup_setting)
+                .apply();
+
+        userexit = easyPopup.findViewById(R.id.exit_setting);
+        usersetting = easyPopup.findViewById(R.id.account_setting);
+
+
+
+        usersetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(),SettingUserActivity.class));
+                easyPopup.dismiss();
+            }
+        });
+        userjoin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().startActivity(new Intent(getActivity(), MyJoinActivity.class));
+            }
+        });
+        userlike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().startActivity(new Intent(getActivity(), MyLikeActivity.class));
+            }
+        });
+
+        userset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().startActivity(new Intent(getActivity(), MySetActivity.class));
+            }
+        });
         setting.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               startActivity(new Intent(getContext(), SettingActivity.class));
+               easyPopup.showAtAnchorView(setting, YGravity.BELOW, XGravity.LEFT, 0, -50);
            }
        });
+
+        userexit.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            BmobUser.logOut();   //清除缓存用户对象
+                                            bmobUser = BmobUser.getCurrentUser(MyUser.class); // 现在的currentUser是null了
+                                            Toast.makeText(getActivity(), "已退出登录", Toast.LENGTH_SHORT).show();
+                                            BmobIM.getInstance().disConnect();
+                                            BmobCheckIfLogin();
+                                            easyPopup.dismiss();
+                                        }
+                                    });
 
 
        maytag.setOnClickListener(new View.OnClickListener() {
@@ -126,14 +177,34 @@ public class UserFragment extends Fragment {
 
 
     private void showUserInfo(){
-                String[]join = bmobUser.getJoin();
+
                 try {
-                    joincountText.setText(join.length+"");
+                    joincountText.setText(bmobUser.getJoin().length+"");
+
                 }
                 catch (Exception e){
                     e.printStackTrace();
                 }
+        try{
+            setcountText.setText(bmobUser.getSetAc().length+"");}
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
+        try {
+            dynamicscountText.setText(bmobUser.getDynamics().length+"");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        try {
+           likecountText.setText(bmobUser.getLike().length+"");
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
                 user.setText(bmobUser.getUsername());
                 Glide.with(getActivity()).load(bmobUser.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
 
@@ -143,8 +214,11 @@ public class UserFragment extends Fragment {
     }
     private void exitUserInfo(){
             setcountText.setText(0+"");
-           joincountText.setText(0+"");
+            joincountText.setText(0+"");
+            likecountText.setText(0+"");
+            dynamicscountText.setText("");
                 user.setText("点击头像登录");
+                userexit.setVisibility(View.GONE);
                 Glide.with(getActivity()).load(R.drawable.head).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
     }
 
@@ -167,7 +241,6 @@ public class UserFragment extends Fragment {
                                                     @Override
                                                     public void onCropImage(Uri imageUri) {
 
-                                                        String originalpath = bmobUser.getAvatar();
                                                         picturePath=imageUri.toString().replace("file:///","");
                                                         if(picturePath!=null){
 
@@ -175,21 +248,36 @@ public class UserFragment extends Fragment {
                                                             bmobFile.uploadblock(new UploadFileListener() {
                                                                                      @Override
                                                                                      public void done(BmobException e) {
+                                                                                         if (!bmobUser.getAvatar().equals("http://bmob-cdn-18038.b0.upaiyun.com/2018/05/18/425ce45f40a6b2208074aa1dbce9f76c.png"))
+                                                                                         {
+                                                                                             BmobFile file = new BmobFile();
+                                                                                             file.setUrl(bmobUser.getAvatar());//此url是上传文件成功之后通过bmobFile.getUrl()方法获取的。
+                                                                                             file.delete(new UpdateListener() {
+
+                                                                                                 @Override
+                                                                                                 public void done(BmobException e) {
+                                                                                                     if(e==null){
+
+                                                                                                     }else{
+                                                                                                     }
+                                                                                                 }
+                                                                                             });
+
+                                                                                         }
+
                                                                                          bmobUser.setAvatar(bmobFile.getFileUrl());
                                                                                          bmobUser.update(bmobUser.getObjectId(),new UpdateListener() {
                                                                                              @Override
                                                                                              public void done(BmobException e) {
                                                                                                  if(e==null){
                                                                                                      Toast.makeText(getContext(),"修改头像成功",Toast.LENGTH_SHORT).show();
-                                                                                                     Glide.with(getContext()).load(bmobUser.getAvatar()).into(avatar);
+                                                                                                     Glide.with(getContext()).load(bmobUser.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
                                                                                                      picturePath =null;
                                                                                                  }else{
 
                                                                                                  }
                                                                                              }
                                                                                          });
-
-
                                                                                      }
 
 
@@ -199,24 +287,7 @@ public class UserFragment extends Fragment {
 
                                                                                  }
                                                             );
-
-
-                                                            BmobFile file = new BmobFile();
-                                                            file.setUrl(originalpath);//此url是上传文件成功之后通过bmobFile.getUrl()方法获取的。
-                                                            file.delete(new UpdateListener() {
-
-                                                                @Override
-                                                                public void done(BmobException e) {
-                                                                    if(e==null){
-
-                                                                    }else{
-
-                                                                    }
-                                                                }
-                                                            });
                                                         }
-
-
 
                                                     }
 
@@ -242,13 +313,8 @@ public class UserFragment extends Fragment {
                                                                                    int[] grantResults) {
                                                         Toast.makeText(getContext(),"抱歉(＞人＜；)，功能将无法实现",Toast.LENGTH_SHORT).show();
                                                     }
-
                                                 });
-
-
-
                                             }
-
                                         }
 
             );
@@ -296,24 +362,37 @@ public class UserFragment extends Fragment {
     }
 
 
-    private void initMySetAc(){
+    @Override
+    public void onResume() {
+        super.onResume();
+          bmobUser=BmobUser.getCurrentUser(MyUser.class);
+        try {
+            joincountText.setText(bmobUser.getJoin().length+"");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        try{
+            setcountText.setText(bmobUser.getSetAc().length+"");}
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
-        BmobQuery<MyActivity> query = new BmobQuery<>();
-        query.addWhereEqualTo("hostName",bmobUser.getUsername());
-        query.findObjects(new FindListener<MyActivity>() {
-            @Override
-            public void done(List<MyActivity> list, BmobException e) {
-                if (e==null){
-                    setActivityList=list;
-                    setcountText.setText(setActivityList.size()+"");
-                }
-            }
-        });
+        try {
+           dynamicscountText.setText(bmobUser.getDynamics().length+"");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
+        try {
+            likecountText.setText(bmobUser.getLike().length+"");
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
-
-
-
 }
 

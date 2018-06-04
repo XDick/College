@@ -1,19 +1,22 @@
 package com.college.xdick.findme.bean;
 
+import java.io.Serializable;
+
 import cn.bmob.v3.BmobUser;
 
 /**
  * Created by Administrator on 2018/4/2.
  */
 
-public class MyUser extends BmobUser {
+public class MyUser extends BmobUser implements Serializable {
 
-    private String avatar ="http://bmob-cdn-18038.b0.upaiyun.com/2018/04/11/0552cec7404930c580071f80377f71d7.png";
+    private String avatar ="http://bmob-cdn-18038.b0.upaiyun.com/2018/05/18/425ce45f40a6b2208074aa1dbce9f76c.png";
 
     private String school="";
 
     private String[] gps;
 
+    private String[] setAc;
 
     private String[] like;
 
@@ -23,11 +26,11 @@ public class MyUser extends BmobUser {
 
     private String setAcTime;
 
-    MyUser[]fans;
+    private String[] dynamics;
 
-    MyUser[] follow;
+    private String[] following;
 
-
+    private String[] fans;
 
 
 
@@ -90,21 +93,37 @@ public class MyUser extends BmobUser {
         this.setAcTime = setAcTime;
     }
 
+    public String[] getSetAc() {
+        return setAc;
+    }
 
-    public MyUser[] getFans() {
+    public void setSetAc(String[] setAc) {
+        this.setAc = setAc;
+    }
+
+    public String[] getDynamics() {
+        return dynamics;
+    }
+
+    public void setDynamics(String[] dynamics) {
+        this.dynamics = dynamics;
+    }
+
+
+    public String[] getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(String[] following) {
+        this.following = following;
+    }
+
+    public String[] getFans() {
         return fans;
     }
 
-    public void setFans(MyUser[] fans) {
+    public void setFans(String[] fans) {
         this.fans = fans;
-    }
-
-    public MyUser[] getFollow() {
-        return follow;
-    }
-
-    public void setFollow(MyUser[] follow) {
-        this.follow = follow;
     }
 }
 

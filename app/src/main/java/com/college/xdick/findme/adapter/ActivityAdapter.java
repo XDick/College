@@ -48,12 +48,20 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
     private int ITEM_TYPE_EMPTY = 3;
 
 
+    private int load_more_status;
+    //上拉加载更多
+    public static final int  PULLUP_LOAD_MORE=0;
+    //正在加载中
+    public static final int  LOADING_MORE=1;
+
+    public static final int  NO_MORE=2;
+
+
     private List<MyActivity> mActivityList;
     private Context mContext;
     private View mHeaderView;
     private View mFooterView;
     private View mEmptyView;
-    private int JoinSize;
 
     private String selectedcolor[]={"#7e07ce","#0d80c2","#c4c414","#0daf33","#cf0003"};
     private List<String> colorList = Arrays.asList(selectedcolor);
@@ -115,20 +123,14 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
                     .inflate(R.layout.item_activity, parent, false);
             final ViewHolder holder = new ActivityAdapter.ViewHolder(view);
 
+
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int position = holder.getAdapterPosition();
-                    MyActivity activity = mActivityList.get(position);
+                     MyActivity activity = mActivityList.get(position);
                     Intent intent = new Intent(mContext, ActivityActivity.class);
-                    intent.putExtra("ACTIVITY_CONTENT", activity.getContent())
-                            .putExtra("ACTIVITY_TIME", activity.getTime())
-                            .putExtra("ACTIVITY_COVER", activity.getCover())
-                            .putExtra("ACTIVITY_HOST", activity.getHostName())
-                            .putExtra("HOST_ID", activity.getHost().getObjectId())
-                            .putExtra("ACTIVITY_TITLE", activity.getTitle())
-                            .putExtra("ACTIVITY_PLACE", activity.getPlace())
-                            .putExtra("ACTIVITY_ID", activity.getObjectId());
+                    intent.putExtra("ACTIVITY",activity);
                     mContext.startActivity(intent);
 
 
@@ -163,8 +165,25 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         int type = getItemViewType(position);
 
         if (type == ITEM_TYPE_HEADER
-                || type == ITEM_TYPE_FOOTER
                 || type == ITEM_TYPE_EMPTY) {
+            return;
+        }
+
+        if (type == ITEM_TYPE_FOOTER) {
+            TextView textView= mFooterView.findViewById(R.id.footer_text);
+            switch (load_more_status) {
+                case PULLUP_LOAD_MORE:
+                    textView.setText("上拉加载更多");
+                    break;
+                case LOADING_MORE:
+                    textView.setText("正在加载数据...");
+                    break;
+
+                case NO_MORE:
+                    textView.setText("没有更多了");
+                    break;
+
+            }
             return;
         }
 
@@ -175,6 +194,15 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         String color;
         color = newColor[(realPos)%5];
         MyActivity activity = mActivityList.get(realPos);
+        int joincount=0;
+        try{
+            joincount=activity.getJoinUser().length;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+
         String gps[]=activity.getGps();
         String tag =Arrays.toString(activity.getTag());
         if(tag.equals(null)){
@@ -206,20 +234,10 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         holder.gps.setText(gps[2]);}
         Glide.with(mContext).load(activity.getCover()).apply(bitmapTransform(new BlurTransformation(9, 3))).into(holder.cover);
 
+           holder.join.setText("有" +joincount + "个人参与");
 
 
-        BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-        query.addWhereContainsAll("join", Arrays.asList(activity.getObjectId()));
-        query.setLimit(99999);
-        query.findObjects(new FindListener<MyUser>() {
-            @Override
-            public void done(List<MyUser> list, BmobException e) {
-                if (e == null) {
-                    JoinSize = list.size();
-                    holder.join.setText("有" + JoinSize + "个人参与");
-                }
-            }
-        });
+
 
 
     }
@@ -268,6 +286,11 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
     public void setEmptyView(View view) {
         mEmptyView = view;
         notifyDataSetChanged();
+    }
+
+
+    public void changeMoreStatus(int status){
+        load_more_status=status;
     }
 
 

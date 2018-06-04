@@ -31,18 +31,18 @@
                 android:text="请先登录" />
 
             <ImageView
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_gravity="right|center"
                 android:id="@+id/setting"
-                android:layout_margin="5dp"
+                android:layout_margin="7dp"
                 android:background="@drawable/setting"/>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.CoordinatorLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="150dp"
         android:background="?attr/colorPrimary">
 
         <com.college.xdick.findme.MyClass.WaveView3
@@ -54,8 +54,8 @@
 
         <ImageView
             android:id="@+id/user_avatar"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_gravity="center|bottom"
             />
 
@@ -108,7 +108,7 @@
             android:background="#eaeaea"
         />
         <LinearLayout
-           android:id="@+id/user_join"
+           android:id="@+id/user_dynamics"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -121,14 +121,14 @@
                 android:layout_height="wrap_content"
                 android:text="0"
                 android:textSize="20dp"
-                android:id="@+id/user_join_count"
+                android:id="@+id/user_dynamics_count"
                 android:textColor="#f11d1d"
                 android:layout_gravity="center"
                 android:layout_margin="5dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="我加入的活动"
+                android:text="我的动态"
                 android:textSize="15dp"
                 android:textColor="#1b1b1b"
                 android:layout_gravity="center"
@@ -137,87 +137,160 @@
         </LinearLayout>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/user_join"
+        android:layout_marginTop="30dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                android:background="@drawable/laptop"
+                android:layout_margin="20dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="我加入的"
+                android:textSize="15dp"
+                android:textColor="#1b1b1b"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="7"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/user_join_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="0"
+                android:textColor="#afafaf"
+                android:textSize="20dp" />
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/arrow_right"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+    </LinearLayout>
+
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/user_like"
         android:background="?android:attr/selectableItemBackground"
-        android:layout_marginTop="50dp"
         android:clickable="true"
         android:focusable="true"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                android:background="@drawable/like2"
+                android:layout_margin="20dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="我喜欢的"
+                android:textSize="15dp"
+                android:textColor="#1b1b1b"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="7"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/user_like_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="0"
+                android:textColor="#afafaf"
+                android:textSize="20dp" />
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/arrow_right"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/user_mytag"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center"
-            android:background="@drawable/send"
-            android:layout_margin="20dp"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="我的标签"
-            android:textSize="15dp"
-            android:textColor="#1b1b1b"
-            android:layout_gravity="center"
-     />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-
-        android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
-
         android:orientation="horizontal">
-        <ImageView
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center"
-            android:background="@drawable/like_t"
-            android:layout_margin="20dp"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="我喜欢的"
-            android:textSize="15dp"
-            android:textColor="#1b1b1b"
-            android:layout_gravity="center"
-           />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                android:background="@drawable/mytag"
+                android:layout_margin="20dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="我的标签"
+                android:textSize="15dp"
+                android:textColor="#1b1b1b"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
 
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="7"
+            android:orientation="horizontal">
+
+
+        </LinearLayout>
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center"
-            android:background="@drawable/user"
-            android:layout_margin="20dp"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="我的消息"
-            android:textSize="15dp"
-            android:textColor="#1b1b1b"
-            android:layout_gravity="center"
-          />
-
-    </LinearLayout>
-
 
 
 

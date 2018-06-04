@@ -21,71 +21,76 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:id="@+id/dynamics_comment_avatar"/>
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/dynamics_comment_username"
-            android:textSize="15dp"
-            android:layout_gravity="center"
+            android:textSize="13sp"
+            android:textColor="#000000"
+            android:textStyle="bold"
             android:layout_marginTop="2dp"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"/>
-    </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-
-
-
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/dynamics_comment_content"
-                  android:layout_margin="10dp"/>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:id="@+id/comment_replylayout_dynamics"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="40dp"
-                android:layout_marginRight="10dp"
-                android:background="@drawable/recycler_decoration">
-
-                <TextView
-                   android:id="@+id/comment_fromwho_dynamics"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:textColor="#3881e1"/>
-
-                <TextView
-                    android:id="@+id/comment_fromcontent_dynamics"
-                    android:layout_margin="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-
-
-        </LinearLayout>
-    </LinearLayout>
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/dynamics_comment_time"
         android:textSize="8dp"
-        android:layout_gravity="right"
         android:layout_margin="2dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dynamics_comment_content" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/comment_replylayout_dynamics"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/recycler_decoration">
+
+        <TextView
+            android:id="@+id/comment_fromwho_dynamics"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:textColor="#3881e1"/>
+
+        <TextView
+            android:id="@+id/comment_fromcontent_dynamics"
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+    </LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+    </LinearLayout>
+
+
 
 
 

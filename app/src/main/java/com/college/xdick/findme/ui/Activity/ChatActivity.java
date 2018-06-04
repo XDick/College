@@ -114,6 +114,7 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
 //在聊天页面的onCreate方法中，通过如下方法创建新的会话实例,这个obtain方法才是真正创建一个管理消息发送的会话
         conversation=BmobIMConversation.obtain(BmobIMClient.getInstance(),
                 (BmobIMConversation) getIntent().getSerializableExtra("c"));
+
     }
 
 
@@ -226,9 +227,14 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
                 //sw_refresh.setRefreshing(false);
                 if (e == null) {
                     if (null != list && list.size() > 0) {
-                        adapter.addMessages(list);
-                        adapter.notifyDataSetChanged();
-                        layoutManager.scrollToPositionWithOffset(list.size() - 1, 0);
+
+                                adapter.addMessages(list);
+                                adapter.notifyDataSetChanged();
+                                layoutManager.scrollToPositionWithOffset(list.size() - 1, 0);
+
+
+
+
                     }
                 } else {
                    // toast(e.getMessage() + "(" + e.getErrorCode() + ")");

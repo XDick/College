@@ -22,27 +22,39 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.CommentAdapter;
 import com.college.xdick.findme.bean.Comment;
+import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.ChatActivity;
+import com.college.xdick.findme.ui.Activity.HostNotifyActivity;
+import com.college.xdick.findme.ui.Activity.UserCenterActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMConversation;
+import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMUserInfo;
+import cn.bmob.newim.core.BmobIMClient;
 import cn.bmob.newim.listener.ConversationListener;
+import cn.bmob.newim.listener.MessageSendListener;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 /**
  * Created by Administrator on 2018/4/12.
@@ -51,7 +63,7 @@ import cn.bmob.v3.listener.UpdateListener;
 public class StartactivityFragment extends Fragment{
 
 
-    private String activityId;
+    private String activityId,hostAvatar,hostID;
     private ImageView avatar1,avatar2,avatar3,avatar4,avatar5,avatar6;
     private TextView joincount,commentcount,loadmore_text;
     private ImageView[] avatar;
@@ -62,11 +74,44 @@ public class StartactivityFragment extends Fragment{
     private View rootView;
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
     private boolean ifJoin;
+   public   MyActivity activity;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
        rootView =inflater.inflate(R.layout.fragment_ac_main,container,false);
+
+        initBaseView();
+        initJoin();
+        initRecyclerView();
+        initComment();
+
+
+       return rootView;
+    }
+
+
+
+    private void initBaseView(){
+        activity = (MyActivity)getActivity().getIntent().getSerializableExtra("ACTIVITY");
+        String activityTitle = activity.getTitle();
+        final String activityHost = activity.getHostName();
+        String activityCover =activity.getCover();
+        String activityContent = activity.getContent();
+        String activityTime = activity.getTime();
+        String activityPlace = activity.getPlace();
+        hostID=  activity.getHost().getObjectId();
+
+        BmobQuery<MyUser>query = new BmobQuery<>();
+        query.getObject(hostID, new QueryListener<MyUser>() {
+            @Override
+            public void done(MyUser myUser, BmobException e) {
+                hostAvatar =myUser.getAvatar();
+            }
+        });
+        activityId = activity.getObjectId();
+
+
 
         Toolbar toolbar =rootView.findViewById(R.id.toolbar_activity);
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout)
@@ -78,7 +123,7 @@ public class StartactivityFragment extends Fragment{
         avatar3=rootView.findViewById(R.id.ac_main_avatar3);
         avatar4=rootView.findViewById(R.id.ac_main_avatar4);
         avatar5=rootView.findViewById(R.id.ac_main_avatar5);
-         avatar6=rootView.findViewById(R.id.ac_main_avatar6);
+        avatar6=rootView.findViewById(R.id.ac_main_avatar6);
         avatar =new ImageView[6];
         avatar[0]=avatar1;
         avatar[1]=avatar2;
@@ -106,23 +151,7 @@ public class StartactivityFragment extends Fragment{
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        Intent intent =getActivity().getIntent();
-        String activityTitle = intent.getStringExtra("ACTIVITY_TITLE");
-        final String activityHost = intent.getStringExtra("ACTIVITY_HOST");
-        String activityCover = intent.getStringExtra("ACTIVITY_COVER");
-        String activityContent = intent.getStringExtra("ACTIVITY_CONTENT");
-        String activityTime = intent.getStringExtra("ACTIVITY_TIME");
-        String activityPlace = intent.getStringExtra("ACTIVITY_PLACE");
-        final String hostID=  intent.getStringExtra("HOST_ID");
-        activityId = intent.getStringExtra("ACTIVITY_ID");
-
-
-        ifJoin();
-        initJoin();
-        initData();
-
-
-       // collapsingToolbar.setExpandedTitleGravity(Gravity.BOTTOM|Gravity.CENTER);//设置收缩后标题的位置
+        // collapsingToolbar.setExpandedTitleGravity(Gravity.BOTTOM|Gravity.CENTER);//设置收缩后标题的位置
         collapsingToolbar.setTitle(activityTitle);
         Glide.with(this).load(activityCover).into(activityImageView);
         activityContentText.setText(activityContent);
@@ -134,64 +163,98 @@ public class StartactivityFragment extends Fragment{
 
 
 
-         activityHostText.setOnClickListener(new View.OnClickListener() {
-             @Override
-             public void onClick(View v) {
-                 startChatting(hostID,activityHost);
-             }
-         });
-
-
-        loadmore.setOnClickListener(new View.OnClickListener() {
+        activityHostText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               if(loadmore_text.getText().equals("加 载 更 多")){
-                activityContentText.setSingleLine(false);
-                loadmore_text.setText("收 起");}
+               BmobQuery<MyUser>  query1 = new BmobQuery<>();
+               query1.getObject(activity.getHost().getObjectId(), new QueryListener<MyUser>() {
+                   @Override
+                   public void done(MyUser myUser, BmobException e) {
+                       if (e==null){
+                           Intent intent = new Intent(getActivity(), UserCenterActivity.class);
+                           intent.putExtra("USER",myUser);
+                           startActivity(intent);
+                       }
+                   }
+               });
 
-                else {
-                   activityContentText.setMaxLines(5);
-                   loadmore_text.setText("加 载 更 多");
-
-               }
 
             }
         });
 
 
+        loadmore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(loadmore_text.getText().equals("加 载 更 多")){
+                    activityContentText.setSingleLine(false);
+                    loadmore_text.setText("收 起");}
 
-        joinButton.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
+                else {
+                    activityContentText.setMaxLines(5);
+                    loadmore_text.setText("加 载 更 多");
+
+                }
+
+            }
+        });
+
+
+          if(activity.getHostName().equals(bmobUser.getUsername())){
+              joinButton.setText("发送通知");
+              joinButton.setBackgroundColor(getResources().getColor(R.color.button_yellow));
+              joinButton.setOnClickListener(new View.OnClickListener() {
+                  @Override
+                  public void onClick(View v) {
+                         Intent intent = new Intent(getActivity(), HostNotifyActivity.class);
+                         intent.putExtra("ACTIVITY",activity);
+                         startActivity(intent);
+                  }
+              });
+          }
+          else {
+              ifJoin();
+              joinButton.setOnClickListener(new View.OnClickListener() {
+                  @Override
+                  public void onClick(View v) {
 
                       if(!ifJoin){
 
-
-                          bmobUser.add("join",activityId);
+                          bmobUser.addUnique("join",activityId);
                           bmobUser.update(new UpdateListener() {
                               @Override
                               public void done(BmobException e) {
                                   if (e == null) {
+                                       sendMessage(bmobUser.getUsername()+"加入了你的"+"#"+activity.getTitle()+"#活动"
+                                       ,new BmobIMUserInfo(hostID,activity.getHostName(),hostAvatar));
+                                      ifJoin=true;
+                                      MyActivity myActivity = new MyActivity();
+                                      myActivity.setObjectId(activity.getObjectId());
+                                      myActivity.setDate(activity.getDate());
+                                      myActivity.addUnique("joinUser",bmobUser.getObjectId());
+                                      myActivity.update();
 
-                                                  ifJoin=true;
 
-                                           getActivity().runOnUiThread(new Runnable() {
-                                               @Override
-                                               public void run() {
-                                                  joincount.setText(++joinnum+"");
-                                                   joinButton.setText("取消加入");
-                                               }
-                                           });
-
-                                                  Toast.makeText(getContext(), "成功加入", Toast.LENGTH_SHORT).show();
-                                              }
-
-                                              else {
-                                             Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
-                                                  Toast.makeText(getContext(),"失败",Toast.LENGTH_SHORT).show();
-                                              }
+                                      getActivity().runOnUiThread(new Runnable() {
+                                          @Override
+                                          public void run() {
+                                              joincount.setText(++joinnum+"");
+                                              joinButton.setText("取消加入");
+                                              joinButton.setBackgroundColor(getResources().getColor(R.color.button_grey));
                                           }
                                       });
+
+
+
+                                      Toast.makeText(getContext(), "成功加入", Toast.LENGTH_SHORT).show();
+                                  }
+
+                                  else {
+                                      Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
+                                      Toast.makeText(getContext(), e.getMessage(),Toast.LENGTH_SHORT).show();
+                                  }
+                              }
+                          });
 
                       }
 
@@ -202,39 +265,45 @@ public class StartactivityFragment extends Fragment{
                               @Override
                               public void done(BmobException e) {
 
-                                                  if(e==null){
-
-                                                      getActivity().runOnUiThread(new Runnable() {
-                                                          @Override
-                                                          public void run() {
-                                                              joinButton.setText("加 入!");
-                                                              joincount.setText(--joinnum+"");
-                                                          }
-                                                      });
-
-
-                                                          ifJoin = false;
-                                                          Toast.makeText(getContext(), "取消加入", Toast.LENGTH_SHORT).show();
-                                                      }
-
-                                           else {
-                                            Toast.makeText(getContext(),"失败",Toast.LENGTH_SHORT).show();
+                                  if(e==null){
+                                      MyActivity myActivity = new MyActivity();
+                                      myActivity.setObjectId(activity.getObjectId());
+                                      myActivity.setDate(activity.getDate());
+                                      myActivity.removeAll("joinUser",Arrays.asList(bmobUser.getObjectId()));
+                                      myActivity.update();
+                                      getActivity().runOnUiThread(new Runnable() {
+                                          @Override
+                                          public void run() {
+                                              joinButton.setText("加 入!");
+                                              joincount.setText(--joinnum+"");
+                                              joinButton.setBackgroundColor(getResources().getColor(R.color.button_red));
                                           }
-                                      }
-                                  });
-                              }
-                  }
-      });
+                                      });
 
-       return rootView;
+
+
+                                      ifJoin = false;
+                                      Toast.makeText(getContext(), "取消加入", Toast.LENGTH_SHORT).show();
+                                  }
+
+                                  else {
+                                      Toast.makeText(getContext(), e.getMessage(),Toast.LENGTH_SHORT).show();
+                                  }
+                              }
+                          });
+                      }
+                  }
+              });
+
+
+          }
+
+
     }
 
 
-
-
-
 public  void initJoin(){
-    BmobQuery<MyUser> query = new BmobQuery<MyUser>();
+        BmobQuery<MyUser> query = new BmobQuery<MyUser>();
     query.addWhereContainsAll("join", Arrays.asList(activityId));
     query.setLimit(99999);
     query.findObjects(new FindListener<MyUser>() {
@@ -249,13 +318,13 @@ public  void initJoin(){
                         public void onClick(View v) {
 
 
-                           String id = user.getObjectId();
-                           String name = user.getUsername();
-                           startChatting(id ,name);
+                            Intent intent = new Intent(getActivity(), UserCenterActivity.class);
+                            intent.putExtra("USER",user);
+                            startActivity(intent);
 
                         }
                     });
-                    Glide.with(getContext()).load(user.getAvatar()).into(avatar[count]);
+                    Glide.with(getContext()).load(user.getAvatar()).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar[count]);
 
                     if(count==5){
                         break;
@@ -273,10 +342,7 @@ public  void initJoin(){
     });
 
 
-
-
 }
-
 
     private void initRecyclerView(){
 
@@ -284,7 +350,11 @@ public  void initJoin(){
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new CommentAdapter(commentList);
+        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_comment, recyclerView, false);
+        adapter.setEmptyView(empty);
+
         recyclerView.setAdapter(adapter);
+
         recyclerView.setNestedScrollingEnabled(false);
         DividerItemDecoration decoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         decoration.setDrawable(getResources().getDrawable(R.drawable.recycler_decoration));
@@ -294,7 +364,7 @@ public  void initJoin(){
     }
 
 
-    public void initData(){
+    public void initComment(){
 
         BmobQuery<Comment> query = new BmobQuery<Comment>();
         query.addWhereEqualTo("ActivityID", activityId);
@@ -329,34 +399,51 @@ public  void initJoin(){
         if (Arrays.toString(bmobUser.getJoin()).indexOf(activityId) < 0) {
             ifJoin = false;
             joinButton.setText("加 入!");
+            joinButton.setBackgroundColor(getResources().getColor(R.color.button_red));
 
         } else {
             ifJoin = true;
             joinButton.setText("取消加入");
+            joinButton.setBackgroundColor(getResources().getColor(R.color.button_grey));
         }
     }
 
 
 
-    private void startChatting(String id,String name){
-        BmobIM.getInstance().startPrivateConversation( new BmobIMUserInfo(id,name,""), new ConversationListener() {
-            @Override
-            public void done(BmobIMConversation c, BmobException e) {
-                if(e==null){
-                    //在此跳转到聊天页面
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("c", c);
-                    Intent intent = new Intent(getContext(),
-                            ChatActivity.class);
-                    intent.putExtras(bundle);
-                    startActivity(intent);
 
-                }else{
-                    Toast.makeText(getContext()
-                            ,e.getMessage()+"("+e.getErrorCode()+")",Toast.LENGTH_SHORT).show();
+
+
+
+    public void sendMessage(String content ,BmobIMUserInfo info) {
+
+        if(!bmobUser.getObjectId().equals(info.getUserId())){
+
+        BmobIMConversation conversationEntrance = BmobIM.getInstance().startPrivateConversation(info, true, null);
+        BmobIMConversation messageManager = BmobIMConversation.obtain(BmobIMClient.getInstance(), conversationEntrance);
+        ActivityMessage msg = new ActivityMessage();
+        msg.setContent(content);//给对方的一个留言信息
+        Map<String, Object> map = new HashMap<>();
+        map.put("currentuser", info.getUserId());
+        map.put("userid", bmobUser.getObjectId());
+        map.put("username",bmobUser.getUsername());
+        map.put("useravatar",bmobUser.getAvatar());
+        map.put("activityid",activity.getObjectId());
+        map.put("activityname",activity.getTitle());
+        map.put("type","activity");
+        msg.setExtraMap(map);
+        messageManager.sendMessage(msg, new MessageSendListener() {
+            @Override
+            public void done(BmobIMMessage msg, BmobException e) {
+                if (e == null) {//发送成功
+
+                } else {//发送失败
+                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
     }
+    }
+
+
+
 }

@@ -1,6 +1,7 @@
 package com.college.xdick.findme.ui.Fragment;
 
 
+import android.app.Activity;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.ActivityAdapter;
+import com.college.xdick.findme.adapter.DynamicsAdapter;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.MainActivity;
@@ -40,6 +42,10 @@ import pl.tajchert.waitingdots.DotsTextView;
 
 public class ActivitygpsFragment extends Fragment {
     static int flag_gps =0;
+    public final int ADD =1;
+    public final int REFRESH=2;
+    public final int SORT =3;
+    private static int size =0;
 
     View rootview;
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
@@ -48,7 +54,8 @@ public class ActivitygpsFragment extends Fragment {
     private ActivityAdapter adapter;
     private DotsTextView dots;
     private LinearLayout loadlayout;
-
+    static boolean ifsort = false;
+    static boolean ifEmpty= false;
 
 
 
@@ -63,7 +70,7 @@ public class ActivitygpsFragment extends Fragment {
         if(flag_gps==0){
             loadlayout.setVisibility(View.VISIBLE);
             dots.start();
-            initData();
+            initData(REFRESH);
             flag_gps=1;
         }
         if (bmobUser==null){
@@ -104,11 +111,12 @@ public class ActivitygpsFragment extends Fragment {
     private void initRecyclerView(){
 
         RecyclerView recyclerView = rootview.findViewById(R.id.recyclerview_ac_gps);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+       final  LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
        adapter = new ActivityAdapter(activityList2);
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
-
+        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty, recyclerView, false);
+        adapter.setEmptyView(empty);
          adapter.addFooterView(footer);
 
 
@@ -118,14 +126,46 @@ public class ActivitygpsFragment extends Fragment {
         alphaAdapter.setInterpolator(new OvershootInterpolator());
         alphaAdapter.setFirstOnly(false);
         recyclerView.setAdapter(alphaAdapter);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+//设置加载的状态
+                if(ifEmpty){
+                    adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                }else
+                {
+                    adapter.changeMoreStatus(ActivityAdapter.LOADING_MORE);}
+                //判断到底部的条件
+                if (newState == RecyclerView.SCROLL_STATE_IDLE &&  layoutManager.findLastVisibleItemPosition()+1  == adapter.getItemCount()) {
+                    if (ifEmpty){
+                        //null
+                    }
+                    else {
+                        if (ifsort){
+                            sortData(SORT);
+                        }
+                        else {
+                            initData(ADD);}
+                    }
+
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
 
     }
 
-    private void initData(){
+    public void initData(final int state){
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
             public void done(Long aLong, BmobException e) {
-                if(activityList2!=null) {activityList2.clear();}
+
 
                 if(bmobUser!=null){
 
@@ -138,19 +178,44 @@ public class ActivitygpsFragment extends Fragment {
                     query.addWhereEqualTo("gps", gps[2]);}
                     if (e==null){
                     query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);}
-//返回50条数据，如果不加上这条语句，默认返回10条数据
-                    query.setLimit(99);
-//执行查询方法
+                    query.order("-createdAt");
+                    query.setSkip(size);
+                    query.setLimit(10);
+                final int listsize = activityList2.size();
                     query.findObjects(new FindListener<MyActivity>() {
                         @Override
                         public void done(List<MyActivity> object, BmobException e) {
                             if(e==null){
-                                for (MyActivity activity : object) {
-                                    activityList2.add(activity);}
-                                Collections.reverse(activityList2); // 倒序排列
-                                loadlayout.setVisibility(View.GONE);
-                                adapter.notifyDataSetChanged();
-                                // Toast.makeText(getContext(),"成功接收内容",Toast.LENGTH_SHORT).show();
+                                ifsort=false;
+                                activityList2.addAll(object);
+                                if (state==ADD){
+                                    if (listsize==activityList2.size()){
+                                        ifEmpty=true;
+                                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                                        adapter.notifyDataSetChanged();
+
+
+                                    } else if (listsize+10>activityList2.size()){
+                                        ifEmpty=true;
+                                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                                        adapter.notifyItemInserted(adapter.getItemCount()-1);
+
+                                    }
+
+                                    else {
+
+                                        adapter.changeMoreStatus(ActivityAdapter.PULLUP_LOAD_MORE);
+                                        adapter.notifyItemInserted(adapter.getItemCount()-1);
+                                        size = size + 10;
+                                    }
+                                }
+                                else if (state==REFRESH){
+
+                                    activityList2.clear();
+                                    activityList2.addAll(object);
+                                    adapter.notifyDataSetChanged();
+                                    size =  10;
+                                }
 
                             }else{
                                 Toast.makeText(getContext(),"网络不佳",Toast.LENGTH_SHORT).show();
@@ -172,11 +237,16 @@ public class ActivitygpsFragment extends Fragment {
 
 
     private void refresh(){
+        size =0;
+
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try{
-                    initData();
+                    if (ifsort){
+                        sortData(REFRESH);
+                    }else {
+                        initData(REFRESH);}
                     Thread.sleep(2000);
                 }
                 catch (InterruptedException e){
@@ -202,9 +272,84 @@ public class ActivitygpsFragment extends Fragment {
 
 
 
+    public void sortData(final int state) {
+
+        Bmob.getServerTime(new QueryListener<Long>() {
+            @Override
+            public void done(Long aLong, BmobException e) {
 
 
 
 
+                if(bmobUser!=null){
+
+
+
+                    String[] gps = bmobUser.getGps();
+
+                    BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
+                    if (gps!=null){
+                        query.addWhereEqualTo("gps", gps[2]);}
+                    if (e==null){
+                        query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);}
+                    query.setSkip(size);
+                    query.setLimit(10);
+                    query.order("date");
+                    final int listsize = activityList2.size();
+                    query.findObjects(new FindListener<MyActivity>() {
+                        @Override
+                        public void done(List<MyActivity> object, BmobException e) {
+                            if(e==null){
+                                ifsort=true;
+                                activityList2.addAll(object);
+                                if (state==SORT){
+                                    if (listsize==activityList2.size()){
+                                        ifEmpty=true;
+                                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                                        adapter.notifyDataSetChanged();
+                                    } else if (listsize+10>activityList2.size()){
+                                        ifEmpty=true;
+                                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                                        adapter.notifyItemInserted(adapter.getItemCount()-1);
+
+                                    }
+
+                                    else {
+
+                                        adapter.changeMoreStatus(ActivityAdapter.PULLUP_LOAD_MORE);
+                                        adapter.notifyItemInserted(adapter.getItemCount()-1);
+                                        size = size + 10;
+                                    }
+                                }
+                                else if (state==REFRESH){
+
+                                    activityList2.clear();
+                                    activityList2.addAll(object);
+                                    adapter.notifyDataSetChanged();
+                                    size =  10;
+                                }
+
+                            }else{
+                                Toast.makeText(getContext(),"网络不佳",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+
+
+                }
+
+            }
+        });
+
+
+
+
+
+    }
+
+
+    public void setSize(int size1){
+        size=size1;
+    }
 
 }
