@@ -417,8 +417,13 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
 
                 if(content.length()!=0&&title.length()!=0
                         &&place.length()!=0&&date.length()!=0&& ifchooseMain&&date.contains("年")){
-                    Toast.makeText(SetActivitiyActivity.this, "发起中...", Toast.LENGTH_SHORT).show();
 
+                 if (contentE.getText().toString().length()<=50){
+                     Toast.makeText(SetActivitiyActivity.this,"活动描述不能少于50字",Toast.LENGTH_SHORT).show();
+
+                 }
+                 else {
+                     Toast.makeText(SetActivitiyActivity.this, "发起中...", Toast.LENGTH_SHORT).show();
                     if(picturePath!=null) {
                     final BmobFile bmobFile = new BmobFile(new File(picturePath));
                         finish();
@@ -452,10 +457,10 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
                                             Bmob.getServerTime(new QueryListener<Long>() {
                                                 @Override
                                                 public void done(Long aLong, BmobException e) {
-                                                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd" );
-                                                    String date=sdf.format(new Date(aLong * 1000L));
+                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                                    String date = sdf.format(new Date(aLong * 1000L));
                                                     user.setSetAcTime(date);
-                                                    user.addUnique("setAc",objectId);
+                                                    user.addUnique("setAc", objectId);
                                                     user.update(new UpdateListener() {
                                                         @Override
                                                         public void done(BmobException e) {
@@ -463,68 +468,63 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
                                                         }
                                                     });
                                                 }
-                                            } );
+                                            });
 
 
+                                            if (ifcreateAdd) {
+                                                AddTagBean tag = new AddTagBean(createText.getText().toString());
+                                                tag.setProviderName(user.getUsername());
+                                                tag.save(new SaveListener<String>() {
+                                                    @Override
+                                                    public void done(String s, BmobException e) {
 
 
+                                                        BmobQuery<AddTagBean> query = new BmobQuery<AddTagBean>();
+                                                        query.addWhereEqualTo("addTag", createText.getText().toString());
+                                                        query.findObjects(new FindListener<AddTagBean>() {
+                                                            @Override
+                                                            public void done(List<AddTagBean> list, BmobException e) {
+                                                                for (AddTagBean tag : list) {
+                                                                    tag.UserCountAdd1();
+                                                                    tag.update(tag.getObjectId(), new UpdateListener() {
+                                                                        @Override
+                                                                        public void done(BmobException e) {
 
-                                          if(ifcreateAdd) {
-                                              AddTagBean tag = new AddTagBean(createText.getText().toString());
-                                              tag.setProviderName(user.getUsername());
-                                              tag.save(new SaveListener<String>() {
-                                                  @Override
-                                                  public void done(String s, BmobException e) {
+                                                                        }
+                                                                    });
+                                                                    break;
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            }
 
+                                            if (!usedAddTag.equals("")) {
+                                                BmobQuery<AddTagBean> query = new BmobQuery<AddTagBean>();
+                                                query.addWhereEqualTo("addTag", usedAddTag);
+                                                query.findObjects(new FindListener<AddTagBean>() {
+                                                    @Override
+                                                    public void done(List<AddTagBean> list, BmobException e) {
+                                                        for (AddTagBean tag : list) {
+                                                            tag.UserCountAdd1();
+                                                            tag.update(tag.getObjectId(), new UpdateListener() {
+                                                                @Override
+                                                                public void done(BmobException e) {
 
+                                                                }
+                                                            });
+                                                            break;
 
-
-                                                      BmobQuery<AddTagBean> query = new BmobQuery<AddTagBean>();
-                                                      query.addWhereEqualTo("addTag", createText.getText().toString());
-                                                      query.findObjects(new FindListener<AddTagBean>() {
-                                                          @Override
-                                                          public void done(List<AddTagBean> list, BmobException e) {
-                                                              for (AddTagBean tag:list){
-                                                                  tag.UserCountAdd1();
-                                                                  tag.update(tag.getObjectId(), new UpdateListener() {
-                                                                      @Override
-                                                                      public void done(BmobException e) {
-
-                                                                      }
-                                                                  });
-                                                                  break;
-                                                              }
-                                                          }
-                                                      });
-                                                  }
-                                              });
-                                          }
-
-                                          if(!usedAddTag.equals("")){
-                                              BmobQuery<AddTagBean> query = new BmobQuery<AddTagBean>();
-                                              query.addWhereEqualTo("addTag", usedAddTag);
-                                              query.findObjects(new FindListener<AddTagBean>() {
-                                                  @Override
-                                                  public void done(List<AddTagBean> list, BmobException e) {
-                                                      for (AddTagBean tag:list){
-                                                          tag.UserCountAdd1();
-                                                          tag.update(tag.getObjectId(), new UpdateListener() {
-                                                              @Override
-                                                              public void done(BmobException e) {
-
-                                                              }
-                                                          });
-                                                          break;
-
-                                                      }
-                                                  }
-                                              });
-                                          }
+                                                        }
+                                                    }
+                                                });
+                                            }
                                             Toast.makeText(SetActivitiyActivity.this, "发起成功", Toast.LENGTH_SHORT).show();
 
 
                                         } else {
-                                            Toast.makeText(SetActivitiyActivity.this, "发起失败"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(SetActivitiyActivity.this, "发起失败" + e.getMessage(), Toast.LENGTH_SHORT).show();
 
                                         }
 
@@ -547,7 +547,7 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
                     });
                 }
 
-
+                 }
 
 
                 }

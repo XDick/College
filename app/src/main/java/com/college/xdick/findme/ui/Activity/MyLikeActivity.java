@@ -106,7 +106,7 @@ public class MyLikeActivity extends AppCompatActivity {
                                 myUser=BmobUser.getCurrentUser(MyUser.class);
                             }
                         });
-
+                        Toast.makeText(MyLikeActivity.this, "Oops，其中一些活动已经被发布者删除", Toast.LENGTH_SHORT).show();
                     }
 
                 }

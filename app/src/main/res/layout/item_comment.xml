@@ -12,38 +12,66 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:orientation="horizontal">
 
 
 
         <ImageView
-            android:layout_margin="10dp"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+
+            android:layout_width="38dp"
+            android:layout_height="38dp"
             android:id="@+id/activity_comment_avatar"/>
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:orientation="vertical">
 
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="2dp"
+    android:layout_marginLeft="2dp"
+    android:layout_marginRight="2dp"
+    android:orientation="horizontal">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/activity_comment_username"
-                android:textStyle="bold"
+                 android:textColor="#262626"
                 android:textSize="15dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp"/>
+               />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_height="wrap_content">
+<ImageView
+    android:layout_width="15dp"
+    android:layout_height="15dp"
+    android:layout_gravity="end"
+    android:layout_marginRight="10dp"
+    android:background="@drawable/thumb_up"/>
+
+    </LinearLayout>
+</LinearLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/activity_comment_time"
-                android:textSize="8dp"
-                android:layout_margin="2dp"/>
+                android:textSize="10dp"
+                android:layout_marginLeft="2dp"/>
 
 
             <TextView
@@ -51,6 +79,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/activity_comment_content"
                 android:layout_marginLeft="3dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="10dp"/>
 

@@ -107,8 +107,8 @@
         <activity android:name=".ui.Activity.HostNotifyActivity"/>
        <activity android:name=".ui.Activity.SearchActivityActivity"/>
         <activity android:name=".ui.Activity.SearchUserActivity"/>
-
-
+        <activity android:name=".ui.Activity.UserCenterFollowedActivity"/>
+         <activity android:name=".ui.Activity.UserCenterFollowingActivity"/>
 
 
         <activity

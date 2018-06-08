@@ -210,7 +210,7 @@ public class ActivitygpsFragment extends Fragment {
                                     }
                                 }
                                 else if (state==REFRESH){
-
+                                    ifEmpty=false;
                                     activityList2.clear();
                                     activityList2.addAll(object);
                                     adapter.notifyDataSetChanged();
@@ -322,7 +322,7 @@ public class ActivitygpsFragment extends Fragment {
                                     }
                                 }
                                 else if (state==REFRESH){
-
+                                      ifEmpty=false;
                                     activityList2.clear();
                                     activityList2.addAll(object);
                                     adapter.notifyDataSetChanged();

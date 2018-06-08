@@ -264,30 +264,25 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
               else if (activity.getType().equals("dynamics")){
 
 
-                       BmobQuery<MyUser> query1 = new BmobQuery<>();
-                       query1.getObject(activity.getUserId(), new QueryListener<MyUser>() {
-                           @Override
-                           public void done(final MyUser myUser, BmobException e) {
-                               if (e==null){
-
-                                   BmobQuery<Dynamics> query = new BmobQuery<>();
 
 
+                                   final BmobQuery<Dynamics> query = new BmobQuery<>();
                                    query.getObject(activity.getActivityId(), new QueryListener<Dynamics>() {
                                        @Override
-                                       public void done(Dynamics dynamics, BmobException e) {
-                                           Intent intent = new Intent(mContext, MainDynamicsActivity.class);
-                                           intent.putExtra("DYNAMICS", dynamics);
-                                           intent.putExtra("USER",myUser);
-                                           mContext.startActivity(intent);
-                                       }
-                                   });
-                               }
+                                       public void done(final Dynamics dynamics, BmobException e) {
+                                          BmobQuery<MyUser> query1 = new BmobQuery<>();
+                                          query1.getObject(dynamics.getUserId(), new QueryListener<MyUser>() {
+                                              @Override
+                                              public void done(MyUser myUser, BmobException e) {
+                                                  if (e==null){
+                                                      Intent intent = new Intent(mContext, MainDynamicsActivity.class);
+                                                      intent.putExtra("DYNAMICS", dynamics);
+                                                      intent.putExtra("USER",myUser);
+                                                      mContext.startActivity(intent);
 
-
-
-
-
+                                                  }
+                                              }
+                                          });
 
                     }
                 });

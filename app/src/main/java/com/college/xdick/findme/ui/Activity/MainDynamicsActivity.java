@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,18 +23,22 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
+import com.college.xdick.findme.MyClass.CommentScrollView;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.ActivityAdapter;
+import com.college.xdick.findme.adapter.CommentAdapter;
 import com.college.xdick.findme.adapter.DynamicsCommentAdapter;
 import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.DynamicsComment;
+import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.jaeger.ninegridimageview.NineGridImageView;
 import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
@@ -65,6 +70,7 @@ import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import pl.tajchert.waitingdots.DotsTextView;
 
+import static android.view.View.GONE;
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
 /**
@@ -76,7 +82,7 @@ public class MainDynamicsActivity extends AppCompatActivity {
     private TextView content1,time1,user1,commentcount,likecount;
     private Toolbar toolbar;
     private RecyclerView recyclerView;
-    private DynamicsCommentAdapter adapter;
+    public DynamicsCommentAdapter adapter;
     private List<DynamicsComment> commentList=new ArrayList<>();
     public boolean ifReply=false;
     private ImageView sendComment;
@@ -84,7 +90,6 @@ public class MainDynamicsActivity extends AppCompatActivity {
     private DynamicsComment replyComment,fromComment;
     private ImageView avatar,avatar1,avatar2,avatar3,avatar4,avatar5,avatar6;
     private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
-    private int dynamicsReplycount;
     private String dynamicsId;
     private InputMethodManager imm ;
     private DotsTextView dots;
@@ -94,30 +99,56 @@ public class MainDynamicsActivity extends AppCompatActivity {
     private ImageView mImageView;
     private Dialog dialog;
     private MyUser  bmobUser = BmobUser.getCurrentUser(MyUser.class);
+    private Dynamics dynamics;
+    private  ImageView[] avatarView =new ImageView[6];
+
+    private  int size =0;
+    public static boolean ifEmpty=false;
+    public static int ADD=2,REFRESH=1,REPLY=3;
+    private int commentCount;
 
 
-
+    private TextView title,time2,host,join;
+    private ImageView cover;
+    private CardView cardView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_dynamics);
-        initView();
         initRecycler();
-        initComment();
+        initView();
+        initComment(REFRESH);
+        initLike();
     }
 
     private void initView(){
-       Intent intent = getIntent();
-        final Dynamics dynamics = (Dynamics)intent.getSerializableExtra("DYNAMICS");
-        final MyUser nowUser = (MyUser) intent.getSerializableExtra("USER");
+        CommentScrollView scrollView = findViewById(R.id.scrollView);
+        scrollView.registerOnScrollViewScrollToBottom(new CommentScrollView.OnScrollBottomListener() {
+            @Override
+            public void srollToBottom() {
+                if (ifEmpty) {
+                    adapter.changeMoreStatus(CommentAdapter.NO_MORE);
+                } else {
+                    adapter.changeMoreStatus(CommentAdapter.LOADING_MORE);
+                }
 
+                if (ifEmpty) {
+                    //null
+                } else {
+                    initComment(ADD);
+                }
+            }
+        });
+
+        Intent intent = getIntent();
+        dynamics = (Dynamics)intent.getSerializableExtra("DYNAMICS");
+        final MyUser nowUser = (MyUser) intent.getSerializableExtra("USER");
+         commentCount= dynamics.getReplycount();
         final  String user = dynamics.getUser();
         String content = dynamics.getContent();
         dynamicsId = dynamics.getObjectId();
-        dynamicsReplycount = dynamics.getReplycount();
-        final String userid=  dynamics.getUserId();
-        String[] like = dynamics.getLike();
+
                     avatar=findViewById(R.id.dynamics_main_avatar);
                     Glide.with(this).load(nowUser.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
                     avatar.setOnClickListener(new View.OnClickListener() {
@@ -128,7 +159,7 @@ public class MainDynamicsActivity extends AppCompatActivity {
                             intent.putExtra("USER",nowUser);
                             startActivity(intent);
                         }});
-        ImageView[] avatarView =new ImageView[6];
+
          avatar1=findViewById(R.id.avatar1);
         avatar2=findViewById(R.id.avatar2);
         avatar3=findViewById(R.id.avatar3);
@@ -142,16 +173,50 @@ public class MainDynamicsActivity extends AppCompatActivity {
         avatarView[4]=avatar5;
         avatarView[5]=avatar6;
           likecount = findViewById(R.id.likecount_text);
-         try {
-             likecount.setText(like.length+"赞");
-             for (int i =0; i<like.length;i++){
-                 String avatarUrl = like[i].substring(like[i].indexOf("+")+1);
-                 Glide.with(this).load(avatarUrl).apply(bitmapTransform(new CropCircleTransformation())).into(avatarView[i]);
-             }
-         }catch (Exception e){
-             e.printStackTrace();
-         }
+        title= findViewById(R.id.title_ac);
+        cardView =findViewById(R.id.cardview_ac);
+        cover = findViewById(R.id.cover_ac);
+        time2= findViewById(R.id.time_ac);
 
+        host = findViewById(R.id.host_ac);
+        join = findViewById(R.id.join_ac);
+
+        if (dynamics.getActivityTitle()==null){
+            cardView.setVisibility(GONE);
+        }
+        else {
+           cardView.setVisibility(View.VISIBLE);
+
+            title.setText(dynamics.getActivityTitle());
+
+            time2.setText(dynamics.getActivityTime());
+
+            Glide.with(this).load(dynamics.getActivityCover()).into(cover);
+
+            host.setText("由"+dynamics.getActivityHost()+"发起");
+
+            cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    BmobQuery<MyActivity> query = new BmobQuery<>();
+                    query.getObject(dynamics.getActivityId(), new QueryListener<MyActivity>() {
+                        @Override
+                        public void done(MyActivity activity, BmobException e) {
+                            if (e==null){
+
+                                Intent intent = new Intent(MainDynamicsActivity.this, ActivityActivity.class);
+                                intent.putExtra("ACTIVITY",activity);
+                                startActivity(intent);
+                            }
+                        }
+                    });
+
+
+
+
+                }
+            });
+        }
 
 
         dialog = new Dialog(MainDynamicsActivity.this, R.style.AppTheme);
@@ -258,7 +323,8 @@ public class MainDynamicsActivity extends AppCompatActivity {
 
                                 editComment.setText("");
                                 commentList.clear();
-                                initComment();
+                                size=0;
+                                initComment(REPLY);
                                 ifReply=false;
 
 
@@ -306,11 +372,12 @@ public class MainDynamicsActivity extends AppCompatActivity {
 
                                 Toast.makeText(MainDynamicsActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
 
-                                sendMessage(bmobUser.getUsername()+"评论了你的动态:"+editComment.getText().toString(),new BmobIMUserInfo(dynamicsId,dynamics.getUser(),null),
+                                sendMessage(bmobUser.getUsername()+"评论了你的动态:"+editComment.getText().toString(),new BmobIMUserInfo(dynamics.getUserId(),dynamics.getUser(),null),
                                         dynamics.getObjectId(),dynamics.getContent());
                                 editComment.setText("");
                                 commentList.clear();
-                                initComment();
+                                size=0;
+                                initComment(REPLY);
                             } else {
                                 Toast.makeText(MainDynamicsActivity.this, "评论失败", Toast.LENGTH_SHORT).show();
                             }
@@ -329,8 +396,9 @@ public class MainDynamicsActivity extends AppCompatActivity {
     }
 
     private void initRecycler(){
+
         recyclerView = findViewById(R.id.recyclerview_main_dynamics);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this) {
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this) {
             @Override
             public boolean canScrollVertically() {
                 return false;
@@ -338,15 +406,16 @@ public class MainDynamicsActivity extends AppCompatActivity {
         };
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setNestedScrollingEnabled(false);
         DividerItemDecoration decoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         decoration.setDrawable(getResources().getDrawable(R.drawable.recycler_decoration));
         recyclerView.addItemDecoration(decoration);
         adapter = new DynamicsCommentAdapter(commentList);
         View empty = LayoutInflater.from(this).inflate(R.layout.item_empty_comment, recyclerView, false);
         adapter.setEmptyView(empty);
-
+        View footer = LayoutInflater.from(this).inflate(R.layout.item_footer, recyclerView, false);
+        adapter.addFooterView(footer);
         recyclerView.setAdapter(adapter);
+
 
     }
 
@@ -369,23 +438,60 @@ public class MainDynamicsActivity extends AppCompatActivity {
     }
 
 
-    private void initComment(){
+    public void initComment(final int state){
 
         BmobQuery<DynamicsComment> query = new BmobQuery<DynamicsComment>();
         query.addWhereEqualTo("dynamicsID", dynamicsId);
-        query.setLimit(50);
+        query.order("-createdAt");
+        query.setLimit(10);
+        query.setSkip(size);
+        final int listsize = commentList.size();
         query.findObjects(new FindListener<DynamicsComment>() {
             @Override
             public void done(List<DynamicsComment> list, BmobException e) {
                 if (e == null) {
 
-                   commentcount.setText("(" + list.size() + ")");
-                    Collections.reverse(list); // 倒序排列
-                    for (DynamicsComment comment : list) {
-                        commentList.add(comment);
+                    commentList.addAll(list);
+
+                    if (state==REFRESH) {
+                        ifEmpty=false;
+                        size=10;
+                        adapter.notifyDataSetChanged();
+                        commentcount.setText("("+commentCount+")");
+                        loadlayout.setVisibility(View.GONE);
+
                     }
-                    loadlayout.setVisibility(View.GONE);
-                    initRecycler();
+                    else if (state == ADD){
+                        if (listsize == commentList.size()) {
+                            ifEmpty = true;
+                            adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                            adapter.notifyDataSetChanged();
+                        } else if (listsize + 10 > commentList.size()) {
+                            ifEmpty = true;
+                            adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                            adapter.notifyItemInserted(adapter.getItemCount() - 1);
+
+
+                        }
+                        else {
+                            adapter.notifyItemInserted(adapter.getItemCount()-1);
+                            size = size + 10;
+                        }
+
+
+                    }
+
+                    else if (state ==REPLY){
+                        ifEmpty=false;
+                        size=10;
+                        initRecycler();
+                        dynamics.increment("replycount",1);
+                        dynamics.update();
+                        commentcount.setText("("+ ++commentCount+")");
+                    }
+
+
+
 
                 } else {
                     Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
@@ -396,27 +502,7 @@ public class MainDynamicsActivity extends AppCompatActivity {
         });}
 
 
-    private void startChatting(String id,String name,String avatar){
-        BmobIM.getInstance().startPrivateConversation( new BmobIMUserInfo(id,name,avatar), new ConversationListener() {
-            @Override
-            public void done(BmobIMConversation c, BmobException e) {
-                if(e==null){
-                    //在此跳转到聊天页面
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("c", c);
-                    Intent intent = new Intent(MainDynamicsActivity.this,
-                            ChatActivity.class);
-                    intent.putExtras(bundle);
-                    startActivity(intent);
 
-                }else{
-                    Toast.makeText(MainDynamicsActivity.this
-                            ,e.getMessage()+"("+e.getErrorCode()+")",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-    }
 
 
 
@@ -481,4 +567,37 @@ public class MainDynamicsActivity extends AppCompatActivity {
 
         return true;
     }
+
+
+    private void initLike(){
+
+       final String[] like = dynamics.getLike();
+          try {
+              likecount.setText(like.length+"赞");
+              BmobQuery<MyUser> query =new BmobQuery<>();
+              query.addWhereContainedIn("objectId",Arrays.asList(like));
+              query.findObjects(new FindListener<MyUser>() {
+                  @Override
+                  public void done(List<MyUser> list, BmobException e) {
+                      if (e==null){
+                          if(!list.isEmpty()){  for (int i =0; i<list.size();i++) {
+                              Glide.with(MainDynamicsActivity.this).load(list.get(i).getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(avatarView[i]);
+                              Log.d("","头像"+list.get(i).getAvatar());
+                              if (i==5){
+                                  break;
+                              }
+                          }
+                          }
+                      }
+                  }
+              });
+
+          }
+          catch (Exception e){
+              e.printStackTrace();
+          }
+
+
+
+          }
 }

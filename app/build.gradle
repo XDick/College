@@ -12,7 +12,12 @@ android {
         versionCode 10
         versionName "1.6 beta3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+
+
+
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -73,5 +78,11 @@ dependencies {
     compile 'com.jaeger.ninegridimageview:library:1.1.1'
 
     compile 'com.github.limuyang2:CardSearchView:1.0.6.9'
+
+
+    compile 'com.youth.banner:banner:1.4.9'//banner
+    //画廊
+
+
 
 }

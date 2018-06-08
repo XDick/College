@@ -34,7 +34,6 @@ import cn.bmob.v3.listener.QueryListener;
 
 public class SplashActivity extends Activity {
     static boolean ifshow = true;
-    private static final int sleepTime = 2000;
    private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
 
 
@@ -78,16 +77,26 @@ public class SplashActivity extends Activity {
                         if (gps != null) {
                             query.addWhereEqualTo("gps", gps[1]);
                         }*/
+
+
+                           String tag[] = bmobUser.getTag();
+                           if (tag!=null){
+                               for (int i =0; i<tag.length;i++){
+                                   BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
+                                   q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
+                                   queries.add(q);
+                               }
+
+                           }
+
+
+
+
                     }
                 if (e == null) {
                     query.addWhereGreaterThan("date", aLong * 1000L - 1.5*60 * 60 * 24 * 1000);
                 }
-                 String tag[] = bmobUser.getTag();
-                    for (int i =0; i<tag.length;i++){
-                        BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
-                        q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
-                        queries.add(q);
-                    }
+
 
 
                      query.setLimit(10);

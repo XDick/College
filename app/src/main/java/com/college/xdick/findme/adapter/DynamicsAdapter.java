@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.target.Target;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
 import com.college.xdick.findme.R;
+import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.DynamicsComment;
 import com.college.xdick.findme.bean.MyActivity;
@@ -65,10 +67,16 @@ import cn.bmob.newim.core.BmobIMClient;
 import cn.bmob.newim.listener.ConversationListener;
 import cn.bmob.newim.listener.MessageSendListener;
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobBatch;
+import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.datatype.BatchResult;
+import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.DeleteBatchListener;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
@@ -106,6 +114,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
         private ImageView mImageView;
         private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
 
+
        private int flag=0;
 
 
@@ -114,14 +123,17 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
            TextView username,time,reply,content,likecount;
            LinearLayout layout;
-           ImageView avatar,like;
+           ImageView avatar,like,more;
            NineGridImageView gridImageView;
 
+        TextView title,time2,host,join;
+        ImageView cover;
+        CardView cardView;
 
            public ViewHolder(View view){
                super(view);
 
-
+               more = view.findViewById(R.id.dynamics_more);
               username = view.findViewById(R.id.username_main);
               time = view.findViewById(R.id.time_main);
               layout = view.findViewById(R.id.layout_main);
@@ -131,7 +143,28 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
               gridImageView= view.findViewById(R.id.nineGrid);
               like = view.findViewById(R.id.like);
               likecount=view.findViewById(R.id.likecount);
+
+
+               title= view.findViewById(R.id.title_ac);
+               cardView =view.findViewById(R.id.cardview_ac);
+               cover = view.findViewById(R.id.cover_ac);
+               time2= view.findViewById(R.id.time_ac);
+
+               host = view.findViewById(R.id.host_ac);
+               join = view.findViewById(R.id.join_ac);
            }
+
+        public void setVisibility(boolean isVisible){
+            RecyclerView.LayoutParams param = (RecyclerView.LayoutParams)itemView.getLayoutParams();
+            if (isVisible){
+                param.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                param.width = LinearLayout.LayoutParams.MATCH_PARENT;
+            }else{
+                param.height = 0;
+                param.width = 0;
+            }
+            itemView.setLayoutParams(param);
+        }
        }
 
 
@@ -298,10 +331,61 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
         final int realPos = getRealItemPosition(position);
 
 
+        final EasyPopup easyPopup = EasyPopup.create()
+                .setContentView(mContext, R.layout.popup_dynamics)
+                .setWidth(400)
+                .setBackgroundDimEnable(true)
+                //变暗的透明度(0-1)，0为完全透明
+                .setDimValue(0.4f)
+                //变暗的背景颜色
+                .apply();
 
-
+        final LinearLayout delete = easyPopup.findViewById(R.id.dynamics_delete);
+        final LinearLayout report = easyPopup.findViewById(R.id.dynamics_report);
 
       final Dynamics dynamics = mDynamicsList.get(realPos);
+
+
+
+
+      if (dynamics.getActivityTitle()==null){
+          holder.cardView.setVisibility(GONE);
+      }
+      else {
+          holder.cardView.setVisibility(View.VISIBLE);
+
+          holder.title.setText(dynamics.getActivityTitle());
+
+          holder.time2.setText(dynamics.getActivityTime());
+
+          Glide.with(mContext).load(dynamics.getActivityCover()).into(holder.cover);
+
+          holder.host.setText("由"+dynamics.getActivityHost()+"发起");
+
+          holder.cardView.setOnClickListener(new View.OnClickListener() {
+              @Override
+              public void onClick(View v) {
+                BmobQuery<MyActivity> query = new BmobQuery<>();
+                query.getObject(dynamics.getActivityId(), new QueryListener<MyActivity>() {
+                    @Override
+                    public void done(MyActivity activity, BmobException e) {
+                   if (e==null){
+
+                       Intent intent = new Intent(mContext, ActivityActivity.class);
+                       intent.putExtra("ACTIVITY",activity);
+                       mContext.startActivity(intent);
+                   }
+                    }
+                });
+
+
+
+
+              }
+          });
+      }
+
+
 
 
 
@@ -317,6 +401,103 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
                        holder.time.setText(rawdate.substring(0,rawdate.length()-3));
                    }
+
+                   report.setOnClickListener(new View.OnClickListener() {
+                       @Override
+                       public void onClick(View v) {
+                           easyPopup.dismiss();
+                       }
+                   });
+
+           if (dynamics.getUser().equals(bmobUser.getUsername())){
+
+               delete.setVisibility(View.VISIBLE);
+               delete.setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View v) {
+                       bmobUser.removeAll("dynamics", Arrays.asList(dynamics.getObjectId()));
+                       bmobUser.update(new UpdateListener() {
+                           @Override
+                           public void done(BmobException e) {
+                               if (e==null){
+
+                                   Dynamics dynamics1 = new Dynamics();
+                                   dynamics1.setObjectId(dynamics.getObjectId());
+                                   dynamics1.delete(new UpdateListener() {
+                                       @Override
+                                       public void done(BmobException e) {
+                                           BmobQuery<DynamicsComment>query =new BmobQuery<>();
+                                           query.addWhereEqualTo("dynamicsID",dynamics.getObjectId());
+                                           query.findObjects(new FindListener<DynamicsComment>() {
+                                               @Override
+                                               public void done(List<DynamicsComment> list, BmobException e) {
+                                                   List<BmobObject> commentList= new ArrayList<BmobObject>();
+                                                   commentList.addAll(list);
+                                                   new BmobBatch().deleteBatch(commentList).doBatch(new QueryListListener<BatchResult>() {
+                                                       @Override
+                                                       public void done(List<BatchResult> list, BmobException e) {
+                                                           if (e==null){
+
+                                                           }
+                                                       }
+                                                   });
+                                               }
+                                           });
+
+
+                                           String[] pic =dynamics.getPicture();
+                                           BmobFile.deleteBatch(pic, new DeleteBatchListener() {
+
+                                               @Override
+                                               public void done(String[] failUrls, BmobException e) {
+                                                   if(e==null){
+
+                                                   }else{
+                                                       if(failUrls!=null){
+
+                                                       }else{
+
+                                                       }
+                                                   }
+                                               }
+                                           });
+
+
+                                           holder.setVisibility(false);
+                                           easyPopup.dismiss();
+                                       }
+                                   });
+
+
+                               }
+                           }
+                       });
+
+
+
+
+
+
+
+
+                   }
+               });
+           }
+           else {
+               delete.setVisibility(GONE);
+           }
+
+                   holder.more.setOnClickListener(new View.OnClickListener() {
+                       @Override
+                       public void onClick(View v) {
+
+
+                           easyPopup.showAtAnchorView(holder.more, YGravity.ABOVE, XGravity.LEFT, 0, -50);
+                       }
+                   });
+
+
+
 
 
                     holder.gridImageView.setVisibility(View.VISIBLE);
@@ -397,14 +578,15 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                                 Dynamics dynamics1 = new Dynamics();
                                 dynamics1.setObjectId(dynamics.getObjectId());
                                 dynamics1.setReplycount(dynamics.getReplycount());
+                                dynamics1.increment("likeCount" ,-1);
                                 dynamics1.removeAll("like", Arrays.asList(BmobUser.getCurrentUser().
-                                        getObjectId()+"+"+BmobUser.getCurrentUser(MyUser.class).getAvatar()));
+                                        getObjectId()));
                                 dynamics1.update(new UpdateListener() {
                                     @Override
                                     public void done(BmobException e) {
                                         if (e == null) {
                                             likelist.removeAll(Arrays.asList(BmobUser.getCurrentUser().
-                                                    getObjectId()+"+"+BmobUser.getCurrentUser(MyUser.class).getAvatar()));
+                                                    getObjectId()));
                                             dynamics.setLike(  likelist.toArray(new String[  likelist.size()]));
                                             holder.likecount.setText(  likelist.size() + "");
                                             holder.like.setBackground(mContext.getResources().getDrawable(R.drawable.thumb_up));
@@ -420,8 +602,10 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                                 Dynamics dynamics1 = new Dynamics();
                                 dynamics1.setObjectId(dynamics.getObjectId());
                                 dynamics1.setReplycount(dynamics.getReplycount());
+                                dynamics1.setIfAdd2Gallery(dynamics.isIfAdd2Gallery());
+                                dynamics1.increment("likeCount" ,1);
                                 dynamics1.addUnique("like",BmobUser.getCurrentUser().
-                                        getObjectId()+"+"+BmobUser.getCurrentUser(MyUser.class).getAvatar());
+                                        getObjectId());
 
                                 dynamics1.update(new UpdateListener() {
                                     @Override
@@ -433,8 +617,8 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
 
                                             likelist.add(BmobUser.getCurrentUser().
-                                                    getObjectId()+"+"+BmobUser.getCurrentUser(MyUser.class).getAvatar());
-                                            dynamics.setLike(  likelist.toArray(new String[  likelist.size()]));
+                                                    getObjectId());
+                                            dynamics.setLike(  likelist.toArray(new String[likelist.size()]));
                                             holder.likecount.setText(  likelist.size() + "");
                                             holder.like.setBackground(mContext.getResources().getDrawable(R.drawable.thumb_up_t));
 
@@ -590,4 +774,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
     public void changeMoreStatus(int status){
         load_more_status=status;
     }
+
+
+
 }

@@ -1,6 +1,7 @@
 package com.college.xdick.findme.ui.Activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -62,17 +63,26 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         IMconnectBomob();
-        BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
-            @Override
-            public void onChange(ConnectionStatus status) {
+ if (BmobUser.getCurrentUser(MyUser.class)!=null) {
+     if (BmobUser.getCurrentUser(MyUser.class).getTag() == null) {
+         startActivity(new Intent(this, InterestActivity.class));
+         Toast.makeText(this, "请选择喜欢的标签", Toast.LENGTH_SHORT).show();
+     }
 
-                if (BmobUser.getCurrentUser()!=null&&status.getMsg().equals("disconnect")){
-                   IMconnectBomob();
-                }
-                Toast.makeText(getApplicationContext(),status.getMsg(),Toast.LENGTH_SHORT).show();
+     BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+         @Override
+         public void onChange(ConnectionStatus status) {
 
-            }
-        });
+             if (BmobUser.getCurrentUser()!=null&&status.getMsg().equals("disconnect")){
+                 IMconnectBomob();
+             }
+             //Toast.makeText(getApplicationContext(),status.getMsg(),Toast.LENGTH_SHORT).show();
+
+         }
+     });
+ }
+
+
 
 
         mLocationClient = new LocationClient(getApplicationContext());

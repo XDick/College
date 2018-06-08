@@ -1,10 +1,12 @@
 package com.college.xdick.findme.ui.Fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -24,15 +26,20 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
+import com.college.xdick.findme.MyClass.GalleryLayoutManager;
+import com.college.xdick.findme.MyClass.ScaleTransformer;
 import com.college.xdick.findme.R;
+import com.college.xdick.findme.adapter.ActivityAdapter;
 import com.college.xdick.findme.adapter.CommentAdapter;
+import com.college.xdick.findme.adapter.GalleryAdapter;
 import com.college.xdick.findme.bean.Comment;
+import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
-import com.college.xdick.findme.ui.Activity.ChatActivity;
 import com.college.xdick.findme.ui.Activity.HostNotifyActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
+import com.youth.banner.Transformer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +53,6 @@ import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.newim.core.BmobIMClient;
-import cn.bmob.newim.listener.ConversationListener;
 import cn.bmob.newim.listener.MessageSendListener;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
@@ -75,16 +81,25 @@ public class StartactivityFragment extends Fragment{
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
     private boolean ifJoin;
    public   MyActivity activity;
+   private GalleryAdapter galleryAdapter;
+   private List<String> galleryUriList=new ArrayList<>();
+    private  int size =0;
+    private boolean ifEmpty=false;
+   public static int ADD=2,REFRESH=1,REPLY=3;
+
+    private int commentCount;
+    private NestedScrollView scroller;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-       rootView =inflater.inflate(R.layout.fragment_ac_main,container,false);
+       rootView =inflater.inflate(R.layout.fragment_startactivity,container,false);
 
         initBaseView();
         initJoin();
         initRecyclerView();
-        initComment();
+        initComment(REFRESH);
+        initGallery();
 
 
        return rootView;
@@ -101,7 +116,7 @@ public class StartactivityFragment extends Fragment{
         String activityTime = activity.getTime();
         String activityPlace = activity.getPlace();
         hostID=  activity.getHost().getObjectId();
-
+        commentCount=activity.getCommentCount();
         BmobQuery<MyUser>query = new BmobQuery<>();
         query.getObject(hostID, new QueryListener<MyUser>() {
             @Override
@@ -110,6 +125,7 @@ public class StartactivityFragment extends Fragment{
             }
         });
         activityId = activity.getObjectId();
+        scroller = rootView.findViewById(R.id.scroll);
 
 
 
@@ -228,11 +244,11 @@ public class StartactivityFragment extends Fragment{
                                        sendMessage(bmobUser.getUsername()+"加入了你的"+"#"+activity.getTitle()+"#活动"
                                        ,new BmobIMUserInfo(hostID,activity.getHostName(),hostAvatar));
                                       ifJoin=true;
-                                      MyActivity myActivity = new MyActivity();
-                                      myActivity.setObjectId(activity.getObjectId());
-                                      myActivity.setDate(activity.getDate());
-                                      myActivity.addUnique("joinUser",bmobUser.getObjectId());
-                                      myActivity.update();
+
+
+                                     activity.addUnique("joinUser",bmobUser.getObjectId());
+                                      activity.increment("joinCount",1);
+                                     activity.update();
 
 
                                       getActivity().runOnUiThread(new Runnable() {
@@ -266,11 +282,12 @@ public class StartactivityFragment extends Fragment{
                               public void done(BmobException e) {
 
                                   if(e==null){
-                                      MyActivity myActivity = new MyActivity();
-                                      myActivity.setObjectId(activity.getObjectId());
-                                      myActivity.setDate(activity.getDate());
-                                      myActivity.removeAll("joinUser",Arrays.asList(bmobUser.getObjectId()));
-                                      myActivity.update();
+
+                                      activity.increment("joinCount",-1);
+                                      activity.removeAll("joinUser",Arrays.asList(bmobUser.getObjectId()));
+                                      activity.update();
+
+
                                       getActivity().runOnUiThread(new Runnable() {
                                           @Override
                                           public void run() {
@@ -305,7 +322,7 @@ public class StartactivityFragment extends Fragment{
 public  void initJoin(){
         BmobQuery<MyUser> query = new BmobQuery<MyUser>();
     query.addWhereContainsAll("join", Arrays.asList(activityId));
-    query.setLimit(99999);
+    query.setLimit(500);
     query.findObjects(new FindListener<MyUser>() {
         @Override
         public void done(List<MyUser> list, BmobException e) {
@@ -347,40 +364,110 @@ public  void initJoin(){
     private void initRecyclerView(){
 
         RecyclerView recyclerView = rootView.findViewById(R.id.activity_comment_recyclerview);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+       final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new CommentAdapter(commentList);
         View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_comment, recyclerView, false);
         adapter.setEmptyView(empty);
-
+        View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
+        adapter.addFooterView(footer);
         recyclerView.setAdapter(adapter);
 
-        recyclerView.setNestedScrollingEnabled(false);
+
         DividerItemDecoration decoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         decoration.setDrawable(getResources().getDrawable(R.drawable.recycler_decoration));
 
         recyclerView.addItemDecoration(decoration);
 
+        scroller.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+
+                if (scrollY > oldScrollY) {
+                    //Log.i(TAG, "Scroll DOWN");
+                }
+                if (scrollY < oldScrollY) {
+                    //Log.i(TAG, "Scroll UP");
+                }
+
+                if (scrollY == 0) {
+                    // Log.i(TAG, "TOP SCROLL");
+                }
+
+                if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
+
+                    if (ifEmpty) {
+                        adapter.changeMoreStatus(CommentAdapter.NO_MORE);
+                    } else {
+                        adapter.changeMoreStatus(CommentAdapter.LOADING_MORE);
+                    }
+
+                    if (ifEmpty) {
+                        //null
+                    } else {
+                        initComment(ADD);
+                    }
+                    //  Log.i(TAG, "BOTTOM SCROLL");
+                }
+            }
+        });
+
     }
 
-
-    public void initComment(){
+    public void initComment(final int state){
 
         BmobQuery<Comment> query = new BmobQuery<Comment>();
         query.addWhereEqualTo("ActivityID", activityId);
-        query.setLimit(50);
+        query.order("-createdAt");
+        query.setLimit(10);
+        query.setSkip(size);
+        final int listsize = commentList.size();
         query.findObjects(new FindListener<Comment>() {
             @Override
             public void done(List<Comment> list, BmobException e) {
                 if (e == null) {
 
-                    commentcount.setText("(" + list.size() + ")");
-                    ((ActivityActivity)getActivity()).setText(list.size());
-                    Collections.reverse(list); // 倒序排列
-                    for (Comment comment : list) {
-                        commentList.add(comment);
-                        initRecyclerView();
-                    }
+                    commentList.addAll(list);
+
+            if (state==REFRESH) {
+                     ifEmpty=false;
+                     size=10;
+                    adapter.notifyDataSetChanged();
+                commentcount.setText("("+commentCount+")");
+                ((ActivityActivity)getActivity()).setText(commentCount);
+            }
+            else if (state == ADD){
+                if (listsize == commentList.size()) {
+                    ifEmpty = true;
+                    adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                    adapter.notifyDataSetChanged();
+                } else if (listsize + 10 > commentList.size()) {
+                    ifEmpty = true;
+                    adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                    adapter.notifyItemInserted(adapter.getItemCount() - 1);
+
+
+                }
+                else {
+                    adapter.notifyItemInserted(adapter.getItemCount()-1);
+                    size = size + 10;
+                }
+
+
+            }
+
+            else if (state ==REPLY){
+                ifEmpty=false;
+                size=10;
+                initRecyclerView();
+                activity.increment("commentCount",1);
+                activity.update();
+                commentcount.setText("("+ ++commentCount+")");
+                ((ActivityActivity)getActivity()).setText(commentCount);
+            }
+
+
+
 
                 } else {
                     Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
@@ -391,6 +478,13 @@ public  void initJoin(){
         });
     }
 
+
+
+
+    public void setSize(int size){
+
+       this. size =size;
+    }
 
 
 
@@ -411,7 +505,56 @@ public  void initJoin(){
 
 
 
+     private void initGallery(){
+        final  RecyclerView recyclerView = rootView.findViewById(R.id.gallery);
+         GalleryLayoutManager layoutManager = new GalleryLayoutManager(GalleryLayoutManager.HORIZONTAL);
+         layoutManager.attach(recyclerView,1);
+         layoutManager.setItemTransformer(new ScaleTransformer());
+         galleryAdapter = new GalleryAdapter(galleryUriList);
 
+         recyclerView.setAdapter(galleryAdapter);
+      BmobQuery<Dynamics> query = new BmobQuery<>();
+
+      BmobQuery<Dynamics> q1 = new BmobQuery<>();
+      q1.addWhereEqualTo("ifAdd2Gallery",true);
+      query.and(Arrays.asList(q1));
+      query.addWhereEqualTo("activityId",activity.getObjectId());
+      query.order("-likeCount");
+
+      query.findObjects(new FindListener<Dynamics>() {
+          @Override
+          public void done(List<Dynamics> list, BmobException e) {
+          if (e==null){
+             if (!list.isEmpty()){
+                 recyclerView.setVisibility(View.VISIBLE);
+              for (Dynamics dynamics: list){
+                  if (galleryUriList.isEmpty()){
+                      galleryUriList.add(dynamics.getActivityCover());
+                  }
+
+                  galleryUriList.addAll(Arrays.asList(dynamics.getPicture()));
+              }
+
+              galleryAdapter.notifyDataSetChanged();
+
+
+             }
+          }
+          }
+      });
+
+
+         layoutManager.setCallbackInFling(true);//should receive callback when flinging, default is false
+         layoutManager.setOnItemSelectedListener(new GalleryLayoutManager.OnItemSelectedListener() {
+             @Override
+             public void onItemSelected(RecyclerView recyclerView, View item, int position) {
+                 //.....
+             }
+         });
+
+
+
+     }
 
 
     public void sendMessage(String content ,BmobIMUserInfo info) {

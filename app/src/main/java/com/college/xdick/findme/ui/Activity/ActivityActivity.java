@@ -185,8 +185,8 @@ public class ActivityActivity extends AppCompatActivity {
                                startEdit.setVisibility(View.GONE);
                                statusbar.setVisibility(View.VISIBLE);
                                myfragment.commentList.clear();
-
-                               myfragment.initComment();
+                               myfragment.setSize(0);
+                               myfragment.initComment(StartactivityFragment.REPLY);
                                ifReply=false;
 
 
@@ -220,8 +220,8 @@ public class ActivityActivity extends AppCompatActivity {
                             startEdit.setVisibility(View.GONE);
                             statusbar.setVisibility(View.VISIBLE);
                             myfragment.commentList.clear();
-
-                            myfragment.initComment();
+                            myfragment.setSize(0);
+                            myfragment.initComment(StartactivityFragment.REPLY);
                         }else{
                             Toast.makeText(ActivityActivity.this,"评论失败",Toast.LENGTH_SHORT).show();
                         }

@@ -42,6 +42,7 @@ import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BatchResult;
+import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListListener;
@@ -243,6 +244,7 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
                                     myActivity.setObjectId(activity.getObjectId());
                                     myActivity.setDate(activity.getDate());
                                     myActivity.removeAll("joinUser", Arrays.asList(user.getObjectId()));
+                                    myActivity.increment("joinCount",-1);
                                     myActivity.update();
                                     holder.setVisibility(false);
                                     Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
@@ -305,6 +307,20 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
                                                                  }
                                                             }
                                                         });
+                                                    }
+                                                });
+
+                                                BmobFile file = new BmobFile();
+                                                file.setUrl(activity.getCover());
+                                                file.delete(new UpdateListener() {
+
+                                                    @Override
+                                                    public void done(BmobException e) {
+                                                        if(e==null){
+
+                                                        }else{
+
+                                                        }
                                                     }
                                                 });
 

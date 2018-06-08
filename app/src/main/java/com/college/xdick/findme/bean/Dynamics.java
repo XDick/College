@@ -11,23 +11,29 @@ import cn.bmob.v3.datatype.BmobFile;
 
 public class Dynamics extends BmobObject implements Serializable {
 
+
+    private String activityId;
+    private String activityTitle;
+    private String activityCover;
+    private String activityTime;
+    private String activityHost;
+
+
     private String user;
     private String userId;
     private String content;
     private String[] picture;
     private String[] like;
-    private int replycount=0;
+    private Integer replycount=0;
+    private Integer likeCount =0;
+
+    private boolean ifAdd2Gallery=false;
 
 
 
 
 
-    public Dynamics(String content){
-        this.content = content;
-    }
-    public Dynamics(){
 
-    }
 
 
     public String getUser() {
@@ -82,5 +88,59 @@ public class Dynamics extends BmobObject implements Serializable {
     }
 
 
+    public String getActivityId() {
+        return activityId;
+    }
 
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
+    }
+
+    public String getActivityTitle() {
+        return activityTitle;
+    }
+
+    public void setActivityTitle(String activityTitle) {
+        this.activityTitle = activityTitle;
+    }
+
+    public String getActivityCover() {
+        return activityCover;
+    }
+
+    public void setActivityCover(String activityCover) {
+        this.activityCover = activityCover;
+    }
+
+    public String getActivityTime() {
+        return activityTime;
+    }
+
+    public void setActivityTime(String activityTime) {
+        this.activityTime = activityTime;
+    }
+
+    public String getActivityHost() {
+        return activityHost;
+    }
+
+    public void setActivityHost(String activityHost) {
+        this.activityHost = activityHost;
+    }
+
+    public boolean isIfAdd2Gallery() {
+        return ifAdd2Gallery;
+    }
+
+    public void setIfAdd2Gallery(boolean ifAdd2Gallery) {
+        this.ifAdd2Gallery = ifAdd2Gallery;
+    }
+
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
 }

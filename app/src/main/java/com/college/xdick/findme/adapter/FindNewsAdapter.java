@@ -84,7 +84,7 @@ public class FindNewsAdapter extends RecyclerView.Adapter<FindNewsAdapter.ViewHo
             holder.layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int position = holder.getAdapterPosition();
+                    int position =getRealItemPosition(holder.getAdapterPosition());
                    FindNews news = mNewsList.get(position);
                     Intent intent= new Intent(mContext, NewsActivity.class);
                     intent.putExtra("URL",news.getContent());

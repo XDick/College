@@ -1,39 +1,57 @@
 package com.college.xdick.findme.ui.Activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.Toolbar;
 import android.util.ArrayMap;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.college.xdick.findme.MyClass.MyGlideEngine;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.GridViewAddImagesAdapter;
+import com.college.xdick.findme.adapter.SelectActivityAdapter;
+import com.college.xdick.findme.bean.City;
 import com.college.xdick.findme.bean.Dynamics;
+import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.bean.Province;
+import com.college.xdick.findme.bean.School;
 import com.college.xdick.findme.util.FileUtil;
+import com.linchaolong.android.imagepicker.ImagePicker;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.net.URI;
@@ -44,9 +62,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadBatchListener;
@@ -59,12 +79,22 @@ import cn.bmob.v3.listener.UploadFileListener;
 
 public class SetDynamicsActivity extends AppCompatActivity {
     private EditText contentEdit;
-    private Button selectImg;
-    private LinearLayout layout;
+    private MyActivity myActivity;
+    private LinearLayout layout,selectActivity,checkboxLayout;
     private int REQUEST_CODE_CHOOSE = 1;
     private List<Uri> mSelected = new ArrayList<>();
     private GridViewAddImagesAdapter adapter;
     private List<String> picPath = new ArrayList<>();
+    private   View parent;
+    private  ListView mActivityListView;
+    private  PopupWindow mPopWindow;
+    private  SelectActivityAdapter mActivityAdapter;
+    private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
+    private  TextView activityText;
+    private ImageView remove;
+    private CheckBox checkBox;
+    private boolean ifAddPic2Ac=false;
+
 
 
     @Override
@@ -77,6 +107,7 @@ public class SetDynamicsActivity extends AppCompatActivity {
 
 
     private void initView() {
+        initPopView(this);
         contentEdit = findViewById(R.id.dynamics_content_edittext);
         adapter = new GridViewAddImagesAdapter(mSelected, this);
         Toolbar toolbar = findViewById(R.id.toolbar_dynamics);
@@ -89,6 +120,40 @@ public class SetDynamicsActivity extends AppCompatActivity {
         layout = findViewById(R.id.daynamics_content_linearlayout);
         final float scale = getResources().getDisplayMetrics().density;
 
+        activityText = findViewById(R.id.choose_activity_text);
+            checkBox = findViewById(R.id.checkbox);
+            checkboxLayout = findViewById(R.id.checkbox_layout);
+        remove = findViewById(R.id.remove);
+        remove.setVisibility(View.INVISIBLE);
+        remove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activityText.setText("插入活动");
+                myActivity=null;
+                checkboxLayout.setVisibility(View.GONE);
+                remove.setVisibility(View.INVISIBLE);
+                ifAddPic2Ac=false;
+            }
+        });
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    ifAddPic2Ac=true;
+                }
+                else {
+                    ifAddPic2Ac=false;
+                }
+            }
+        });
+        selectActivity = findViewById(R.id.select_activity);
+        selectActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initActivity();
+                showPopWindow();
+            }
+        });
 
         layout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,7 +210,13 @@ public class SetDynamicsActivity extends AppCompatActivity {
 
                     String content = contentEdit.getText().toString();
                     Dynamics dynamics = new Dynamics();
+                    dynamics.setActivityTitle(myActivity.getTitle());
+                    dynamics.setActivityId(myActivity.getObjectId());
+                    dynamics.setActivityCover(myActivity.getCover());
+                    dynamics.setActivityTime(myActivity.getTime());
+                    dynamics.setActivityHost(myActivity.getHostName());
                     dynamics.setContent(content);
+                    dynamics.setIfAdd2Gallery(false);
                     dynamics.setUserId(BmobUser.getCurrentUser().getObjectId());
                     dynamics.setUser(BmobUser.getCurrentUser().getUsername());
                     finish();
@@ -184,9 +255,16 @@ public class SetDynamicsActivity extends AppCompatActivity {
                                     String content = contentEdit.getText().toString();
                                     Dynamics dynamics = new Dynamics();
                                     dynamics.setContent(content);
+                                    dynamics.setActivityTitle(myActivity.getTitle());
+                                    dynamics.setIfAdd2Gallery(ifAddPic2Ac);
+                                    dynamics.setActivityId(myActivity.getObjectId());
+                                    dynamics.setActivityCover(myActivity.getCover());
+                                    dynamics.setActivityTime(myActivity.getTime());
+                                    dynamics.setActivityHost(myActivity.getHostName());
                                     dynamics.setUserId(BmobUser.getCurrentUser().getObjectId());
                                     dynamics.setUser(BmobUser.getCurrentUser().getUsername());
                                     dynamics.addAll("picture", list1);
+
                                     dynamics.save(new SaveListener<String>() {
 
                                         @Override
@@ -229,12 +307,108 @@ public class SetDynamicsActivity extends AppCompatActivity {
         return true;
     }
 
+
+
+
+
+    private void initActivity(){
+        BmobQuery<MyActivity> query = new BmobQuery<>();
+        BmobQuery<MyActivity> q1 = new BmobQuery<>();
+        BmobQuery<MyActivity> q2 = new BmobQuery<>();
+        String[] join = myUser.getJoin();
+        List<BmobQuery<MyActivity>> queries = new ArrayList<>();
+        q1.addWhereEqualTo("hostName",myUser.getUsername());
+        q2.addWhereContainedIn("objectId",Arrays.asList(join));
+
+        queries.add(q1);
+        queries.add(q2);
+        query.order("-createdAt");
+        query.or(queries);
+        query.findObjects(new FindListener<MyActivity>() {
+            @Override
+            public void done(List<MyActivity> list, BmobException e) {
+                      if (e==null){
+
+                          mActivityAdapter.setList(list);
+                          mActivityAdapter.notifyDataSetChanged();
+                      }
+            }
+        });
+
+    }
+
+
+    public void initPopView(Activity activity ) {
+        parent = activity.getWindow().getDecorView();
+        View popView = View.inflate( activity, R.layout.item_popup_select_activity, null);
+
+
+
+        mActivityListView = popView.findViewById(R.id.activity_list);
+        mActivityListView.setOnItemClickListener(itemListener);
+
+        mActivityAdapter = new SelectActivityAdapter( activity);
+        mActivityListView.setAdapter(mActivityAdapter);
+
+
+
+
+
+        int width =  activity.getResources().getDisplayMetrics().widthPixels * 3 / 4;
+        int height =  activity.getResources().getDisplayMetrics().heightPixels * 3 / 5;
+        mPopWindow = new PopupWindow(popView, width, height);
+        ColorDrawable dw = new ColorDrawable(0x30000000);
+        mPopWindow.setBackgroundDrawable(dw);
+        mPopWindow.setFocusable(true);
+        mPopWindow.setTouchable(true);
+        mPopWindow.setOutsideTouchable(true);//允许在外侧点击取消
+    }
+
+
+
+    public void showPopWindow() {
+        mPopWindow.showAtLocation(parent, Gravity.CENTER, 0, 0);
+    }
+
+
+
+
+
+
+
+
+
+
+    /**
+     * ListView Item点击事件
+     */
+
+    AdapterView.OnItemClickListener itemListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            MyActivity activity = (MyActivity) mActivityListView.getItemAtPosition(position);
+              ifAddPic2Ac=true;
+              myActivity=activity;
+              remove.setVisibility(View.VISIBLE);
+              checkboxLayout.setVisibility(View.VISIBLE);
+              activityText.setText(activity.getTitle());
+              mPopWindow.dismiss();
+
+
+        }
+
+    };
+
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
 
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == RESULT_OK) {
+
             mSelected.addAll(Matisse.obtainResult(data));
             adapter.notifyDataSetChanged();
 
@@ -243,4 +417,6 @@ public class SetDynamicsActivity extends AppCompatActivity {
         }
 
     }
+
+
 }

@@ -48,7 +48,13 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
     private int ITEM_TYPE_FOOTER = 2;
     private int ITEM_TYPE_EMPTY = 3;
 
+    private int load_more_status;
+    //上拉加载更多
+    public static final int  PULLUP_LOAD_MORE=0;
+    //正在加载中
+    public static final int  LOADING_MORE=1;
 
+    public static final int  NO_MORE=2;
 
     private Context mContext;
     private View mHeaderView;
@@ -166,8 +172,25 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
         int type = getItemViewType(position);
 
         if (type == ITEM_TYPE_HEADER
-                || type == ITEM_TYPE_FOOTER
+
                 || type == ITEM_TYPE_EMPTY) {
+            return;
+        }
+        if (type == ITEM_TYPE_FOOTER) {
+            TextView textView= mFooterView.findViewById(R.id.footer_text);
+            switch (load_more_status) {
+                case PULLUP_LOAD_MORE:
+                    textView.setText("上拉加载更多");
+                    break;
+                case LOADING_MORE:
+                    textView.setText("正在加载数据...");
+                    break;
+
+                case NO_MORE:
+                    textView.setText("没有更多了");
+                    break;
+
+            }
             return;
         }
 
@@ -270,5 +293,7 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
         notifyDataSetChanged();
     }
 
-
+    public void changeMoreStatus(int status){
+        load_more_status=status;
+    }
 }

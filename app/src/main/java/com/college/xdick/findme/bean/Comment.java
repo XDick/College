@@ -16,7 +16,7 @@ public class Comment extends BmobObject {
     String replyusername;
     String replyuserId;
     String replycontent;
-    int replyNum=0;
+    Integer replyNum=0;
 
 
 

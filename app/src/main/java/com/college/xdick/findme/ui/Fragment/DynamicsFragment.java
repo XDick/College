@@ -61,6 +61,8 @@ public  class DynamicsFragment extends Fragment {
     private static boolean flag=true;
     private static int size =0;
     private static boolean ifEmpty=false;
+    private int REFRESH=1;
+    private int ADD=2;
 
 
 
@@ -74,7 +76,7 @@ public  class DynamicsFragment extends Fragment {
         if (flag){
             loadlayout.setVisibility(View.VISIBLE);
             dots.start();
-        initData();
+        initData(REFRESH);
         flag=false;}
         setHasOptionsMenu(true);
 
@@ -155,7 +157,7 @@ public  class DynamicsFragment extends Fragment {
                   if (ifEmpty){
                       //null
                   }
-                  else {initData();}
+                  else {initData(ADD);}
                 }
             }
 
@@ -167,60 +169,79 @@ public  class DynamicsFragment extends Fragment {
 
     }
 
-  private void initData(){
+  private void initData(final int state){
 
 
 
 
 
                   BmobQuery<Dynamics> query = new BmobQuery<Dynamics>();
+
                   String following[] = bmobUser.getFollowing();
-                  final List<String> list =new ArrayList<>(Arrays.asList(following));
-                  list.add(bmobUser.getObjectId());
+      if (following!=null){
+          final List<String> list =new ArrayList<>(Arrays.asList(following));
+          list.add(bmobUser.getObjectId());
 
-                  query.addWhereContainedIn("userId", list);
-                  query.order("-createdAt");
-                  query.setLimit(20);
-                  query.setSkip(size);
-                  final int listsize = dynamicsList.size();
-
-
-                  query.findObjects(new FindListener<Dynamics>() {
-                      @Override
-                      public void done(List<Dynamics> object, BmobException e) {
-                          if (e == null) {
+          query.addWhereContainedIn("userId", list);
+          query.order("-createdAt");
+          query.setLimit(20);
+          query.setSkip(size);
+          final int listsize = dynamicsList.size();
 
 
-                              dynamicsList.addAll(object);
-
-                              if (listsize==dynamicsList.size()){
-                                  ifEmpty=true;
-                                  adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
-                                  adapter.notifyDataSetChanged();
-                              }else if (listsize+20>dynamicsList.size()){
-                                  ifEmpty=true;
-                                  adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
-                                  adapter.notifyItemInserted(adapter.getItemCount()-1);
-
-                              }
+          query.findObjects(new FindListener<Dynamics>() {
+              @Override
+              public void done(List<Dynamics> object, BmobException e) {
+                  if (e == null) {
 
 
-                              else {
-                                  adapter.notifyItemInserted(adapter.getItemCount()-1);
-                                  size = size + 20;
-                              }
-                              loadlayout.setVisibility(View.GONE);
-
-
-
-                          } else {
-                              Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-
+                      dynamicsList.addAll(object);
+                      if (state==ADD) {
+                          if (listsize == dynamicsList.size()) {
+                              ifEmpty = true;
+                              adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                              adapter.notifyDataSetChanged();
+                          } else if (listsize + 20 > dynamicsList.size()) {
+                              ifEmpty = true;
+                              adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                              adapter.notifyItemInserted(adapter.getItemCount() - 1);
 
                           }
+
+
+                          else {
+                              adapter.notifyItemInserted(adapter.getItemCount()-1);
+                              size = size + 20;
+                          }
+                      }
+                      else if (state==REFRESH){
+                          ifEmpty=false;
+                          adapter.notifyDataSetChanged();
+                          loadlayout.setVisibility(View.GONE);
+                          size=20;
                       }
 
-                      });
+
+
+
+                  } else {
+                      Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+
+
+                  }
+              }
+
+          });
+
+
+      }
+      else {
+          ifEmpty = true;
+          loadlayout.setVisibility(View.GONE);
+
+      }
+
+
 
   }
 
@@ -278,8 +299,8 @@ public  class DynamicsFragment extends Fragment {
           public void run() {
               try{
                  
-                  initData();
-                  ifEmpty=false;
+                  initData(REFRESH);
+
                   Thread.sleep(1000);
               }
               catch (InterruptedException e){

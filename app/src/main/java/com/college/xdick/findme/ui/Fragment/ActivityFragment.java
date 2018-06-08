@@ -1,14 +1,12 @@
 package com.college.xdick.findme.ui.Fragment;
 
 
-import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Rect;
+
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
+
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,6 +19,7 @@ import android.view.animation.LayoutAnimationController;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Toast;
 
+import com.college.xdick.findme.MyClass.GalleryLayoutManager;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.ActivityAdapter;
 
@@ -112,16 +111,20 @@ public class ActivityFragment extends Fragment {
     private void initRecyclerView(){
 
         RecyclerView recyclerView = rootview.findViewById(R.id.recyclerview_ac);
-       final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+
+
+         final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new ActivityAdapter(activityList);
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
          adapter.addFooterView(footer);
         View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty, recyclerView, false);
         adapter.setEmptyView(empty);
+
+
        // int resId = R.anim.recycler_animation;
        // LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(getContext(), resId);
-       // recyclerView.setLayoutAnimation(animation);
+      // recyclerView.setLayoutAnimation(animation);
         ScaleInAnimationAdapter alphaAdapter = new ScaleInAnimationAdapter(adapter);
         alphaAdapter.setDuration(250);
         alphaAdapter.setInterpolator(new OvershootInterpolator());
@@ -177,6 +180,15 @@ public class ActivityFragment extends Fragment {
                     if (gps!=null){
                         query.addWhereEqualTo("gps",gps[1]);}*/
 
+                    String tag[] = bmobUser.getTag();
+                    if (tag!=null){
+                        for (int i =0; i<tag.length;i++){
+                            BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
+                            q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
+                            queries.add(q);
+                        }
+
+                    }
                 }
 
                 if (e==null){
@@ -185,12 +197,6 @@ public class ActivityFragment extends Fragment {
                 Log.d("","时间"+aLong);
                 //返回50条数据，如果不加上这条语句，默认返回10条数据
 
-                String tag[] = bmobUser.getTag();
-                for (int i =0; i<tag.length;i++){
-                    BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
-                    q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
-                    queries.add(q);
-                }
                 query.order("-createdAt");
                 query.setLimit(10);
                 query.or(queries);

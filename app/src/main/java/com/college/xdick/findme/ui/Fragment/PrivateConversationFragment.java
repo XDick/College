@@ -130,7 +130,8 @@ public class PrivateConversationFragment extends Fragment implements MessageList
                         if (e == null) {
                             BmobIM.getInstance().
                                     updateUserInfo(new BmobIMUserInfo(bmobUser.getObjectId(),
-                                            bmobUser.getUsername(), bmobUser.getAvatar()));
+                                    bmobUser.getUsername(), bmobUser.getAvatar()));
+                            initAllConversation();
                         } else {
                             //连接失败
                             //Toast.makeText(MainActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();

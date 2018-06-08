@@ -12,7 +12,7 @@ public class AddTagBean extends BmobObject implements Comparable<AddTagBean> {
 
     String providerName;
 
-    int useCount=0;
+    Integer useCount=0;
 
 
     public String getProviderName() {

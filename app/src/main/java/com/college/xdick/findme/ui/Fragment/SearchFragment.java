@@ -1,5 +1,6 @@
 package com.college.xdick.findme.ui.Fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,7 +12,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,11 +22,17 @@ import android.widget.LinearLayout;
 
 import com.college.xdick.findme.MyClass.BackHandlerHelper;
 import com.college.xdick.findme.MyClass.FragmentBackHandler;
+import com.college.xdick.findme.MyClass.MyBannerImageLoader;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.FindNewsAdapter;
 import com.college.xdick.findme.bean.FindNews;
-import com.college.xdick.findme.bean.MyCircleBanner;
+import com.college.xdick.findme.bean.MyActivity;
+import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.SearchActivity;
+import com.youth.banner.Banner;
+import com.youth.banner.BannerConfig;
+import com.youth.banner.Transformer;
+import com.youth.banner.listener.OnBannerListener;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -35,7 +41,11 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.bmob.v3.b.V;
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListener;
 import km.lmy.searchview.SearchView;
 import pl.tajchert.waitingdots.DotsTextView;
 
@@ -53,8 +63,10 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
     private DotsTextView dots;
     private LinearLayout loadlayout;
     private RecyclerView recyclerView;
-    private   List<String> mInfos = new ArrayList<>();
+
     private SearchView searchView;
+    private  List<String> imageList = new ArrayList<>();
+    private   List<String> titleList = new ArrayList<>();
 
 
 
@@ -133,21 +145,77 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
         recyclerView = rootView.findViewById(R.id.recyclerview_search);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         adapter = new FindNewsAdapter(newsList);
-        View header = LayoutInflater.from(getContext()).inflate(R.layout.item_banner, recyclerView, false);
-        MyCircleBanner mBanner =  header.findViewById(R.id.banner1);
+        View header = LayoutInflater.from(getContext()).inflate(R.layout.item_header_banner, recyclerView, false);
+        final Banner banner =  header.findViewById(R.id.banner);
+        //设置图片加载器
+        banner.setImageLoader(new MyBannerImageLoader());
+        //设置图片集合
+
+        Bmob.getServerTime(new QueryListener<Long>() {
+            @Override
+            public void done(Long aLong, BmobException e) {
+           if (e==null){
+               BmobQuery<MyActivity> query = new BmobQuery();
+               query.addWhereGreaterThan("date", aLong*1000L-60*60*24*1000);
+               query.addWhereLessThan("date", aLong*1000L+60*60*24*1000);
+               query.order("-joinCount");
+               query.setLimit(5);
+               query.findObjects(new FindListener<MyActivity>() {
+                   @Override
+                   public void done(final List<MyActivity> list, BmobException e) {
+                  if (e==null){
+                      for (MyActivity activity:list){
+                          imageList.add(activity.getCover());
+                          String[] gps=activity.getGps();
+                          titleList.add(activity.getTitle()+"("+gps[1]+")");
+                      }
+
+                      banner.setImages(imageList)
+                              .setDelayTime(3000)
+                              .setBannerTitles(titleList)
+                              .setBannerAnimation(Transformer.ScaleInOut)
+                              .setBannerStyle(BannerConfig.CIRCLE_INDICATOR_TITLE_INSIDE)
+                              .setIndicatorGravity(BannerConfig.RIGHT);
+
+
+                      banner.setOnBannerListener(new OnBannerListener() {
+                          @Override
+                          public void OnBannerClick(int position) {
+                                Intent intent = new Intent(getContext(), ActivityActivity.class);
+                                intent.putExtra("ACTIVITY",list.get(position));
+                                startActivity(intent);
+                          }
+                      });
+                      //banner设置方法全部调用完毕时最后调用
+                      banner.start();
+
+                  }
+
+                   }
+               });
+
+
+           }
+            }
+        });
+
+
+
+
+
+
+
+
+
+
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
-// 设置数据源
-        mInfos.add( "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525619386672&di=7f1cb1528333b60f87a50a1016f6d6f4&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimage%2Fc0%253Dshijue1%252C0%252C0%252C294%252C40%2Fsign%3Dc20bee098082b90129a0cb701be4c302%2F4b90f603738da97734e54305ba51f8198718e3d2.jpg");
-        mInfos.add( "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525619368239&di=4ada85418df0fe74ab3196663a4f9e25&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2Fa6efce1b9d16fdfae6becffcbe8f8c5495ee7bd5.jpg");
-        mInfos.add( "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525619350732&di=27952991e7142a797a600fbb39e0e72f&imgtype=0&src=http%3A%2F%2Fb.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2F342ac65c103853430a74d9149513b07eca808848.jpg");
-        //adapter.addHeaderView(header);
+        adapter.addHeaderView(header);
         View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty, recyclerView, false);
-         adapter.setEmptyView(empty);
+        adapter.setEmptyView(empty);
         adapter.addFooterView(footer);
         recyclerView.setAdapter(adapter);
-        mBanner.play(mInfos);
+
 
     }
 
@@ -243,6 +311,7 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
     private void setSearch() {
 
         searchView = rootView.findViewById(R.id.searchView);
+        searchView.setHintText("输入用户名、学校名、地名或标签...");
         searchView.setOnSearchActionListener(new SearchView.OnSearchActionListener() {
             @Override
             public void onSearchAction(String s) {

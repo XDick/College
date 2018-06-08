@@ -28,6 +28,7 @@ import com.college.xdick.findme.adapter.UserCenterFragmentStatePagerAdapter;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Fragment.MessageFragment;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -112,14 +113,34 @@ public class UserCenterActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+
+        followingcount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserCenterActivity.this,UserCenterFollowingActivity.class);
+                intent.putExtra("USER",nowUser);
+                startActivity(intent);
+            }
+        });
+
+
         BmobQuery<MyUser> query = new BmobQuery<>();
         query.addWhereContainsAll("following",Arrays.asList(nowUser.getObjectId()));
-        query.setLimit(99999);
+        query.setLimit(500);
         query.findObjects(new FindListener<MyUser>() {
             @Override
-            public void done(List<MyUser> list, BmobException e) {
+            public void done(final List<MyUser> list, BmobException e) {
                 if (e==null){
+
                     fanscount.setText("粉丝: "+list.size());
+                    fanscount.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(UserCenterActivity.this,UserCenterFollowedActivity.class);
+                            intent.putExtra("USERLIST",(Serializable)list);
+                            startActivity(intent);
+                        }
+                    });
 
                 }
             }

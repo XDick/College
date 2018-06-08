@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<android.support.v7.widget.CardView android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="4dp"
+
+    android:id="@+id/cardview_user"
+    android:foreground="?attr/selectableItemBackground"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <LinearLayout
+       android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp">
+
+
+        <ImageView
+            android:layout_width = "80dp"
+            android:layout_height = "80dp"
+            android:scaleType="centerCrop"
+            android:layout_gravity="center"
+            android:id="@+id/cover_user"/>
+
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginLeft="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/username_user"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:textSize="20dp"
+                        android:textStyle="bold"
+                        />
+
+
+                    <TextView
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/school_user"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#2680f7"
+                        android:textSize="10sp"
+
+                        />
+
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <Button
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
+                      android:text="关注"
+                    android:layout_gravity="right|center_vertical"
+                    android:id="@+id/usercenter_follow_button"
+                    android:textColor="#fff"
+                    android:layout_margin="5dp"
+                    android:background="#d75050"/>
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
+
+
