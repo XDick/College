@@ -485,8 +485,6 @@ public class MainDynamicsActivity extends AppCompatActivity {
                         ifEmpty=false;
                         size=10;
                         initRecycler();
-                        dynamics.increment("replycount",1);
-                        dynamics.update();
                         commentcount.setText("("+ ++commentCount+")");
                     }
 

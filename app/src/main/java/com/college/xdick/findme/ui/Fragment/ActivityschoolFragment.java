@@ -202,11 +202,18 @@ public class ActivityschoolFragment extends Fragment {
                                     }
                                 }
                                 else if (state==REFRESH){
-                                    ifEmpty=false;
                                     activityList3.clear();
-                                    activityList3.addAll(object);
-                                    adapter.notifyDataSetChanged();
-                                    size = 10;
+                                    if(activityList3.size()<10){
+                                        ifEmpty=true;
+                                        activityList3.addAll(object);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                    else {
+                                        ifEmpty=false;
+                                        activityList3.addAll(object);
+                                        adapter.notifyDataSetChanged();}
+                                    size =  10;
+
                                 }
 
                             }else{

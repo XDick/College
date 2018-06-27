@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
 
     public void setBottomNav() {
      mBadgeItem = new TextBadgeItem()
-                .setGravity(Gravity.CENTER|Gravity.TOP)
+               /* .setGravity(Gravity.CENTER|Gravity.TOP)*/
                 .setBorderWidth(1)
                 .setAnimationDuration(200)
                 .setBackgroundColorResource(R.color.red)
@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
 
 
 
-        mBottomNavigationBar.setMode(BottomNavigationBar.MODE_FIXED_NO_TITLE);
+        mBottomNavigationBar.setMode(BottomNavigationBar.MODE_FIXED);
         mBottomNavigationBar.setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC);
         // mBottomNavigationBar.setInActiveColor("#FFFFFF");
         mBottomNavigationBar.setActiveColor(R.color.colorPrimary);
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
 
         mBottomNavigationBar.addItem(new BottomNavigationItem(R.drawable.main, "首页"))
                 .addItem(new BottomNavigationItem( R.drawable.find,"发现"))
-                .addItem(new BottomNavigationItem(R.drawable.talk, "讨论"))
+                .addItem(new BottomNavigationItem(R.drawable.talk, "动态"))
                 .addItem(new BottomNavigationItem(R.drawable.message, "消息").setBadgeItem(mBadgeItem))
                 .addItem(new BottomNavigationItem(R.drawable.user, "我"))
                 .setFirstSelectedPosition(0)

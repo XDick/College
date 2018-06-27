@@ -293,7 +293,11 @@ public class ActivityFragment extends Fragment {
             MainActivity activity = (MainActivity) getActivity();
             List<MyActivity>list=(List<MyActivity>)activity.getIntent().getSerializableExtra("LISTDATA");;
             if (list!=null) {
+                if (list.size()<10){
+                    ifEmpty=true;
+                }
                 activityList =list;
+               
             }
 
             flag=1;
@@ -363,11 +367,19 @@ public class ActivityFragment extends Fragment {
                                 }
                             }
                             else if (state==REFRESH){
-                                ifEmpty=false;
                                 activityList.clear();
+                               if(activityList.size()<10){
+                                   ifEmpty=true;
+                                   activityList.addAll(object);
+                                   adapter.notifyDataSetChanged();
+                               }
+                               else {
+                                ifEmpty=false;
                                 activityList.addAll(object);
-                                adapter.notifyDataSetChanged();
+                                adapter.notifyDataSetChanged();}
                                 size =  10;
+
+
                             }
 
 

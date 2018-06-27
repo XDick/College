@@ -210,11 +210,13 @@ public class SetDynamicsActivity extends AppCompatActivity {
 
                     String content = contentEdit.getText().toString();
                     Dynamics dynamics = new Dynamics();
-                    dynamics.setActivityTitle(myActivity.getTitle());
-                    dynamics.setActivityId(myActivity.getObjectId());
-                    dynamics.setActivityCover(myActivity.getCover());
-                    dynamics.setActivityTime(myActivity.getTime());
-                    dynamics.setActivityHost(myActivity.getHostName());
+                    if(myActivity!=null){
+                        dynamics.setActivityTitle(myActivity.getTitle());
+                        dynamics.setActivityCover(myActivity.getCover());
+                        dynamics.setActivityTime(myActivity.getTime());
+                        dynamics.setActivityHost(myActivity.getHostName());
+                        dynamics.setActivityId(myActivity.getObjectId());
+                    }
                     dynamics.setContent(content);
                     dynamics.setIfAdd2Gallery(false);
                     dynamics.setUserId(BmobUser.getCurrentUser().getObjectId());
@@ -255,12 +257,16 @@ public class SetDynamicsActivity extends AppCompatActivity {
                                     String content = contentEdit.getText().toString();
                                     Dynamics dynamics = new Dynamics();
                                     dynamics.setContent(content);
+                                    if(myActivity!=null){
                                     dynamics.setActivityTitle(myActivity.getTitle());
+                                        dynamics.setActivityCover(myActivity.getCover());
+                                        dynamics.setActivityTime(myActivity.getTime());
+                                        dynamics.setActivityHost(myActivity.getHostName());
+                                        dynamics.setActivityId(myActivity.getObjectId());
+                                    }
                                     dynamics.setIfAdd2Gallery(ifAddPic2Ac);
-                                    dynamics.setActivityId(myActivity.getObjectId());
-                                    dynamics.setActivityCover(myActivity.getCover());
-                                    dynamics.setActivityTime(myActivity.getTime());
-                                    dynamics.setActivityHost(myActivity.getHostName());
+
+
                                     dynamics.setUserId(BmobUser.getCurrentUser().getObjectId());
                                     dynamics.setUser(BmobUser.getCurrentUser().getUsername());
                                     dynamics.addAll("picture", list1);

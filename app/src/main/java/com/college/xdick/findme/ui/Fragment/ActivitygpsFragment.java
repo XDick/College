@@ -210,11 +210,18 @@ public class ActivitygpsFragment extends Fragment {
                                     }
                                 }
                                 else if (state==REFRESH){
-                                    ifEmpty=false;
                                     activityList2.clear();
-                                    activityList2.addAll(object);
-                                    adapter.notifyDataSetChanged();
+                                    if(activityList2.size()<10){
+                                        ifEmpty=true;
+                                        activityList2.addAll(object);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                    else {
+                                        ifEmpty=false;
+                                        activityList2.addAll(object);
+                                        adapter.notifyDataSetChanged();}
                                     size =  10;
+
                                 }
 
                             }else{

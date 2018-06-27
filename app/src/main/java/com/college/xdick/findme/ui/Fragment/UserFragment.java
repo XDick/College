@@ -1,6 +1,8 @@
 package com.college.xdick.findme.ui.Fragment;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -42,6 +44,7 @@ import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadFileListener;
+import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
@@ -51,37 +54,43 @@ import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
  */
 
 public class UserFragment extends Fragment {
-    private View rooview;
+    private View rootview;
     private String picturePath;
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
     private TextView user,setcountText,joincountText,likecountText,dynamicscountText;
-    private ImageView avatar,setting;
+    private ImageView avatar,setting,background;
     private ImagePicker imagePicker;
     private LinearLayout maytag,userset,userjoin,userlike,userexit,usersetting,userdynamics;
     private WaveView3 waveView3;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rooview =inflater.inflate(R.layout.fragment_user,container,false);
+        rootview =inflater.inflate(R.layout.fragment_user,container,false);
         startImagePicker();
         initView();
         BmobCheckIfLogin();
-        return rooview;
+        return rootview;
     }
 
     private void initView(){
-        user= rooview.findViewById(R.id.user_username);
-        avatar=rooview.findViewById(R.id.user_avatar);
-        maytag = rooview.findViewById(R.id.user_mytag);
-        setting = rooview.findViewById(R.id.setting);
-        joincountText = rooview.findViewById(R.id.user_join_count);
-        setcountText = rooview.findViewById(R.id.user_set_count);
-        userset = rooview.findViewById(R.id.user_set);
-        userjoin = rooview.findViewById(R.id.user_join);
-        userlike=rooview.findViewById(R.id.user_like);
-        likecountText = rooview.findViewById(R.id.user_like_count);
-        dynamicscountText = rooview.findViewById(R.id.user_dynamics_count);
-        userdynamics = rooview.findViewById(R.id.user_dynamics);
+        user= rootview.findViewById(R.id.user_username);
+        avatar=rootview.findViewById(R.id.user_avatar);
+        maytag = rootview.findViewById(R.id.user_mytag);
+        setting = rootview.findViewById(R.id.setting);
+        joincountText = rootview.findViewById(R.id.user_join_count);
+        setcountText = rootview.findViewById(R.id.user_set_count);
+        userset = rootview.findViewById(R.id.user_set);
+        userjoin = rootview.findViewById(R.id.user_join);
+        userlike=rootview.findViewById(R.id.user_like);
+        likecountText = rootview.findViewById(R.id.user_like_count);
+        dynamicscountText = rootview.findViewById(R.id.user_dynamics_count);
+        userdynamics = rootview.findViewById(R.id.user_dynamics);
+       background = rootview.findViewById(R.id.user_background);
+      //  background.setColorFilter(Color.parseColor("#c40730"), PorterDuff.Mode.MULTIPLY);
+
+
+
 
 
 
@@ -160,7 +169,7 @@ public class UserFragment extends Fragment {
        });
 
 
-        waveView3 = (WaveView3) rooview.findViewById(R.id.wave_view);
+        waveView3 = (WaveView3) rootview.findViewById(R.id.wave_view);
         final FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-2,-2);
         lp.gravity = Gravity.BOTTOM|Gravity.CENTER;
         waveView3.setOnWaveAnimationListener(new WaveView3.OnWaveAnimationListener() {
@@ -208,7 +217,8 @@ public class UserFragment extends Fragment {
                 user.setText(bmobUser.getUsername());
                 Glide.with(getActivity()).load(bmobUser.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
 
-
+        Glide.with(this).load(bmobUser.getAvatar()).apply(bitmapTransform(new BlurTransformation(9, 7))
+        ).into(background);
 
 
     }

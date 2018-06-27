@@ -17,7 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="更多图片"
+        android:text="全部图片"
         android:textStyle="bold"
         android:id="@+id/gallery_more"
         android:textColor="#fff"

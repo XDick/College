@@ -52,7 +52,13 @@ public class ActivityAdapter3 extends RecyclerView.Adapter<ActivityAdapter3.View
     private int ITEM_TYPE_FOOTER = 2;
     private int ITEM_TYPE_EMPTY = 3;
 
+    private int load_more_status;
+    //上拉加载更多
+    public static final int  PULLUP_LOAD_MORE=0;
+    //正在加载中
+    public static final int  LOADING_MORE=1;
 
+    public static final int  NO_MORE=2;
 
 
     private List<MyActivity> mActivityList;
@@ -174,11 +180,27 @@ public class ActivityAdapter3 extends RecyclerView.Adapter<ActivityAdapter3.View
         int type = getItemViewType(position);
 
         if (type == ITEM_TYPE_HEADER
-                || type == ITEM_TYPE_FOOTER
+
                 || type == ITEM_TYPE_EMPTY) {
             return;
         }
+        if (type == ITEM_TYPE_FOOTER) {
+            TextView textView= mFooterView.findViewById(R.id.footer_text);
+            switch (load_more_status) {
+                case PULLUP_LOAD_MORE:
+                    textView.setText("上拉加载更多");
+                    break;
+                case LOADING_MORE:
+                    textView.setText("正在加载数据...");
+                    break;
 
+                case NO_MORE:
+                    textView.setText("没有更多了");
+                    break;
+
+            }
+            return;
+        }
 
         int realPos = getRealItemPosition(position);
 
@@ -255,7 +277,9 @@ public class ActivityAdapter3 extends RecyclerView.Adapter<ActivityAdapter3.View
         notifyDataSetChanged();
     }
 
-
+    public void changeMoreStatus(int status){
+        load_more_status=status;
+    }
 
 }
 
