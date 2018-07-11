@@ -115,7 +115,7 @@
         <Button
             android:layout_width="60dp"
             android:layout_height="45dp"
-            android:background="#b3042d"
+            android:background="@color/colorPrimaryDark"
             android:textColor="#FFF"
             android:id="@+id/sendidentity_button"
             android:text="验证码"/>
@@ -151,7 +151,7 @@
         <Button
             android:layout_width="60dp"
             android:layout_height="45dp"
-            android:background="#b3042d"
+            android:background="@color/colorPrimaryDark"
             android:textColor="#ffffff"
             android:id="@+id/identify_confirm_button"
             android:text="确定"/>
@@ -164,7 +164,7 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="#b3042d"
+        android:background="@color/colorPrimaryDark"
         android:text="选择学校"
         android:layout_margin="10dp"
         android:textColor="#FFF"/>
@@ -175,7 +175,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="#b3042d"
+            android:background="@color/colorPrimaryDark"
             android:text="注册"
             android:textColor="#FFF"/>
 

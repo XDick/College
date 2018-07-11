@@ -168,7 +168,8 @@ public class ActivityschoolFragment extends Fragment {
 
                     query.addWhereEqualTo("hostSchool", bmobUser.getSchool());
                     if (e==null){
-                        query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);}
+                       // query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);
+                    }
 
                     query.order("-createdAt");
                     query.setSkip(size);
@@ -281,7 +282,7 @@ public class ActivityschoolFragment extends Fragment {
 
                     query.addWhereEqualTo("hostSchool", bmobUser.getSchool());
                     if (e == null) {
-                        query.addWhereGreaterThan("date", aLong * 1000L - 1.5 * 60 * 60 * 24 * 1000);
+                       // query.addWhereGreaterThan("date", aLong * 1000L - 1.5 * 60 * 60 * 24 * 1000);
                     }
                     query.setSkip(size);
                     query.setLimit(10);

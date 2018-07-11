@@ -157,7 +157,7 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
             public void done(Long aLong, BmobException e) {
            if (e==null){
                BmobQuery<MyActivity> query = new BmobQuery();
-               query.addWhereGreaterThan("date", aLong*1000L-60*60*24*1000);
+               //query.addWhereGreaterThan("date", aLong*1000L-60*60*24*1000);
                query.addWhereLessThan("date", aLong*1000L+60*60*24*1000);
                query.order("-joinCount");
                query.setLimit(5);

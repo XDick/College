@@ -94,7 +94,7 @@ public class SplashActivity extends Activity {
 
                     }
                 if (e == null) {
-                    query.addWhereGreaterThan("date", aLong * 1000L - 1.5*60 * 60 * 24 * 1000);
+                    //query.addWhereGreaterThan("date", aLong * 1000L - 1.5*60 * 60 * 24 * 1000);
                 }
 
 

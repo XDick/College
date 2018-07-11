@@ -192,7 +192,8 @@ public class ActivityFragment extends Fragment {
                 }
 
                 if (e==null){
-                    query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);}
+                    //query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);
+                }
 
                 Log.d("","时间"+aLong);
                 //返回50条数据，如果不加上这条语句，默认返回10条数据
@@ -322,7 +323,8 @@ public class ActivityFragment extends Fragment {
                 }
 
                 if (e==null){
-                    query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);}
+                    //query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);
+                }
 
                 Log.d("","时间"+aLong);
 

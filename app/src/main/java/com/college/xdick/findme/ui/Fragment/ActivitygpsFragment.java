@@ -177,7 +177,8 @@ public class ActivitygpsFragment extends Fragment {
                     if (gps!=null){
                     query.addWhereEqualTo("gps", gps[2]);}
                     if (e==null){
-                    query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);}
+                   // query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);
+                        }
                     query.order("-createdAt");
                     query.setSkip(size);
                     query.setLimit(10);
@@ -298,7 +299,8 @@ public class ActivitygpsFragment extends Fragment {
                     if (gps!=null){
                         query.addWhereEqualTo("gps", gps[2]);}
                     if (e==null){
-                        query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);}
+                        //query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);
+                    }
                     query.setSkip(size);
                     query.setLimit(10);
                     query.order("date");

@@ -76,7 +76,10 @@ public  class DynamicsFragment extends Fragment {
         if (flag){
             loadlayout.setVisibility(View.VISIBLE);
             dots.start();
-        initData(REFRESH);
+       if(bmobUser!=null){
+           initData(REFRESH);
+       }
+
         flag=false;}
         setHasOptionsMenu(true);
 
