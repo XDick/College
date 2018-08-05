@@ -118,7 +118,7 @@ public class ActivityFragment extends Fragment {
         adapter = new ActivityAdapter(activityList);
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
          adapter.addFooterView(footer);
-        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty, recyclerView, false);
+        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_activity, recyclerView, false);
         adapter.setEmptyView(empty);
 
 
@@ -186,9 +186,11 @@ public class ActivityFragment extends Fragment {
                             BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
                             q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
                             queries.add(q);
+                            query.or(queries);//临时
                         }
 
                     }
+
                 }
 
                 if (e==null){
@@ -200,7 +202,7 @@ public class ActivityFragment extends Fragment {
 
                 query.order("-createdAt");
                 query.setLimit(10);
-                query.or(queries);
+                //query.or(queries);
                 query.setSkip(size);
                 final int listsize = activityList.size();
                 query.findObjects(new FindListener<MyActivity>() {
@@ -297,9 +299,15 @@ public class ActivityFragment extends Fragment {
                 if (list.size()<10){
                     ifEmpty=true;
                 }
+
+                else {
+                    ifEmpty=false;
+
+                }
                 activityList =list;
                
             }
+
 
             flag=1;
 
@@ -327,12 +335,13 @@ public class ActivityFragment extends Fragment {
                 }
 
                 Log.d("","时间"+aLong);
-
-                String tag[] = bmobUser.getTag();
-                for (int i =0; i<tag.length;i++){
-                    BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
-                    q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
-                    queries.add(q);
+                if(bmobUser!=null&&bmobUser.getTag()!=null) {
+                    String tag[] = bmobUser.getTag();
+                    for (int i = 0; i < tag.length; i++) {
+                        BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
+                        q.addWhereContainsAll("tag", Arrays.asList(tag[i]));
+                        queries.add(q);
+                    }
                 }
                 //返回50条数据，如果不加上这条语句，默认返回10条数据
                 query.setLimit(10);

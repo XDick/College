@@ -285,11 +285,7 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
                             @Override
                             public void done(BmobException e) {
                                 if (e == null) {
-                                    MyActivity myActivity = new MyActivity();
-                                    myActivity.setObjectId(activity.getObjectId());
-                                    myActivity.setDate(activity.getDate());
-                                    myActivity.removeAll("likeUser", Arrays.asList(user.getObjectId()));
-                                    myActivity.update();
+
                                     holder.setVisibility(false);
                                     Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
 

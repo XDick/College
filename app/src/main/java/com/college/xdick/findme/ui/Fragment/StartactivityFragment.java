@@ -1,11 +1,14 @@
 package com.college.xdick.findme.ui.Fragment;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -14,9 +17,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,7 +35,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
 import com.college.xdick.findme.MyClass.GalleryLayoutManager;
+import com.college.xdick.findme.MyClass.PicturePageAdapter;
 import com.college.xdick.findme.MyClass.ScaleTransformer;
+import com.college.xdick.findme.MyClass.ViewPagerFixed;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.ActivityAdapter;
 import com.college.xdick.findme.adapter.CommentAdapter;
@@ -38,6 +48,8 @@ import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.HostNotifyActivity;
+import com.college.xdick.findme.ui.Activity.LoginActivity;
+import com.college.xdick.findme.ui.Activity.MainActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
 import com.youth.banner.Transformer;
 
@@ -60,6 +72,7 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
+import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 /**
@@ -82,11 +95,11 @@ public class StartactivityFragment extends Fragment{
     private boolean ifJoin;
    public   MyActivity activity;
    private GalleryAdapter galleryAdapter;
-   private List<String> galleryUriList=new ArrayList<>();
+   private Map<String,Dynamics>picMap = new HashMap<>();
+   private List<String> uriList = new ArrayList<>();
     private  int size =0;
     private boolean ifEmpty=false;
    public static int ADD=2,REFRESH=1,REPLY=3;
-
     private int commentCount;
     private NestedScrollView scroller;
 
@@ -167,9 +180,9 @@ public class StartactivityFragment extends Fragment{
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        // collapsingToolbar.setExpandedTitleGravity(Gravity.BOTTOM|Gravity.CENTER);//设置收缩后标题的位置
+
         collapsingToolbar.setTitle(activityTitle);
-        Glide.with(this).load(activityCover).into(activityImageView);
+        Glide.with(this).load(activityCover).apply(RequestOptions.bitmapTransform(new BlurTransformation())).into(activityImageView);
         activityContentText.setText(activityContent);
         activityTimeText.setText("时间:"+activityTime);
         activityPlaceText.setText("地点:"+activityPlace);
@@ -216,7 +229,7 @@ public class StartactivityFragment extends Fragment{
         });
 
 
-          if(activity.getHostName().equals(bmobUser.getUsername())){
+          if(bmobUser!=null&&activity.getHostName().equals(bmobUser.getUsername())){
               joinButton.setText("发送通知");
               joinButton.setBackgroundColor(getResources().getColor(R.color.button_yellow));
               joinButton.setOnClickListener(new View.OnClickListener() {
@@ -234,6 +247,16 @@ public class StartactivityFragment extends Fragment{
                   @Override
                   public void onClick(View v) {
 
+
+                      if (MyUser.getCurrentUser(MyUser.class)==null){
+                          startActivity(new Intent(getContext(),LoginActivity.class));
+                          getActivity().finish();
+                          Toast.makeText(getActivity(),"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+
+                      }
+                      else {
+
+
                       if(!ifJoin){
 
                           bmobUser.addUnique("join",activityId);
@@ -245,10 +268,12 @@ public class StartactivityFragment extends Fragment{
                                        ,new BmobIMUserInfo(hostID,activity.getHostName(),hostAvatar));
                                       ifJoin=true;
 
+                                      MyActivity myActivity = new MyActivity();
+                                      myActivity.setObjectId(activityId);
+                                      myActivity.setDate(activity.getDate());
+                                      myActivity.addUnique("joinUser",bmobUser.getObjectId());
+                                      myActivity.update();
 
-                                     activity.addUnique("joinUser",bmobUser.getObjectId());
-                                      activity.increment("joinCount",1);
-                                     activity.update();
 
 
                                       getActivity().runOnUiThread(new Runnable() {
@@ -282,10 +307,11 @@ public class StartactivityFragment extends Fragment{
                               public void done(BmobException e) {
 
                                   if(e==null){
-
-                                      activity.increment("joinCount",-1);
-                                      activity.removeAll("joinUser",Arrays.asList(bmobUser.getObjectId()));
-                                      activity.update();
+                                      MyActivity myActivity = new MyActivity();
+                                      myActivity.setObjectId(activityId);
+                                      myActivity.setDate(activity.getDate());
+                                      myActivity.removeAll("joinUser",Arrays.asList(bmobUser.getObjectId()));
+                                      myActivity.update();
 
 
                                       getActivity().runOnUiThread(new Runnable() {
@@ -310,6 +336,7 @@ public class StartactivityFragment extends Fragment{
                           });
                       }
                   }
+                  }
               });
 
 
@@ -333,7 +360,12 @@ public  void initJoin(){
                     avatar[count].setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-
+                            if (MyUser.getCurrentUser(MyUser.class)==null){
+                                startActivity(new Intent(getContext(),LoginActivity.class));
+                                getActivity().finish();
+                                Toast.makeText(getActivity(),"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                                return;
+                            }
 
                             Intent intent = new Intent(getActivity(), UserCenterActivity.class);
                             intent.putExtra("USER",user);
@@ -460,8 +492,10 @@ public  void initJoin(){
                 ifEmpty=false;
                 size=10;
                 initRecyclerView();
-                activity.increment("commentCount",1);
-                activity.update();
+                MyActivity myActivity = new MyActivity();
+                myActivity.setObjectId(activityId);
+                myActivity.increment("commentCount",1);
+                myActivity.update();
                 commentcount.setText("("+ ++commentCount+")");
                 ((ActivityActivity)getActivity()).setText(commentCount);
             }
@@ -489,7 +523,10 @@ public  void initJoin(){
 
 
     private void ifJoin() {
-
+       if (bmobUser==null){
+           joinButton.setText("未登录");
+           return;
+       }
         if (Arrays.toString(bmobUser.getJoin()).indexOf(activityId) < 0) {
             ifJoin = false;
             joinButton.setText("加 入!");
@@ -510,7 +547,7 @@ public  void initJoin(){
          GalleryLayoutManager layoutManager = new GalleryLayoutManager(GalleryLayoutManager.HORIZONTAL);
          layoutManager.attach(recyclerView,1);
          layoutManager.setItemTransformer(new ScaleTransformer());
-         galleryAdapter = new GalleryAdapter(galleryUriList);
+         galleryAdapter = new GalleryAdapter(picMap,uriList);
 
          recyclerView.setAdapter(galleryAdapter);
       BmobQuery<Dynamics> query = new BmobQuery<>();
@@ -527,12 +564,18 @@ public  void initJoin(){
           if (e==null){
              if (!list.isEmpty()){
                  recyclerView.setVisibility(View.VISIBLE);
+
               for (Dynamics dynamics: list){
-                  if (galleryUriList.isEmpty()){
-                      galleryUriList.add(dynamics.getActivityCover());
+                  if (uriList.isEmpty()){
+                      picMap.put(dynamics.getActivityCover(),dynamics)                                  ;
+                      uriList.add(dynamics.getActivityCover());
                   }
 
-                  galleryUriList.addAll(Arrays.asList(dynamics.getPicture()));
+                  uriList.addAll(Arrays.asList(dynamics.getPicture()));
+                  List<String>uri = new ArrayList<>(Arrays.asList(dynamics.getPicture()));
+                  for (String str:uri){
+                      picMap.put(str,dynamics);
+                  }
               }
 
               galleryAdapter.notifyDataSetChanged();

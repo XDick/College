@@ -24,10 +24,10 @@ public class Dynamics extends BmobObject implements Serializable {
     private String content;
     private String[] picture;
     private String[] like;
-    private Integer replycount=0;
-    private Integer likeCount =0;
+    private Integer replycount;
+    private Integer likeCount ;
 
-    private boolean ifAdd2Gallery=false;
+    private boolean ifAdd2Gallery;
 
 
 

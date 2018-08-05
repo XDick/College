@@ -49,27 +49,13 @@
 
 
 
-      <LinearLayout
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:orientation="vertical"
-          android:layout_gravity="center"
-          >
             <ImageView
-                android:layout_width="100dp"
-                android:layout_height="40dp"
+                android:layout_width="120dp"
+                android:layout_height="48dp"
                 android:id="@+id/logo"
-               android:background="@drawable/findme"
-                android:textStyle="bold"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="10sp"
-                android:id="@+id/sort_main_ac_text"
-                android:textColor="#ffb7b7"
-                android:text="排序"/>
-      </LinearLayout>
+               android:background="@drawable/findme" />
+
 
 
         </android.support.v7.widget.Toolbar>
@@ -88,22 +74,31 @@
 
     </android.support.design.widget.AppBarLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
 
         <android.support.v4.view.ViewPager
             android:id="@+id/mViewPager1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
            >
 
         </android.support.v4.view.ViewPager>
 
-        </RelativeLayout>
-    </android.support.design.widget.CoordinatorLayout>
 
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_gravity="bottom|end"
+            android:elevation="10dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:src="@drawable/add_white"
+            android:id="@+id/floatactionbutton"
+            app:layout_behavior="com.college.xdick.findme.MyClass.FabBehavior"/>
+
+    </android.support.design.widget.CoordinatorLayout>
 
 
 

@@ -87,7 +87,8 @@
             android:value="b689cf6ecc75e3fafd3588b88ede6fcc" />
 
     <activity android:name=".ui.Activity.UserCenterActivity"/>
-    <activity android:name="com.college.xdick.findme.ui.Activity.MainActivity"/>
+    <activity android:name="com.college.xdick.findme.ui.Activity.MainActivity"
+        android:launchMode="singleTask"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.LoginActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.SignupActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.SetDynamicsActivity"/>
@@ -126,6 +127,7 @@
         </intent-filter >
     </activity>
 
+        <activity android:name=".ui.Activity.GalleryActivity"/>
 
 
         <service android:name="com.baidu.location.f"
@@ -143,7 +145,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                  tools:replace="android:resource"
                 android:resource="@xml/file_paths" />
-        </provider>
+    </provider>
 
 
     </application>

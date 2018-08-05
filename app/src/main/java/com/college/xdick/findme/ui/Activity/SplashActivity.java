@@ -85,6 +85,7 @@ public class SplashActivity extends Activity {
                                    BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
                                    q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
                                    queries.add(q);
+                                   query.or(queries);//临时
                                }
 
                            }
@@ -100,7 +101,7 @@ public class SplashActivity extends Activity {
 
 
                      query.setLimit(10);
-                     query.or(queries);
+                     //query.or(queries);
                   query.order("-createdAt");
 //执行查询方法
                     query.findObjects(new FindListener<MyActivity>() {

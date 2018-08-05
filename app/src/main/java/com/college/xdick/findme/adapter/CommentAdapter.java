@@ -1,5 +1,6 @@
 package com.college.xdick.findme.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 
 import android.content.Intent;
@@ -20,6 +21,7 @@ import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.ChatActivity;
+import com.college.xdick.findme.ui.Activity.LoginActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
 
 
@@ -111,6 +113,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
            @Override
            public void onClick(View v) {
 
+                       if (MyUser.getCurrentUser(MyUser.class)==null){
+                           mContext.startActivity(new Intent(mContext,LoginActivity.class));
+                           ((Activity)mContext).finish();
+                           Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                           return;
+                       }
                 ActivityActivity activity = ( ActivityActivity)mContext;
                 activity.ifReply=false;
                int position = holder.getAdapterPosition();
@@ -206,7 +214,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                     holder.avatar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-
+                            if (MyUser.getCurrentUser(MyUser.class)==null){
+                                mContext.startActivity(new Intent(mContext,LoginActivity.class));
+                                ((Activity)mContext).finish();
+                                Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                                     Intent intent = new Intent(mContext, UserCenterActivity.class);
                                     intent.putExtra("USER",object);
                                     mContext.startActivity(intent);
@@ -230,7 +243,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         holder.replyto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (MyUser.getCurrentUser(MyUser.class)==null){
+                    mContext.startActivity(new Intent(mContext,LoginActivity.class));
+                    ((Activity)mContext).finish();
+                    Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 final  String id = comment.getReplyuserId();
                 final String name = comment.getReplyusername();
                 BmobQuery<MyUser> query = new BmobQuery<>();

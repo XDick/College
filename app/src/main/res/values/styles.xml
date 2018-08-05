@@ -36,4 +36,21 @@
         <item name="android:colorControlActivated">#c10000</item>
     </style>
 
+
+
+
+    <style name="StartActivity_Title_Style" parent="@android:style/TextAppearance">
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">25sp</item>
+    </style>
+
+    <style name="PictureDialog" parent="android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+        <item name="android:background">#00000000</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+
+
 </resources>

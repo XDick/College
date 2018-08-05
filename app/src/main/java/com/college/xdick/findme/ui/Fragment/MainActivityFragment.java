@@ -3,6 +3,7 @@ package com.college.xdick.findme.ui.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -28,6 +29,7 @@ import com.college.xdick.findme.adapter.MyFragmentStatePagerAdapter;
 import com.college.xdick.findme.bean.MyUser;
 
 import com.college.xdick.findme.ui.Activity.LoginActivity;
+import com.college.xdick.findme.ui.Activity.MainActivity;
 import com.college.xdick.findme.ui.Activity.SetActivitiyActivity;
 
 import com.zyyoona7.popup.EasyPopup;
@@ -51,13 +53,13 @@ import cn.bmob.v3.listener.QueryListener;
 public class MainActivityFragment extends Fragment {
     private View rootView;
     private ViewPager mViewPager1;
-    private ImageView logo;
     private TabLayout mTabLayout;
     private LinearLayout newsort, datesort;
     private TextView gpsTextView;
     private String[] tabTitle = {"推荐", "同城", "同校"};//每个页面顶部标签的名字
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
     private  MyFragmentStatePagerAdapter adapter;
+    private FloatingActionButton floatingActionButton;
 
     @Nullable
     @Override
@@ -74,7 +76,33 @@ public class MainActivityFragment extends Fragment {
         mViewPager1 = (ViewPager) rootView.findViewById(R.id.mViewPager1);
         mTabLayout = (TabLayout) rootView.findViewById(R.id.mTabLayout);
         adapter = new MyFragmentStatePagerAdapter(getChildFragmentManager(), tabTitle);
-        logo = rootView.findViewById(R.id.logo);
+        floatingActionButton = rootView.findViewById(R.id.floatactionbutton);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bmobUser = BmobUser.getCurrentUser(MyUser.class);
+                Bmob.getServerTime(new QueryListener<Long>() {
+                    @Override
+                    public void done(Long aLong, BmobException e) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        String date = sdf.format(new Date(aLong * 1000L));
+                        if (bmobUser != null) {
+                            if (!date.equals(bmobUser.getSetAcTime()) || bmobUser.getUsername().equals("叉地克")) {
+                                Intent intent = new Intent(getContext(), SetActivitiyActivity.class);
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(getContext(), "今天已经发过活动了o(╥﹏╥)o", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+
+                                startActivity(new Intent(getContext(),LoginActivity.class));
+                                getActivity().finish();
+                                Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
         Toolbar toolbar = rootView.findViewById(R.id.toolbar_ac);
         toolbar.setTitle("");
         gpsTextView = rootView.findViewById(R.id.gps_main_ac_toolbar);
@@ -95,11 +123,6 @@ public class MainActivityFragment extends Fragment {
         }
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-
-
-
-
-
 
 
         for (int i = 0; i < tabTitle.length; i++) {
@@ -137,105 +160,12 @@ public class MainActivityFragment extends Fragment {
 
 
 
-
-
-
-
-
-        final EasyPopup easyPopup = EasyPopup.create()
-                .setContentView(getContext(), R.layout.popup_sort)
-                .setWidth(400)
-                .apply();
-
-        datesort = easyPopup.findViewById(R.id.datesort);
-
-
-
-
-        newsort = easyPopup.findViewById(R.id.newsort);
-
-        logo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                easyPopup.showAtAnchorView(logo, YGravity.BELOW, XGravity.CENTER, 0, 0);
-            }
-        });
-
-
-
-        datesort.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                switch (mViewPager1.getCurrentItem()){
-                    case 0:
-                    {
-                        ActivityFragment fragment=((ActivityFragment)adapter.instantiateItem(mViewPager1,0));
-                        fragment.setSize(0);
-                        fragment.sortData(fragment.REFRESH);
-                        easyPopup.dismiss();
-                        break;
-
-                    }
-                    case 1:
-                    {
-                        ActivitygpsFragment fragment=((ActivitygpsFragment)adapter.instantiateItem(mViewPager1,1));
-                        fragment.setSize(0);
-                        fragment.sortData(fragment.REFRESH);
-                        easyPopup.dismiss();
-                        break;
-                    }
-                    case 2:
-                    {
-                        ActivityschoolFragment fragment=((ActivityschoolFragment)adapter.instantiateItem(mViewPager1,2));
-                        fragment.setSize(0);
-                        fragment.sortData(fragment.REFRESH);
-                        easyPopup.dismiss();
-                        break;
-                    }
-                }
-            }
-        });
-
-
-
-        newsort.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                switch (mViewPager1.getCurrentItem()){
-                    case 0:
-                    {
-                        ActivityFragment fragment=((ActivityFragment)adapter.instantiateItem(mViewPager1,0));
-                        fragment.setSize(0);
-                        fragment.initData(fragment.REFRESH);
-                        easyPopup.dismiss();
-                        break;
-
-                    }
-                    case 1:
-                    {
-                        ActivitygpsFragment fragment=((ActivitygpsFragment)adapter.instantiateItem(mViewPager1,1));
-                        fragment.setSize(0);
-                        fragment.initData(fragment.REFRESH);
-                        easyPopup.dismiss();
-                        break;
-                    }
-                    case 2:
-                    {
-                        ActivityschoolFragment fragment=((ActivityschoolFragment)adapter.instantiateItem(mViewPager1,2));
-                        fragment.setSize(0);
-                        fragment.initData(fragment.REFRESH);
-                        easyPopup.dismiss();
-                        break;
-                    }
-                }
-            }
-        });
-
-
-
     }
+
+
+
+
+
 
 
 
@@ -243,7 +173,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
-        inflater.inflate(R.menu.toolbar_set_activity_menu, menu);
+        inflater.inflate(R.menu.toolbar_sort, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -251,39 +181,68 @@ public class MainActivityFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
-            case R.id.set_activity:
-                bmobUser = BmobUser.getCurrentUser(MyUser.class);
-                Bmob.getServerTime(new QueryListener<Long>() {
-                    @Override
-                    public void done(Long aLong, BmobException e) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                        String date = sdf.format(new Date(aLong * 1000L));
-                        if (bmobUser != null) {
-                            if (!date.equals(bmobUser.getSetAcTime()) || bmobUser.getUsername().equals("叉地克")) {
-                                Intent intent = new Intent(getContext(), SetActivitiyActivity.class);
-                                startActivity(intent);
-                            } else {
-                                Toast.makeText(getContext(), "今天已经发过活动了o(╥﹏╥)o", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
-                        }
+            case R.id.menu_sort_recent: {
+                switch (mViewPager1.getCurrentItem()) {
+                    case 0: {
+                        ActivityFragment fragment = ((ActivityFragment) adapter.instantiateItem(mViewPager1, 0));
+                        fragment.setSize(0);
+                        fragment.initData(fragment.REFRESH);
+
+                        break;
+
                     }
-                });
+                    case 1: {
+                        ActivitygpsFragment fragment = ((ActivitygpsFragment) adapter.instantiateItem(mViewPager1, 1));
+                        fragment.setSize(0);
+                        fragment.initData(fragment.REFRESH);
+
+                        break;
+                    }
+                    case 2: {
+                        ActivityschoolFragment fragment = ((ActivityschoolFragment) adapter.instantiateItem(mViewPager1, 2));
+                        fragment.setSize(0);
+                        fragment.initData(fragment.REFRESH);
+
+                        break;
+                    }
+
+                }
+            }
+
+            case R.id.menu_sort_time: {
+                switch (mViewPager1.getCurrentItem()) {
+                    case 0: {
+                        ActivityFragment fragment = ((ActivityFragment) adapter.instantiateItem(mViewPager1, 0));
+                        fragment.setSize(0);
+                        fragment.sortData(fragment.REFRESH);
+
+                        break;
+
+                    }
+                    case 1: {
+                        ActivitygpsFragment fragment = ((ActivitygpsFragment) adapter.instantiateItem(mViewPager1, 1));
+                        fragment.setSize(0);
+                        fragment.sortData(fragment.REFRESH);
+
+                        break;
+                    }
+                    case 2: {
+                        ActivityschoolFragment fragment = ((ActivityschoolFragment) adapter.instantiateItem(mViewPager1, 2));
+                        fragment.setSize(0);
+                        fragment.sortData(fragment.REFRESH);
+                        break;
+                    }
 
 
-                break;
+                    default:
+                        break;
+                }
+
+                return true;
+            }
 
 
-            default:
-                break;
         }
-
         return true;
     }
-
-
-
-
-
 }

@@ -28,6 +28,7 @@ import com.college.xdick.findme.ui.Activity.MyLikeActivity;
 import com.college.xdick.findme.ui.Activity.MySetActivity;
 import com.college.xdick.findme.ui.Activity.SettingUserActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
+import com.college.xdick.findme.util.SelectSchoolUtil;
 import com.linchaolong.android.imagepicker.ImagePicker;
 import com.linchaolong.android.imagepicker.cropper.CropImage;
 import com.linchaolong.android.imagepicker.cropper.CropImageView;
@@ -58,7 +59,7 @@ public class UserFragment extends Fragment {
     private String picturePath;
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
     private TextView user,setcountText,joincountText,likecountText,dynamicscountText;
-    private ImageView avatar,setting,background;
+    private ImageView avatar,setting;
     private ImagePicker imagePicker;
     private LinearLayout maytag,userset,userjoin,userlike,userexit,usersetting,userdynamics;
     private WaveView3 waveView3;
@@ -67,6 +68,9 @@ public class UserFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootview =inflater.inflate(R.layout.fragment_user,container,false);
+
+
+
         startImagePicker();
         initView();
         BmobCheckIfLogin();
@@ -86,8 +90,22 @@ public class UserFragment extends Fragment {
         likecountText = rootview.findViewById(R.id.user_like_count);
         dynamicscountText = rootview.findViewById(R.id.user_dynamics_count);
         userdynamics = rootview.findViewById(R.id.user_dynamics);
-       background = rootview.findViewById(R.id.user_background);
-      //  background.setColorFilter(Color.parseColor("#c40730"), PorterDuff.Mode.MULTIPLY);
+        TextView schoolText = rootview.findViewById(R.id.userschool);
+
+        try {
+            schoolText.setText("学校:"+bmobUser.getSchool());
+            SelectSchoolUtil.initPopView(getActivity(),null,schoolText,bmobUser);
+            schoolText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SelectSchoolUtil.showPopWindow();
+                }
+            });
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
 
 
 
@@ -217,8 +235,7 @@ public class UserFragment extends Fragment {
                 user.setText(bmobUser.getUsername());
                 Glide.with(getActivity()).load(bmobUser.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
 
-        Glide.with(this).load(bmobUser.getAvatar()).apply(bitmapTransform(new BlurTransformation(9, 7))
-        ).into(background);
+
 
 
     }

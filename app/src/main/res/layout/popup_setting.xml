@@ -13,6 +13,7 @@
         android:orientation="vertical"
         android:layout_gravity="center"
         android:id="@+id/account_setting"
+        android:visibility="gone"
         android:clickable="true"
         android:focusable="true">
     <TextView
@@ -37,6 +38,7 @@
         android:background="@drawable/select_popup"
         android:clickable="true"
         android:focusable="true"
+        android:visibility="gone"
         android:orientation="vertical">
 
         <TextView

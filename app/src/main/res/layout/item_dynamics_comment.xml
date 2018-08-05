@@ -56,12 +56,12 @@
                     android:orientation="vertical"
                     android:layout_weight="1"
                     android:layout_height="wrap_content">
-                    <ImageView
+                   <!-- <ImageView
                         android:layout_width="15dp"
                         android:layout_height="15dp"
                         android:layout_gravity="end"
                         android:layout_marginRight="10dp"
-                        android:background="@drawable/thumb_up"/>
+                        android:background="@drawable/thumb_up"/>-->
 
                 </LinearLayout>
             </LinearLayout>
@@ -78,6 +78,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/dynamics_comment_content"
+                android:textIsSelectable="true"
                 android:layout_marginLeft="3dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="3dp"
@@ -102,6 +103,7 @@
                 <TextView
                     android:id="@+id/comment_fromcontent_dynamics"
                     android:layout_margin="5dp"
+                    android:textIsSelectable="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 

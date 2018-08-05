@@ -75,7 +75,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
-                <Button
+               <!-- <Button
                     android:layout_width="50dp"
                     android:layout_height="30dp"
                       android:text="关注"
@@ -83,7 +83,7 @@
                     android:id="@+id/usercenter_follow_button"
                     android:textColor="#fff"
                     android:layout_margin="5dp"
-                    android:background="#d75050"/>
+                    android:background="#d75050"/>-->
             </LinearLayout>
         </LinearLayout>
 

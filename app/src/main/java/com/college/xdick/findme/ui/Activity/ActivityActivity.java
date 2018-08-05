@@ -1,5 +1,6 @@
 package com.college.xdick.findme.ui.Activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -50,7 +51,7 @@ public class ActivityActivity extends AppCompatActivity {
    private StartactivityFragment myfragment;
    private Comment replyComment,fromComment;
    private   InputMethodManager imm ;
-    private TextView likecount, commentcount;
+    private TextView  commentcount;
 
 
 
@@ -63,12 +64,8 @@ public class ActivityActivity extends AppCompatActivity {
         setContentView(R.layout.activity_activity);
          imm = (InputMethodManager) getSystemService (Context.INPUT_METHOD_SERVICE);
 
-        if(myUser==null){
-          //  startActivity(new Intent(ActivityActivity.this,LoginActivity.class));
-            Toast.makeText(ActivityActivity.this,"请先登录",Toast.LENGTH_SHORT).show();
-            finish();
-        }
-        else {
+
+
         myfragment=new StartactivityFragment();
         replaceFragment(myfragment);
         editComment = findViewById(R.id.activity_edit_comment_edittext);
@@ -77,15 +74,22 @@ public class ActivityActivity extends AppCompatActivity {
         statusbar = findViewById(R.id.activity_statusbar);
         like = findViewById(R.id.activity_like_imageview);
         startEdit = findViewById(R.id.activity_startedit);
-        likecount = findViewById(R.id.activity_like_count);
+
         commentcount = findViewById(R.id.activity_comment_count);
         final Intent intent =getIntent();
         final MyActivity activity = (MyActivity)intent.getSerializableExtra("ACTIVITY");
         activityId =activity.getObjectId();
-        initLike();
         comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (MyUser.getCurrentUser(MyUser.class)==null){
+                    startActivity(new Intent(ActivityActivity.this,LoginActivity.class));
+                    finish();
+                    Toast.makeText(ActivityActivity.this,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 startEdit.setVisibility(View.VISIBLE);
                 statusbar.setVisibility(View.GONE);
 
@@ -99,12 +103,25 @@ public class ActivityActivity extends AppCompatActivity {
 
             }
         });
+        try{
+         ifLike();
 
-        ifLike();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
 
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (MyUser.getCurrentUser(MyUser.class)==null){
+                    startActivity(new Intent(ActivityActivity.this,LoginActivity.class));
+                   finish();
+                    Toast.makeText(ActivityActivity.this,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if(!ifLike) {
                     myUser.addUnique("like",activityId);
                     myUser.update(new UpdateListener() {
@@ -113,11 +130,7 @@ public class ActivityActivity extends AppCompatActivity {
                             if (e == null) {
                                 like.setBackground(ActivityActivity.this.getResources().getDrawable(R.drawable.like_t));
                                 ifLike = true;
-                                MyActivity myActivity = new MyActivity();
-                                myActivity.setObjectId(activity.getObjectId());
-                                myActivity.setDate(activity.getDate());
-                                myActivity.addUnique("likeUser",myUser.getObjectId());
-                                myActivity.update();
+
                                 Toast.makeText(ActivityActivity.this, "成功收藏", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(ActivityActivity.this, "失败", Toast.LENGTH_SHORT).show();
@@ -136,11 +149,6 @@ public class ActivityActivity extends AppCompatActivity {
 
                             if(e==null){
                                 like.setBackground(ActivityActivity.this.getResources().getDrawable(R.drawable.like_f));
-                                MyActivity myActivity = new MyActivity();
-                                myActivity.setObjectId(activity.getObjectId());
-                                myActivity.setDate(activity.getDate());
-                                myActivity.removeAll("likeUser",Arrays.asList(myUser.getObjectId()));
-                                myActivity.update();
                                 ifLike = false;
                                 Toast.makeText(ActivityActivity.this, "取消收藏", Toast.LENGTH_SHORT).show();
                             }
@@ -229,7 +237,7 @@ public class ActivityActivity extends AppCompatActivity {
                 });}
 
             }
-        });}
+        });
 
 
 
@@ -273,6 +281,8 @@ public class ActivityActivity extends AppCompatActivity {
     }
 
     private void ifLike(){
+
+
         if(!Arrays.toString(myUser.getLike()).contains(activityId) ){
             ifLike= false;
         }
@@ -304,24 +314,7 @@ public class ActivityActivity extends AppCompatActivity {
         commentcount .setText("评论:"+count);
     }
 
-    private void initLike(){
-        BmobQuery<MyUser> query = new BmobQuery<MyUser>();
 
-        query.addWhereContainsAll("like", Arrays.asList(activityId));
-        query.findObjects(new FindListener<MyUser>() {
-
-            @Override
-            public void done(List<MyUser> object, BmobException e) {
-                if(e==null){
-                   likecount.setText("喜欢:"+object.size());
-                }else{
-                    Log.i("bmob","失败："+e.getMessage());
-                }
-            }
-
-        });
-
-    }
 
 
 }

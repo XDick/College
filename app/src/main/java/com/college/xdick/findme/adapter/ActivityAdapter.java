@@ -19,14 +19,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.college.xdick.findme.R;
 
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -63,8 +67,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
     private View mFooterView;
     private View mEmptyView;
 
-    private String selectedcolor[]={"#7e07ce","#0d80c2","#c4c414","#0daf33","#cf0003"};
-    private List<String> colorList = Arrays.asList(selectedcolor);
+   // private String selectedcolor[]={"#7e07ce","#0d80c2","#c4c414","#0daf33","#cf0003"};
+   // private List<String> colorList = Arrays.asList(selectedcolor);
     private boolean ifShuffle=true;
 
 
@@ -73,8 +77,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
     static class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView place,title,host,time,join,gps,tag,date;
-        ImageView cover;
+        TextView place,title,host,time,join,gps,tag,date,comment;
+        ImageView cover,avatar;
         CardView cardView;
 
 
@@ -90,6 +94,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
             gps=view.findViewById(R.id.gps_ac);
             tag = view.findViewById(R.id.tag_ac);
             date = view. findViewById(R.id.date_ac);
+            avatar = view.findViewById(R.id.host_avatar);
+            comment = view.findViewById(R.id.comment_ac);
         }
     }
 
@@ -101,10 +107,10 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        if(ifShuffle) {
+        /*if(ifShuffle) {
             Collections.shuffle(colorList);
         ifShuffle=false;
-        }
+        }*/
 
         if(mContext == null){
             mContext = parent.getContext();
@@ -190,9 +196,9 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
         int realPos = getRealItemPosition(position);
 
-        String[] newColor =  (String[]) colorList.toArray();
+       /* String[] newColor =  (String[]) colorList.toArray();
         String color;
-        color = newColor[(realPos)%5];
+        color = newColor[(realPos)%5];*/
         MyActivity activity = mActivityList.get(realPos);
         int joincount=0;
         try{
@@ -212,29 +218,57 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         tag = tag.replace("]","");
         tag = tag.replace(","," ");
         String rawTime=activity.getTime();
+
+
+
+
+
        String time = rawTime.substring(rawTime.indexOf(" "));
        String date = rawTime.substring(0,rawTime.indexOf(" "));
 
-        holder.title.setText(activity.getTitle());
-        holder.place.setText(activity.getPlace());
-        holder.host.setText("发起人"+activity.getHostName());
 
+
+        final DateFormat sdf = new SimpleDateFormat("yyyy");
+        String  nowYear = sdf.format(new Date( ));
+        String year = date.substring(0,4);
+        if (nowYear.equals(year)) {
+            holder.date.setText(date.substring(5));
+        }
+        else
+        {
+            holder.date.setText(date);
+        }
 
         holder.time.setText(time);
-        holder.date.setText(date);
+        holder.title.setText(activity.getTitle());
+        holder.place.setText(activity.getPlace());
+        holder.host.setText(activity.getHostName());
+        BmobQuery<MyUser> query = new BmobQuery();
+        query.addWhereEqualTo("username",activity.getHostName());
+       query.findObjects(new FindListener<MyUser>() {
+           @Override
+           public void done(List<MyUser> list, BmobException e) {
+               for (MyUser user:list){
+                   Glide.with(mContext).load(user.getAvatar()).apply(bitmapTransform(new CircleCrop())).into(holder.avatar);
+               }
 
+           }
+       });
+
+        holder.comment.setText(activity.getCommentCount()+"评论");
 
 
         holder.tag.setText(tag);
 
-        holder.cover.setColorFilter(Color.parseColor(color), PorterDuff.Mode.MULTIPLY);
+        //holder.cover.setColorFilter(Color.parseColor(color), PorterDuff.Mode.MULTIPLY);
 
 
        if (gps!=null){
         holder.gps.setText(gps[2]);}
         Glide.with(mContext).load(activity.getCover()).apply(bitmapTransform(new BlurTransformation(9, 3))).into(holder.cover);
 
-           holder.join.setText("有" +joincount + "个人参与");
+           holder.join.setText( joincount +"人参与");
+
 
 
 

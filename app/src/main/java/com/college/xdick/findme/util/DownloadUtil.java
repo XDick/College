@@ -139,7 +139,7 @@ public class DownloadUtil {
 
 
     OnDownloadListener listener;
-    public interface OnDownloadListener{
+    public interface    OnDownloadListener{
         /**
          * 下载成功
          */

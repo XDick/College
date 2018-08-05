@@ -1,5 +1,6 @@
 package com.college.xdick.findme.ui.Activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import com.college.xdick.findme.adapter.MsgAdapter;
 import com.college.xdick.findme.R;
+import com.college.xdick.findme.bean.MyUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +34,9 @@ import cn.bmob.newim.listener.MessageListHandler;
 import cn.bmob.newim.listener.MessageSendListener;
 import cn.bmob.newim.listener.MessagesQueryListener;
 import cn.bmob.newim.notification.BmobNotificationManager;
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.QueryListener;
 
 /**
  * Created by Administrator on 2018/4/4 0004.
@@ -42,7 +46,7 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
 
     private RecyclerView msgRecyclerView;
     private EditText inputText;
-    private Button send;
+    private Button send,usercenter;
     private MsgAdapter adapter;
     private Toolbar toolbar;
     private BmobIMConversation conversation;
@@ -105,7 +109,26 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
                sendIMMsg();
                 }
             }
+
         );
+
+        usercenter= findViewById(R.id.usercenter_chat);
+        usercenter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BmobQuery<MyUser> query = new BmobQuery<>();
+                query.getObject(conversation.getConversationId(), new QueryListener<MyUser>() {
+                    @Override
+                    public void done(MyUser myUser, BmobException e) {
+                        Intent intent = new Intent(ChatActivity.this,UserCenterActivity.class);
+                        intent.putExtra("USER",myUser);
+                        startActivity(intent);
+                    }
+                });
+
+
+            }
+        });
     }
 
     private void BaseIMoperation(){

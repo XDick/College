@@ -1,7 +1,9 @@
 package com.college.xdick.findme.adapter;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -9,12 +11,18 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,6 +34,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.target.Target;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
+import com.college.xdick.findme.MyClass.PicturePageAdapter;
+import com.college.xdick.findme.MyClass.ViewPagerFixed;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.Dynamics;
@@ -37,19 +47,16 @@ import com.college.xdick.findme.ui.Activity.ChatActivity;
 import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
 import com.college.xdick.findme.util.DownloadUtil;
-import com.college.xdick.findme.util.FileUtil;
+
 import com.jaeger.ninegridimageview.NineGridImageView;
 import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
+
 import com.zyyoona7.popup.EasyPopup;
 import com.zyyoona7.popup.XGravity;
 import com.zyyoona7.popup.YGravity;
 
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -110,11 +117,10 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
        private List<Dynamics> mDynamicsList;
        private  NineGridImageViewAdapter<String> mAdapter;
        private Context mContext;
-       private Dialog dialog;
-        private ImageView mImageView;
         private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
+         private Dialog mDialog;
 
-
+           private ViewPagerFixed pager;
        private int flag=0;
 
 
@@ -201,52 +207,8 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
 
 
-            dialog = new Dialog(mContext, R.style.AppTheme);
-            mAdapter = new NineGridImageViewAdapter<String>() {
-                @Override
-                protected void onDisplayImage(Context context, ImageView imageView, String photo) {
-                    Glide.with(mContext).load(photo).into(imageView);
-                }
 
-                @Override
-                protected ImageView generateImageView(Context context) {
-                    return super.generateImageView(context);
-                }
 
-                @Override
-                protected void onItemImageClick(Context context, ImageView imageView, final int index, final List<String> photoList) {
-                    mImageView = getImageView(photoList.get(index));
-                    dialog.setContentView( mImageView);
-                    dialog.show();
-                    mImageView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            dialog.dismiss();
-                        }
-                    });
-                    mImageView.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View v) {
-                            final EasyPopup easyPopup = EasyPopup.create()
-                                    .setContentView(mContext, R.layout.popup_savepic)
-                                    .setWidth(400)
-                                    .apply();
-                            LinearLayout layout = easyPopup.findViewById(R.id.save_pic);
-                            layout.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    downloadFile1(photoList.get(index));
-                                }
-                            });
-                            easyPopup.showAtAnchorView(mImageView, YGravity.CENTER, XGravity.CENTER, 0, 0);
-
-                            return true;
-                        }
-                    });
-                }
-            };
-
-            holder.gridImageView.setAdapter(mAdapter);
 
 
 
@@ -276,7 +238,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                         }
                     });
 
-                }});
+        }});
 
 
             return holder;
@@ -344,9 +306,60 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
         final LinearLayout report = easyPopup.findViewById(R.id.dynamics_report);
 
       final Dynamics dynamics = mDynamicsList.get(realPos);
+       final  List<MyUser> user=new ArrayList<>();
+        BmobQuery<MyUser> query = new BmobQuery<MyUser>();
+        query.addWhereEqualTo("username", dynamics.getUser());
+        query.getObject(dynamics.getUserId(), new QueryListener<MyUser>() {
+
+            @Override
+            public void done(final MyUser object, BmobException e) {
+                if (e == null) {
+                        user.add(object);
+                    Glide.with(mContext).load(object.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
+
+
+                    holder.layout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent intent = new Intent(mContext, MainDynamicsActivity.class);
+                            intent.putExtra("DYNAMICS", dynamics);
+                            intent.putExtra("USER",object);
+
+                            mContext.startActivity(intent);
+                        }
+                    });
 
 
 
+
+
+                }
+            }
+
+        });
+        mAdapter = new NineGridImageViewAdapter<String>() {
+
+            @Override
+            protected void onDisplayImage(Context context, ImageView imageView, String photo) {
+                Glide.with(mContext).load(photo).into(imageView);
+            }
+
+            @Override
+            protected ImageView generateImageView(Context context) {
+                return super.generateImageView(context);
+            }
+
+            @Override
+            protected void onItemImageClick(Context context, ImageView imageView, final int index, final List<String> photoList) {
+                List<String> picList = new  ArrayList<>(photoList);
+                showPictureDialog(index,picList,dynamics,user.get(0));
+
+
+            }
+        };
+
+        holder.gridImageView.setAdapter(mAdapter);
 
       if (dynamics.getActivityTitle()==null){
           holder.cardView.setVisibility(GONE);
@@ -514,33 +527,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                     }
 
 
-                    BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-                    query.addWhereEqualTo("username", dynamics.getUser());
-                    query.getObject(dynamics.getUserId(), new QueryListener<MyUser>() {
 
-                        @Override
-                        public void done(final MyUser object, BmobException e) {
-                            if (e == null) {
-
-                                Glide.with(mContext).load(object.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
-
-
-                                holder.layout.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                        Intent intent = new Intent(mContext, MainDynamicsActivity.class);
-                                        intent.putExtra("DYNAMICS", dynamics);
-                                        intent.putExtra("USER",object);
-
-                                        mContext.startActivity(intent);
-                                    }
-                                });
-
-                            }
-                        }
-
-                    });
 
 
                     if (dynamics.getPicture() == null) {
@@ -577,7 +564,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
                                 Dynamics dynamics1 = new Dynamics();
                                 dynamics1.setObjectId(dynamics.getObjectId());
-                                dynamics1.setReplycount(dynamics.getReplycount());
+                                dynamics1.setIfAdd2Gallery(dynamics.isIfAdd2Gallery());
                                 dynamics1.increment("likeCount" ,-1);
                                 dynamics1.removeAll("like", Arrays.asList(BmobUser.getCurrentUser().
                                         getObjectId()));
@@ -601,7 +588,6 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
                                 Dynamics dynamics1 = new Dynamics();
                                 dynamics1.setObjectId(dynamics.getObjectId());
-                                dynamics1.setReplycount(dynamics.getReplycount());
                                 dynamics1.setIfAdd2Gallery(dynamics.isIfAdd2Gallery());
                                 dynamics1.increment("likeCount" ,1);
                                 dynamics1.addUnique("like",BmobUser.getCurrentUser().
@@ -618,6 +604,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
                                             likelist.add(BmobUser.getCurrentUser().
                                                     getObjectId());
+
                                             dynamics.setLike(  likelist.toArray(new String[likelist.size()]));
                                             holder.likecount.setText(  likelist.size() + "");
                                             holder.like.setBackground(mContext.getResources().getDrawable(R.drawable.thumb_up_t));
@@ -693,16 +680,125 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
 
 
-    private ImageView getImageView(String Uri){
-        ImageView iv = new ImageView(mContext);
-        //宽高
-        iv.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        //设置Padding
-        iv.setPadding(20,20,20,20);
-        //imageView设置图片
-       Glide.with(mContext).load(Uri).into(iv);
-        return iv;
+    public void showPictureDialog(final int mPosition, final List<String> mListPicPath,
+                                  final Dynamics dynamics,final MyUser user) {
+       TextView content,likeCount,commentCount;
+       final LinearLayout clickToDetail;
+
+
+
+        //创建dialog
+        mDialog = new Dialog(mContext, R.style.PictureDialog);
+        final Window window1 = mDialog.getWindow() ;
+        WindowManager m = ((Activity)mContext).getWindowManager();
+        Display d = m.getDefaultDisplay(); // 获取屏幕宽、高用
+        WindowManager.LayoutParams p = window1.getAttributes(); // 获取对话框当前的参数值
+        p.height = (int) (d.getHeight() * 1.0); // 改变的是dialog框在屏幕中的位置而不是大小
+        p.width = (int) (d.getWidth() * 1.0); // 宽度设置为屏幕
+        window1.setAttributes(p);
+        View inflate = View.inflate(mContext, R.layout.picture_dialog, null);//该layout在后面po出
+        int screenWidth = mContext.getResources().getDisplayMetrics().widthPixels;
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(screenWidth, ViewGroup.LayoutParams.MATCH_PARENT);
+        mDialog.setContentView(inflate, layoutParams);
+
+
+        commentCount = inflate.findViewById(R.id.comment);
+        likeCount = inflate.findViewById(R.id.like);
+        content = inflate.findViewById(R.id.content);
+        clickToDetail=inflate.findViewById(R.id.layout_to_dynamics);
+        content.setText(dynamics.getContent());
+        commentCount.setText(dynamics.getReplycount()+"");
+        likeCount.setText(dynamics.getLikeCount()+"");
+
+        clickToDetail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                            clickToDetail.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                    Intent intent = new Intent(mContext, MainDynamicsActivity.class);
+                                    intent.putExtra("DYNAMICS", dynamics);
+                                    intent.putExtra("USER",user);
+
+                                    mContext.startActivity(intent);
+                                }
+                            });
+
+
+
+                        }
+
+
+
+        });
+        pager = inflate.findViewById(R.id.gallery01);
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        PicturePageAdapter adapter = new PicturePageAdapter((ArrayList<String>) mListPicPath, mContext);
+        pager.setAdapter(adapter);
+        pager.setPageMargin(0);
+        pager.setCurrentItem(mPosition);
+        window1.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        mDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                return false;
+            }
+        });
+        mDialog.show();
+        adapter.setOnPictureClickListener(new PicturePageAdapter.OnPictureClickListener() {
+            @Override
+            public void OnClick() {
+                window1.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                mDialog.dismiss();
+            }
+        });
+        //长按图片保存
+        adapter.setOnPictureLongClickListener(new PicturePageAdapter.OnPictureLongClickListener() {
+            @Override
+            public void OnLongClick() {
+                //展示保存取消dialog
+                final EasyPopup savePop = EasyPopup.create()
+                        .setContentView(mContext, R.layout.popup_savepic)
+                        .setWidth(400)
+                        .setBackgroundDimEnable(true)
+                        //变暗的透明度(0-1)，0为完全透明
+                        .setDimValue(0.4f)
+                        //变暗的背景颜色
+                        .apply();
+
+
+                 savePop.showAtAnchorView(pager,YGravity.CENTER, XGravity.CENTER, 0, 0);
+
+                 LinearLayout savepic = savePop.findViewById(R.id.save_pic);
+                 savepic.setOnClickListener(new View.OnClickListener() {
+                     @Override
+                     public void onClick(View v) {
+                         downloadFile(mListPicPath.get(mPosition));
+                         savePop.dismiss();
+                     }
+                 });
+            }
+        });
     }
+
 
 
     public void sendMessage(String content ,BmobIMUserInfo info,String objectId,String objectTitle) {
@@ -734,24 +830,31 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
             });
         }
     }
-    public void downloadFile1(String url) {
-        DownloadUtil.getInstance().download(url, "file:///FindMe/Picture", new DownloadUtil.OnDownloadListener() {
-            @Override
-            public void onDownloadSuccess(String path) {
-                Toast.makeText(mContext, "保存成功", Toast.LENGTH_SHORT).show();
-            }
+    public void downloadFile(final String url) {
 
-            @Override
-            public void onDownloading(int progress) {
+               DownloadUtil.getInstance().download(url, "file:///FindMe/Picture", new DownloadUtil.OnDownloadListener() {
+                   @Override
+                   public void onDownloadSuccess(String path) {
+                       Toast.makeText(mContext, "保存成功", Toast.LENGTH_SHORT).show();
+                   }
 
-            }
+                   @Override
+                   public void onDownloading(int progress) {
 
-            @Override
-            public void onDownloadFailed() {
+                   }
 
-            }
-        });
-    }
+                   @Override
+                   public void onDownloadFailed() {
+
+                       Toast.makeText(mContext, "保存失败", Toast.LENGTH_SHORT).show();
+                   }
+
+               });
+           }
+
+
+
+
 
 
 

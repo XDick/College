@@ -39,7 +39,6 @@ public class MyLikeActivity extends AppCompatActivity {
     private List<MyActivity> activityList= new ArrayList<>();
     private ActivityAdapter2 adapter;
     private List<String> currentList = new ArrayList<>();
-    private boolean flag= true;
     private Toolbar toolbar;
 
     @Override
@@ -80,7 +79,12 @@ public class MyLikeActivity extends AppCompatActivity {
     public void initData(){
         activityList.clear();
         BmobQuery<MyActivity> query = new BmobQuery<>();
-        query.addWhereContainsAll("likeUser", Arrays.asList(myUser.getObjectId()));
+        final List<String> list =new ArrayList<>(Arrays.asList(myUser.getLike()));
+
+
+        query.addWhereContainedIn("objectId", list);
+        query.order("-date");
+
         query.findObjects(new FindListener<MyActivity>() {
             @Override
             public void done(List<MyActivity> list, BmobException e) {
@@ -90,28 +94,9 @@ public class MyLikeActivity extends AppCompatActivity {
                         currentList.add(activity.getObjectId());
                         activityList.add(activity);
                     }
-                    Collections.sort(activityList);
-                    Collections.reverse(activityList);
+
                     adapter.notifyDataSetChanged();
-                    if (flag) {
 
-                    if (myUser.getLike().length>list.size()){
-                        List<String> userList = Arrays.asList(myUser.getLike());
-                        Collection<String> collection = new ArrayList<>(userList);
-                        collection.removeAll(currentList);
-                        myUser.removeAll("like",collection);
-                        myUser.update(new UpdateListener() {
-                            @Override
-                            public void done(BmobException e) {
-                                myUser=BmobUser.getCurrentUser(MyUser.class);
-                            }
-                        });
-                        Toast.makeText(MyLikeActivity.this, "Oops，其中一些活动已经被发布者删除", Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-
-                    flag= false;
                 }
             }
         });

@@ -23,6 +23,8 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:expandedTitleGravity="center"
+            app:expandedTitleTextAppearance="@style/StartActivity_Title_Style"
             android:fitsSystemWindows="true">
 
             <ImageView
@@ -167,6 +169,7 @@
                         android:id="@+id/activity_time_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textIsSelectable="true"
                         android:layout_margin="10dp"
                         android:textSize="15dp"
                         android:textStyle="bold"/>
@@ -187,6 +190,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
+                        android:textIsSelectable="true"
                         android:textSize="15dp"
                         android:textStyle="bold"/>
                 </LinearLayout>
@@ -255,6 +259,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxLines="5"
+                        android:textIsSelectable="true"
                         android:textSize="15sp"
                         android:textStyle="bold"
                         android:textColor="#494949"

@@ -114,7 +114,7 @@ public class ActivityschoolFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
          adapter = new ActivityAdapter(activityList3);
          View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
-         View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty, recyclerView, false);
+         View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_activity, recyclerView, false);
          adapter.setEmptyView(empty);
          adapter.addFooterView(footer);
 
@@ -204,7 +204,7 @@ public class ActivityschoolFragment extends Fragment {
                                 }
                                 else if (state==REFRESH){
                                     activityList3.clear();
-                                    if(activityList3.size()<10){
+                                    if(object.size()<10){
                                         ifEmpty=true;
                                         activityList3.addAll(object);
                                         adapter.notifyDataSetChanged();
@@ -214,7 +214,7 @@ public class ActivityschoolFragment extends Fragment {
                                         activityList3.addAll(object);
                                         adapter.notifyDataSetChanged();}
                                     size =  10;
-
+                                    loadlayout.setVisibility(View.INVISIBLE);
                                 }
 
                             }else{

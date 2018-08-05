@@ -1,7 +1,6 @@
 package com.college.xdick.findme.ui.Activity;
 
-import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
+
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -10,40 +9,22 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.PopupWindow;
-import android.widget.TextView;
+
 import android.widget.Toast;
 
 import com.college.xdick.findme.R;
-import com.college.xdick.findme.adapter.CityAdapter;
-import com.college.xdick.findme.adapter.ProvinceAdapter;
-import com.college.xdick.findme.adapter.SchoolAdapter;
-import com.college.xdick.findme.bean.City;
 import com.college.xdick.findme.bean.MyUser;
-import com.college.xdick.findme.bean.Province;
-import com.college.xdick.findme.bean.School;
-import com.college.xdick.findme.bean.SelectSchool;
-import com.college.xdick.findme.util.ListViewUtil;
-import com.college.xdick.findme.util.SelectSchoolUtil;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.college.xdick.findme.util.SelectSchoolUtil;
+
+
 
 import cn.bmob.newim.BmobIM;
-import cn.bmob.v3.BmobSMS;
+
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.QueryListener;
+
 import cn.bmob.v3.listener.SaveListener;
-import cn.bmob.v3.listener.UpdateListener;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * Created by Administrator on 2018/4/2.
@@ -60,6 +41,7 @@ public class SignupActivity  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
         initView();
+
 
 
 

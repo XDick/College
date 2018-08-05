@@ -89,49 +89,25 @@ public class MyJoinActivity extends AppCompatActivity {
     public void initData(){
         activityList.clear();
         BmobQuery<MyActivity> query = new BmobQuery<>();
-        query.addWhereContainsAll("joinUser", Arrays.asList(myUser.getObjectId()));
+        final List<String> list =new ArrayList<>(Arrays.asList(myUser.getJoin()));
+        query.addWhereContainedIn("objectId", list);
+        query.order("-date");
         query.findObjects(new FindListener<MyActivity>() {
             @Override
             public void done(List<MyActivity> list, BmobException e) {
-                if (e==null) {
+                if (e == null) {
 
                     for (MyActivity activity : list) {
                         currentList.add(activity.getObjectId());
                         activityList.add(activity);
                     }
-                    Collections.sort(activityList);
-                    Collections.reverse(activityList);
+
                     adapter.notifyDataSetChanged();
 
 
-                    if (flag) {
-
-                        try {
-                            if (myUser.getJoin().length > list.size()) {
-
-                                List<String> userList = Arrays.asList(myUser.getJoin());
-                                Collection<String> collection = new ArrayList<>(userList);
-                                collection.removeAll(currentList);
-                                myUser.removeAll("join", collection);
-                                myUser.update(new UpdateListener() {
-                                    @Override
-                                    public void done(BmobException e) {
-
-                                    }
-                                });
-                                Toast.makeText(MyJoinActivity.this, "Oops，其中一些活动已经被发布者删除", Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
-                        }
-                    }
-                    flag=false;
                 }
 
-
-            }
-
-        });
+            }  });
 
 
     }

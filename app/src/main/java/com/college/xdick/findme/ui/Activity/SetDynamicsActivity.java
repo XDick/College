@@ -221,6 +221,8 @@ public class SetDynamicsActivity extends AppCompatActivity {
                     dynamics.setIfAdd2Gallery(false);
                     dynamics.setUserId(BmobUser.getCurrentUser().getObjectId());
                     dynamics.setUser(BmobUser.getCurrentUser().getUsername());
+                    dynamics.setLikeCount(0);
+                    dynamics.setReplycount(0);
                     finish();
                     dynamics.save(new SaveListener<String>() {
 
@@ -265,8 +267,8 @@ public class SetDynamicsActivity extends AppCompatActivity {
                                         dynamics.setActivityId(myActivity.getObjectId());
                                     }
                                     dynamics.setIfAdd2Gallery(ifAddPic2Ac);
-
-
+                                    dynamics.setLikeCount(0);
+                                    dynamics.setReplycount(0);
                                     dynamics.setUserId(BmobUser.getCurrentUser().getObjectId());
                                     dynamics.setUser(BmobUser.getCurrentUser().getUsername());
                                     dynamics.addAll("picture", list1);
@@ -276,6 +278,14 @@ public class SetDynamicsActivity extends AppCompatActivity {
                                         @Override
                                         public void done(String objectId, BmobException e) {
                                             if (e == null) {
+                                                MyUser user = BmobUser.getCurrentUser(MyUser.class);
+                                                user.addUnique("dynamics",objectId);
+                                                user.update(new UpdateListener() {
+                                                    @Override
+                                                    public void done(BmobException e) {
+
+                                                    }
+                                                });
                                                 Toast.makeText(SetDynamicsActivity.this, "发送成功", Toast.LENGTH_SHORT).show();
                                             } else {
                                                 Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());

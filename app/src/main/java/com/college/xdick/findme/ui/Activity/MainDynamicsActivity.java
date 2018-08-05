@@ -1,10 +1,13 @@
 package com.college.xdick.findme.ui.Activity;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -13,10 +16,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Adapter;
 import android.widget.EditText;
@@ -31,6 +38,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
 import com.college.xdick.findme.MyClass.CommentScrollView;
+import com.college.xdick.findme.MyClass.PicturePageAdapter;
+import com.college.xdick.findme.MyClass.ViewPagerFixed;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.ActivityAdapter;
 import com.college.xdick.findme.adapter.CommentAdapter;
@@ -85,7 +94,7 @@ public class MainDynamicsActivity extends AppCompatActivity {
     public DynamicsCommentAdapter adapter;
     private List<DynamicsComment> commentList=new ArrayList<>();
     public boolean ifReply=false;
-    private ImageView sendComment;
+    private ImageView sendComment,like;
     private EditText editComment;
     private DynamicsComment replyComment,fromComment;
     private ImageView avatar,avatar1,avatar2,avatar3,avatar4,avatar5,avatar6;
@@ -96,8 +105,8 @@ public class MainDynamicsActivity extends AppCompatActivity {
     private LinearLayout loadlayout;
     private NineGridImageViewAdapter mAdapter;
     private NineGridImageView gridImageView;
-    private ImageView mImageView;
-    private Dialog dialog;
+    private Dialog mDialog;
+    private ViewPagerFixed pager;
     private MyUser  bmobUser = BmobUser.getCurrentUser(MyUser.class);
     private Dynamics dynamics;
     private  ImageView[] avatarView =new ImageView[6];
@@ -148,6 +157,82 @@ public class MainDynamicsActivity extends AppCompatActivity {
         final  String user = dynamics.getUser();
         String content = dynamics.getContent();
         dynamicsId = dynamics.getObjectId();
+
+        like =findViewById(R.id.maindynamics_send_like_imageview);
+        final List<String> likelist;
+        if (dynamics.getLike() != null) {
+            List<String> like1 = Arrays.asList(dynamics.getLike());
+            likelist = new ArrayList<>(like1);
+        } else {
+            likelist = new ArrayList<>();
+
+        }
+
+
+        if (Arrays.toString(dynamics.getLike()).contains(BmobUser.getCurrentUser().getObjectId())) {
+           like.setBackground(getResources().getDrawable(R.drawable.thumb_up_t));
+        }
+        else {
+            like.setBackground(getResources().getDrawable(R.drawable.thumb_up));}
+
+
+        like.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (Arrays.toString(likelist.toArray(new String[  likelist.size()])).contains(
+                        BmobUser.getCurrentUser().getObjectId())) {
+
+                    Dynamics dynamics1 = new Dynamics();
+                    dynamics1.setObjectId(dynamics.getObjectId());
+                    dynamics1.increment("likeCount" ,-1);
+                    dynamics1.setIfAdd2Gallery(dynamics.isIfAdd2Gallery());
+                    dynamics1.removeAll("like", Arrays.asList(BmobUser.getCurrentUser().
+                            getObjectId()));
+                    dynamics1.update(new UpdateListener() {
+                        @Override
+                        public void done(BmobException e) {
+                            if (e == null) {
+                                likelist.removeAll(Arrays.asList(BmobUser.getCurrentUser().
+                                        getObjectId()));
+                                dynamics.setLike(  likelist.toArray(new String[  likelist.size()]));
+                               like.setBackground(getResources().getDrawable(R.drawable.thumb_up));
+                            }
+
+                        }
+                    });
+
+                }
+
+                else {
+
+                    Dynamics dynamics1 = new Dynamics();
+                    dynamics1.setObjectId(dynamics.getObjectId());
+                    dynamics1.increment("likeCount" ,1);
+                    dynamics1.setIfAdd2Gallery(dynamics.isIfAdd2Gallery());
+                    dynamics1.addUnique("like",BmobUser.getCurrentUser().
+                            getObjectId());
+
+                    dynamics1.update(new UpdateListener() {
+                        @Override
+                        public void done(BmobException e) {
+                            if (e == null) {
+                                sendMessage(bmobUser.getUsername() + "点赞了你的动态",
+                                        new BmobIMUserInfo(dynamics.getUserId(), dynamics.getUser(), null),
+                                        dynamics.getObjectId(), dynamics.getContent());
+
+
+                                likelist.add(BmobUser.getCurrentUser().
+                                        getObjectId());
+                                dynamics.setLike(  likelist.toArray(new String[likelist.size()]));
+                             like.setBackground(getResources().getDrawable(R.drawable.thumb_up_t));
+
+                            }
+                        }
+                    });
+                }
+            }
+        });
 
                     avatar=findViewById(R.id.dynamics_main_avatar);
                     Glide.with(this).load(nowUser.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
@@ -219,7 +304,6 @@ public class MainDynamicsActivity extends AppCompatActivity {
         }
 
 
-        dialog = new Dialog(MainDynamicsActivity.this, R.style.AppTheme);
         mAdapter = new NineGridImageViewAdapter<String>() {
             @Override
             protected void onDisplayImage(Context context, ImageView imageView, String photo) {
@@ -233,15 +317,8 @@ public class MainDynamicsActivity extends AppCompatActivity {
 
             @Override
             protected void onItemImageClick(Context context, ImageView imageView, int index, List<String> photoList) {
-                mImageView = getImageView(photoList.get(index));
-                dialog.setContentView(mImageView);
-                dialog.show();
-                mImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                    }
-                });
+                List<String> picList = new  ArrayList<>(photoList);
+                showPictureDialog(index,picList);
             }
         };
         gridImageView= findViewById(R.id.nineGrid);
@@ -304,6 +381,10 @@ public class MainDynamicsActivity extends AppCompatActivity {
         sendComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (editComment.getText().toString().isEmpty()){
+                    return;
+                }
+
                 imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
                 if(ifReply){
                     replyComment.setContent(editComment.getText().toString());
@@ -327,14 +408,10 @@ public class MainDynamicsActivity extends AppCompatActivity {
                                 initComment(REPLY);
                                 ifReply=false;
 
-
-                                dynamics.increment("replycount",1);
-                                dynamics.update(dynamicsId, new UpdateListener() {
-                                    @Override
-                                    public void done(BmobException e) {
-
-                                    }
-                                });
+                                Dynamics dynamics1 = new Dynamics();
+                                dynamics1.setObjectId(dynamicsId);
+                                dynamics1.increment("replycount",1);
+                                dynamics1.update();
 
 
 
@@ -360,15 +437,10 @@ public class MainDynamicsActivity extends AppCompatActivity {
                         public void done(String s, BmobException e) {
                             if (e == null) {
 
-                                dynamics.increment("replycount",1);
-                                dynamics.update(dynamicsId, new UpdateListener() {
-                                    @Override
-                                    public void done(BmobException e) {
-                                        if(e!=null){
-                                            Log.i("bmob","更新失败："+e.getMessage()+","+e.getErrorCode());
-                                        }
-                                    }
-                                });
+                                Dynamics dynamics1 = new Dynamics();
+                                dynamics1.setObjectId(dynamicsId);
+                                dynamics1.increment("replycount",1);
+                                dynamics1.update();
 
                                 Toast.makeText(MainDynamicsActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
 
@@ -454,8 +526,15 @@ public class MainDynamicsActivity extends AppCompatActivity {
                     commentList.addAll(list);
 
                     if (state==REFRESH) {
-                        ifEmpty=false;
-                        size=10;
+
+                        if (list.size()<10){
+                            adapter.changeMoreStatus(DynamicsCommentAdapter.DONTSHOW);
+                            ifEmpty=true;
+
+                        }else {
+                            ifEmpty=false;
+                        }
+
                         adapter.notifyDataSetChanged();
                         commentcount.setText("("+commentCount+")");
                         loadlayout.setVisibility(View.GONE);
@@ -482,7 +561,15 @@ public class MainDynamicsActivity extends AppCompatActivity {
                     }
 
                     else if (state ==REPLY){
-                        ifEmpty=false;
+
+                        if (list.size()<10){
+                            adapter.changeMoreStatus(DynamicsCommentAdapter.DONTSHOW);
+                            ifEmpty=true;
+
+                        }else {
+                            ifEmpty=false;
+                        }
+
                         size=10;
                         initRecycler();
                         commentcount.setText("("+ ++commentCount+")");
@@ -504,17 +591,6 @@ public class MainDynamicsActivity extends AppCompatActivity {
 
 
 
-
-    private ImageView getImageView(String Uri){
-        ImageView iv = new ImageView(this);
-        //宽高
-        iv.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        //设置Padding
-        iv.setPadding(20,20,20,20);
-        //imageView设置图片
-        Glide.with(this).load(Uri).into(iv);
-        return iv;
-    }
 
     public void sendMessage(String content ,BmobIMUserInfo info,String objectId,String objectTitle) {
 
@@ -598,4 +674,75 @@ public class MainDynamicsActivity extends AppCompatActivity {
 
 
           }
+
+    public void showPictureDialog(final int mPosition,List<String> mListPicPath) {
+
+        TextView content,likeCount,commentCount;
+
+        //创建dialog
+        mDialog = new Dialog(this, R.style.PictureDialog);
+        final Window window1 = mDialog.getWindow() ;
+        WindowManager m = getWindowManager();
+        Display d = m.getDefaultDisplay(); // 获取屏幕宽、高用
+        WindowManager.LayoutParams p = window1.getAttributes(); // 获取对话框当前的参数值
+        p.height = (int) (d.getHeight() * 1.0); // 改变的是dialog框在屏幕中的位置而不是大小
+        p.width = (int) (d.getWidth() * 1.0); // 宽度设置为屏幕
+        window1.setAttributes(p);
+        View inflate = View.inflate(this, R.layout.picture_dialog, null);//该layout在后面po出
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(screenWidth, ViewGroup.LayoutParams.MATCH_PARENT);
+        mDialog.setContentView(inflate, layoutParams);
+
+
+        commentCount = inflate.findViewById(R.id.comment);
+        likeCount = inflate.findViewById(R.id.like);
+        content = inflate.findViewById(R.id.content);
+        content.setText(dynamics.getContent());
+        commentCount.setText(dynamics.getReplycount()+"");
+        likeCount.setText(dynamics.getLikeCount()+"");
+        pager = (ViewPagerFixed) inflate.findViewById(R.id.gallery01);
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        PicturePageAdapter adapter = new PicturePageAdapter((ArrayList<String>) mListPicPath, this);
+        pager.setAdapter(adapter);
+        pager.setPageMargin(0);
+        pager.setCurrentItem(mPosition);
+        window1.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        mDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                return false;
+            }
+        });
+        mDialog.show();
+        adapter.setOnPictureClickListener(new PicturePageAdapter.OnPictureClickListener() {
+            @Override
+            public void OnClick() {
+                window1.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                mDialog.dismiss();
+            }
+        });
+        //长按图片保存
+        adapter.setOnPictureLongClickListener(new PicturePageAdapter.OnPictureLongClickListener() {
+            @Override
+            public void OnLongClick() {
+                //展示保存取消dialog
+                //showPicDialog();
+            }
+        });
+    }
 }

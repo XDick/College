@@ -115,7 +115,7 @@ public class ActivitygpsFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
        adapter = new ActivityAdapter(activityList2);
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
-        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty, recyclerView, false);
+        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_activity, recyclerView, false);
         adapter.setEmptyView(empty);
          adapter.addFooterView(footer);
 
@@ -212,7 +212,7 @@ public class ActivitygpsFragment extends Fragment {
                                 }
                                 else if (state==REFRESH){
                                     activityList2.clear();
-                                    if(activityList2.size()<10){
+                                    if(object.size()<10){
                                         ifEmpty=true;
                                         activityList2.addAll(object);
                                         adapter.notifyDataSetChanged();
@@ -224,7 +224,7 @@ public class ActivitygpsFragment extends Fragment {
                                     size =  10;
 
                                 }
-
+                                loadlayout.setVisibility(View.INVISIBLE);
                             }else{
                                 Toast.makeText(getContext(),"网络不佳",Toast.LENGTH_SHORT).show();
                             }

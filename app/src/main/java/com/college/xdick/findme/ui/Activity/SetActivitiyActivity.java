@@ -447,7 +447,7 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
                                 activity.setHostName(user.getUsername());
                                 activity.setHostSchool(user.getSchool());
                                 activity.setDate(time);
-
+                                activity.setCommentCount(0);
                                 activity.save(new SaveListener<String>() {
 
                                     @Override

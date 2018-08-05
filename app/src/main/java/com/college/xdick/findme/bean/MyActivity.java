@@ -20,14 +20,9 @@ public class MyActivity extends BmobObject implements Serializable ,Comparable<M
      String[] gps;
      MyUser host;
      String[]joinUser;
-     String[] likeUser;
      String[] picture;
     String[] tag;
-
-
-    Integer commentCount=0;
-    Integer  joinCount=0;
-
+    Integer commentCount;
     long date;
 
     public String[] getGps() {
@@ -129,14 +124,6 @@ public class MyActivity extends BmobObject implements Serializable ,Comparable<M
         this.joinUser = joinUser;
     }
 
-    public String[] getLikeUser() {
-        return likeUser;
-    }
-
-    public void setLikeUser(String[] likeUser) {
-        this.likeUser = likeUser;
-    }
-
 
     public String[] getPicture() {
         return picture;
@@ -155,13 +142,7 @@ public class MyActivity extends BmobObject implements Serializable ,Comparable<M
         return -1;
     }
 
-    public int getJoinCount() {
-        return joinCount;
-    }
 
-    public void setJoinCount(int joinCount) {
-        this.joinCount = joinCount;
-    }
 
 
     public int getCommentCount() {

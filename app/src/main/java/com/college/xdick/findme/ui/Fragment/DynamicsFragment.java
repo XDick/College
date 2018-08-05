@@ -3,6 +3,7 @@ package com.college.xdick.findme.ui.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -63,6 +64,7 @@ public  class DynamicsFragment extends Fragment {
     private static boolean ifEmpty=false;
     private int REFRESH=1;
     private int ADD=2;
+    private FloatingActionButton floatingActionButton;
 
 
 
@@ -111,7 +113,23 @@ public  class DynamicsFragment extends Fragment {
         });
         dots = rootview.findViewById(R.id.dots);
         loadlayout= rootview.findViewById(R.id.loading_layout);
+         floatingActionButton = rootview.findViewById(R.id.floatactionbutton);
+         floatingActionButton.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 if(bmobUser!=null){
 
+
+                     Intent intent = new Intent(getContext(), SetDynamicsActivity.class);
+                     startActivity(intent);}
+
+
+                 else
+                 {Toast.makeText(getContext(),"请先登录",Toast.LENGTH_SHORT).show();
+                 }
+
+             }
+         });
 
 
 
@@ -135,7 +153,7 @@ public  class DynamicsFragment extends Fragment {
         adapter = new DynamicsAdapter(dynamicsList);
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
         adapter.addFooterView(footer);
-        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty, recyclerView, false);
+        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_dynamics, recyclerView, false);
         adapter.setEmptyView(empty);
         ScaleInAnimationAdapter alphaAdapter = new ScaleInAnimationAdapter(adapter);
         alphaAdapter.setDuration(250);
@@ -250,42 +268,6 @@ public  class DynamicsFragment extends Fragment {
 
 
 
-
-
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
-        inflater.inflate(R.menu.toolbar_main_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override                //ToolBar上面的按钮事件
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-
-
-
-                case R.id.add:
-
-                    if(bmobUser!=null){
-
-
-                    Intent intent = new Intent(getContext(), SetDynamicsActivity.class);
-                    startActivity(intent);}
-
-
-                    else
-                    {Toast.makeText(getContext(),"请先登录",Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-
-            default:
-                break;
-        }
-
-        return true;
-    }
 
 
     private void refresh(){

@@ -81,37 +81,22 @@ public class MySetActivity extends AppCompatActivity {
         activityList.clear();
         BmobQuery<MyActivity> query = new BmobQuery<>();
         query.addWhereEqualTo("host",myUser);
+        query.order("-date");
         query.findObjects(new FindListener<MyActivity>() {
            @Override
            public void done(List<MyActivity> list, BmobException e) {
-                if (e==null){
+                if (e==null) {
 
-                    for (MyActivity activity: list){
+                    for (MyActivity activity : list) {
                         currentList.add(activity.getObjectId());
                         activityList.add(activity);
                     }
                     Collections.sort(activityList);
                     Collections.reverse(activityList);
-                     adapter.notifyDataSetChanged();
+                    adapter.notifyDataSetChanged();
 
-     if (flag){
+                }}
 
-                    if (myUser.getSetAc().length>list.size()){
-                        List<String> userList = Arrays.asList(myUser.getSetAc());
-                        Collection<String> collection = new ArrayList<>(userList);
-                        collection.removeAll(currentList);
-                        myUser.removeAll("setAc",collection);
-                        myUser.update(new UpdateListener() {
-                            @Override
-                            public void done(BmobException e) {
-                                myUser=BmobUser.getCurrentUser(MyUser.class);
-                            }
-                        });
-                }
-                }
-
-                    flag=false;}
-           }
        });
 
 

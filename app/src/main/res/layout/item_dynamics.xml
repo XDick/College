@@ -50,6 +50,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginRight="4dp"
                 android:maxLines="9"
+                android:textIsSelectable="true"
                 android:id="@+id/content_main"/>
 
   <com.jaeger.ninegridimageview.NineGridImageView

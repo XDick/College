@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
          Toast.makeText(this, "请选择喜欢的标签", Toast.LENGTH_SHORT).show();
      }
 
+     IMconnectBomob();
+
      BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
          @Override
          public void onChange(ConnectionStatus status) {
@@ -150,14 +152,31 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
                         replaceFragment(new SearchFragment());
                         break;
                     case 2:
-
+                        if (MyUser.getCurrentUser(MyUser.class)==null){
+                            startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                            finish();
+                            Toast.makeText(MainActivity.this,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                            break;
+                        }
                         replaceFragment(new DynamicsFragment());
+
                         break;
                     case 3 :
-
+                        if (MyUser.getCurrentUser(MyUser.class)==null){
+                            startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                            finish();
+                            Toast.makeText(MainActivity.this,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                            break;
+                        }
                         replaceFragment(new MainMessageFragment());
                         break;
                     case 4 :
+                        if (MyUser.getCurrentUser(MyUser.class)==null){
+                            startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                            finish();
+                            Toast.makeText(MainActivity.this,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                            break;
+                        }
                         replaceFragment(new UserFragment());
 
                         break;

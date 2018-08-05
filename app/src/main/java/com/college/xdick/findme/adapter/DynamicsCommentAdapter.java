@@ -56,6 +56,8 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
 
     public static final int  NO_MORE=2;
 
+    public static final int DONTSHOW=3;
+
     private Context mContext;
     private View mHeaderView;
     private View mFooterView;
@@ -180,14 +182,20 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
             TextView textView= mFooterView.findViewById(R.id.footer_text);
             switch (load_more_status) {
                 case PULLUP_LOAD_MORE:
+                    mFooterView.setVisibility(View.VISIBLE);
                     textView.setText("上拉加载更多");
                     break;
                 case LOADING_MORE:
+                    mFooterView.setVisibility(View.VISIBLE);
                     textView.setText("正在加载数据...");
                     break;
 
                 case NO_MORE:
+                    mFooterView.setVisibility(View.VISIBLE);
                     textView.setText("没有更多了");
+                    break;
+                case DONTSHOW:
+                    mFooterView.setVisibility(View.GONE);
                     break;
 
             }
