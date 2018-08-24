@@ -411,6 +411,7 @@ public class MainDynamicsActivity extends AppCompatActivity {
                                 Dynamics dynamics1 = new Dynamics();
                                 dynamics1.setObjectId(dynamicsId);
                                 dynamics1.increment("replycount",1);
+                                dynamics1.setIfAdd2Gallery(dynamics.isIfAdd2Gallery());
                                 dynamics1.update();
 
 
@@ -440,6 +441,7 @@ public class MainDynamicsActivity extends AppCompatActivity {
                                 Dynamics dynamics1 = new Dynamics();
                                 dynamics1.setObjectId(dynamicsId);
                                 dynamics1.increment("replycount",1);
+                                dynamics1.setIfAdd2Gallery(dynamics.isIfAdd2Gallery());
                                 dynamics1.update();
 
                                 Toast.makeText(MainDynamicsActivity.this, "评论成功", Toast.LENGTH_SHORT).show();

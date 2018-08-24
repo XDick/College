@@ -442,7 +442,7 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
                                 activity.setContent(content);
                                 activity.setPlace(place);
                                 activity.setGps(gps);
-                                activity.setHost(user);
+                                activity.setHostId(user.getObjectId());
                                 activity.setTag(tag);
                                 activity.setHostName(user.getUsername());
                                 activity.setHostSchool(user.getSchool());

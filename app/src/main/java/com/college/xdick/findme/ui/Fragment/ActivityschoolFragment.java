@@ -48,7 +48,7 @@ public class ActivityschoolFragment extends Fragment {
 
     View rootview;
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
-    static private List<MyActivity> activityList3= new ArrayList<>();
+    static private List<MyActivity> activityList= new ArrayList<>();
     private SwipeRefreshLayout swipeRefresh;
     private ActivityAdapter adapter;
     private DotsTextView dots;
@@ -112,7 +112,7 @@ public class ActivityschoolFragment extends Fragment {
         RecyclerView recyclerView = rootview.findViewById(R.id.recyclerview_ac_school);
       final   LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-         adapter = new ActivityAdapter(activityList3);
+         adapter = new ActivityAdapter(activityList);
          View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
          View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_activity, recyclerView, false);
          adapter.setEmptyView(empty);
@@ -174,19 +174,19 @@ public class ActivityschoolFragment extends Fragment {
                     query.order("-createdAt");
                     query.setSkip(size);
                     query.setLimit(10);
-                    final int listsize = activityList3.size();
+                    final int listsize = activityList.size();
                     query.findObjects(new FindListener<MyActivity>() {
                         @Override
                         public void done(List<MyActivity> object, BmobException e) {
                             if(e==null){
                                 ifsort=false;
-                                activityList3.addAll(object);
+                                activityList.addAll(object);
                                 if (state==ADD){
-                                    if (listsize==activityList3.size()){
+                                    if (listsize==activityList.size()){
                                         ifEmpty=true;
                                         adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                                         adapter.notifyDataSetChanged();
-                                    }else if (listsize+10>activityList3.size()){
+                                    }else if (listsize+10>activityList.size()){
                                         ifEmpty=true;
                                         adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                                         adapter.notifyItemInserted(adapter.getItemCount()-1);
@@ -203,15 +203,15 @@ public class ActivityschoolFragment extends Fragment {
                                     }
                                 }
                                 else if (state==REFRESH){
-                                    activityList3.clear();
+                                    activityList.clear();
                                     if(object.size()<10){
                                         ifEmpty=true;
-                                        activityList3.addAll(object);
+                                        activityList.addAll(object);
                                         adapter.notifyDataSetChanged();
                                     }
                                     else {
                                         ifEmpty=false;
-                                        activityList3.addAll(object);
+                                        activityList.addAll(object);
                                         adapter.notifyDataSetChanged();}
                                     size =  10;
                                     loadlayout.setVisibility(View.INVISIBLE);
@@ -287,20 +287,20 @@ public class ActivityschoolFragment extends Fragment {
                     query.setSkip(size);
                     query.setLimit(10);
                     query.order("date");
-                    final int listsize = activityList3.size();
+                    final int listsize = activityList.size();
                     query.findObjects(new FindListener<MyActivity>() {
                         @Override
                         public void done(List<MyActivity> object, BmobException e) {
                             if(e==null){
                                 ifsort=true;
-                                activityList3.addAll(object);
+                                activityList.addAll(object);
                                 if (state==SORT){
-                                    if (listsize==activityList3.size()){
+                                    if (listsize==activityList.size()){
                                         ifEmpty=true;
                                         adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                                         adapter.notifyDataSetChanged();
                                     }
-                                    else if (listsize+10>activityList3.size()){
+                                    else if (listsize+10>activityList.size()){
                                         ifEmpty=true;
                                         adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                                         adapter.notifyItemInserted(adapter.getItemCount()-1);
@@ -315,10 +315,16 @@ public class ActivityschoolFragment extends Fragment {
                                     }
                                 }
                                 else if (state==REFRESH){
-                                    ifEmpty=false;
-                                    activityList3.clear();
-                                    activityList3.addAll(object);
-                                    adapter.notifyDataSetChanged();
+                                    activityList.clear();
+                                    if(object.size()<10){
+                                        ifEmpty=true;
+                                        activityList.addAll(object);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                    else {
+                                        ifEmpty=false;
+                                        activityList.addAll(object);
+                                        adapter.notifyDataSetChanged();}
                                     size =  10;
                                 }
 

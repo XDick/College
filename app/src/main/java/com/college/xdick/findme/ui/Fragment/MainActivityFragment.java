@@ -56,7 +56,7 @@ public class MainActivityFragment extends Fragment {
     private TabLayout mTabLayout;
     private LinearLayout newsort, datesort;
     private TextView gpsTextView;
-    private String[] tabTitle = {"推荐", "同城", "同校"};//每个页面顶部标签的名字
+    private String[] tabTitle = {"关注","推荐", "同城", "同校"};//每个页面顶部标签的名字
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
     private  MyFragmentStatePagerAdapter adapter;
     private FloatingActionButton floatingActionButton;
@@ -156,7 +156,7 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
-
+          mViewPager1.setCurrentItem(1);
 
 
 
@@ -183,23 +183,33 @@ public class MainActivityFragment extends Fragment {
 
             case R.id.menu_sort_recent: {
                 switch (mViewPager1.getCurrentItem()) {
+
                     case 0: {
-                        ActivityFragment fragment = ((ActivityFragment) adapter.instantiateItem(mViewPager1, 0));
+                        ActivityFollowFragment fragment = ((ActivityFollowFragment) adapter.instantiateItem(mViewPager1, 0));
                         fragment.setSize(0);
                         fragment.initData(fragment.REFRESH);
 
                         break;
 
                     }
+
                     case 1: {
-                        ActivitygpsFragment fragment = ((ActivitygpsFragment) adapter.instantiateItem(mViewPager1, 1));
+                        ActivityFragment fragment = ((ActivityFragment) adapter.instantiateItem(mViewPager1, 1));
                         fragment.setSize(0);
                         fragment.initData(fragment.REFRESH);
 
                         break;
+
                     }
                     case 2: {
-                        ActivityschoolFragment fragment = ((ActivityschoolFragment) adapter.instantiateItem(mViewPager1, 2));
+                        ActivitygpsFragment fragment = ((ActivitygpsFragment) adapter.instantiateItem(mViewPager1, 2));
+                        fragment.setSize(0);
+                        fragment.initData(fragment.REFRESH);
+
+                        break;
+                    }
+                    case 3: {
+                        ActivityschoolFragment fragment = ((ActivityschoolFragment) adapter.instantiateItem(mViewPager1, 3));
                         fragment.setSize(0);
                         fragment.initData(fragment.REFRESH);
 
@@ -211,23 +221,33 @@ public class MainActivityFragment extends Fragment {
 
             case R.id.menu_sort_time: {
                 switch (mViewPager1.getCurrentItem()) {
+
                     case 0: {
-                        ActivityFragment fragment = ((ActivityFragment) adapter.instantiateItem(mViewPager1, 0));
+                        ActivityFollowFragment fragment = ((ActivityFollowFragment) adapter.instantiateItem(mViewPager1, 0));
                         fragment.setSize(0);
                         fragment.sortData(fragment.REFRESH);
 
                         break;
 
                     }
+
                     case 1: {
-                        ActivitygpsFragment fragment = ((ActivitygpsFragment) adapter.instantiateItem(mViewPager1, 1));
+                        ActivityFragment fragment = ((ActivityFragment) adapter.instantiateItem(mViewPager1, 1));
                         fragment.setSize(0);
                         fragment.sortData(fragment.REFRESH);
 
                         break;
+
                     }
                     case 2: {
-                        ActivityschoolFragment fragment = ((ActivityschoolFragment) adapter.instantiateItem(mViewPager1, 2));
+                        ActivitygpsFragment fragment = ((ActivitygpsFragment) adapter.instantiateItem(mViewPager1, 2));
+                        fragment.setSize(0);
+                        fragment.sortData(fragment.REFRESH);
+
+                        break;
+                    }
+                    case 3: {
+                        ActivityschoolFragment fragment = ((ActivityschoolFragment) adapter.instantiateItem(mViewPager1, 3));
                         fragment.setSize(0);
                         fragment.sortData(fragment.REFRESH);
                         break;

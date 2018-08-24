@@ -234,13 +234,19 @@ public class ActivityFragment extends Fragment {
                                   }
                               }
                               else if (state==REFRESH){
-                                  ifEmpty=false;
                                   activityList.clear();
-                                  activityList.addAll(object);
-                                  adapter.notifyDataSetChanged();
+                                  if(object.size()<10){
+                                      ifEmpty=true;
+                                      activityList.addAll(object);
+                                      adapter.notifyDataSetChanged();
+                                  }
+                                  else {
+                                      ifEmpty=false;
+                                      activityList.addAll(object);
+                                      adapter.notifyDataSetChanged();}
                                   size =  10;
-                              }
 
+                              }
 
                         }else{
 

@@ -18,7 +18,7 @@ public class MyActivity extends BmobObject implements Serializable ,Comparable<M
      String content;
      String cover;
      String[] gps;
-     MyUser host;
+     String hostId;
      String[]joinUser;
      String[] picture;
     String[] tag;
@@ -33,12 +33,12 @@ public class MyActivity extends BmobObject implements Serializable ,Comparable<M
         this.gps = gps;
     }
 
-    public MyUser getHost() {
-        return host;
+    public String getHostId() {
+        return hostId;
     }
 
-    public void setHost(MyUser host) {
-        this.host = host;
+    public void setHostId(String host) {
+        this.hostId = host;
     }
 
     public String[] getTag() {

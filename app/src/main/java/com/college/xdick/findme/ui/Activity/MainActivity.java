@@ -24,6 +24,7 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.college.xdick.findme.Listener.MyLocationListener;
 import com.college.xdick.findme.MyClass.BackHandlerHelper;
+import com.college.xdick.findme.MyClass.IMMLeaks;
 import com.college.xdick.findme.bean.ActivityMessageBean;
 
 import com.college.xdick.findme.bean.MyUser;
@@ -78,12 +79,13 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
              if (BmobUser.getCurrentUser()!=null&&status.getMsg().equals("disconnect")){
                  IMconnectBomob();
              }
-             //Toast.makeText(getApplicationContext(),status.getMsg(),Toast.LENGTH_SHORT).show();
+             Toast.makeText(getApplicationContext(),status.getMsg(),Toast.LENGTH_SHORT).show();
 
          }
      });
- }
 
+ }
+        IMMLeaks.fixFocusedViewLeak(getApplication());
 
 
 
@@ -325,7 +327,6 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
 
     private void IMconnectBomob() {
 
-        //TODO 连接：3.1、登录成功、注册成功或处于登录状态重新打开应用后执行连接IM服务器的操作
         final MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
         if (bmobUser != null) {
             if (!TextUtils.isEmpty(bmobUser.getObjectId())) {

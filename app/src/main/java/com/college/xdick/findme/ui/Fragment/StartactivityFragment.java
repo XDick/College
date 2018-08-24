@@ -128,7 +128,7 @@ public class StartactivityFragment extends Fragment{
         String activityContent = activity.getContent();
         String activityTime = activity.getTime();
         String activityPlace = activity.getPlace();
-        hostID=  activity.getHost().getObjectId();
+        hostID=  activity.getHostId();
         commentCount=activity.getCommentCount();
         BmobQuery<MyUser>query = new BmobQuery<>();
         query.getObject(hostID, new QueryListener<MyUser>() {
@@ -196,7 +196,7 @@ public class StartactivityFragment extends Fragment{
             @Override
             public void onClick(View v) {
                BmobQuery<MyUser>  query1 = new BmobQuery<>();
-               query1.getObject(activity.getHost().getObjectId(), new QueryListener<MyUser>() {
+               query1.getObject(activity.getHostId(), new QueryListener<MyUser>() {
                    @Override
                    public void done(MyUser myUser, BmobException e) {
                        if (e==null){

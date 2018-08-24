@@ -222,7 +222,7 @@ public class ActivityActivity extends AppCompatActivity {
                         if(e==null){
                             Toast.makeText(ActivityActivity.this,"评论成功",Toast.LENGTH_SHORT).show();
                             myfragment.sendMessage(myUser.getUsername()+"评论了你:"+editComment.getText().toString()
-                                    ,new BmobIMUserInfo(myfragment.activity.getHost().getObjectId(),
+                                    ,new BmobIMUserInfo(myfragment.activity.getHostId(),
                                             myfragment.activity.getHostName(),null));
                             editComment.setText("");
                             startEdit.setVisibility(View.GONE);
