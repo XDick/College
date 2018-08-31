@@ -80,7 +80,7 @@ public class MySetActivity extends AppCompatActivity {
     public void initData(){
         activityList.clear();
         BmobQuery<MyActivity> query = new BmobQuery<>();
-        query.addWhereEqualTo("host",myUser);
+        query.addWhereEqualTo("hostId",myUser.getObjectId());
         query.order("-date");
         query.findObjects(new FindListener<MyActivity>() {
            @Override

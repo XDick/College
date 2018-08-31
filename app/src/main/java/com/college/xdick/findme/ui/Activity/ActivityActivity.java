@@ -176,6 +176,8 @@ public class ActivityActivity extends AppCompatActivity {
 
                    fromComment.addReply();
                    fromComment.update();
+                   final String content=editComment.getText().toString();
+                   editComment.setText("");
 
 
 
@@ -187,9 +189,9 @@ public class ActivityActivity extends AppCompatActivity {
                        public void done(String s, BmobException e) {
                            if(e==null){
                                Toast.makeText(ActivityActivity.this,"回复成功",Toast.LENGTH_SHORT).show();
-                               myfragment.sendMessage(myUser.getUsername()+"回复了你:"+editComment.getText().toString()
+                               myfragment.sendMessage(myUser.getUsername()+"回复了你:"+content
                                        ,new BmobIMUserInfo(replyComment.getReplyuserId(),replyComment.getReplyusername(),null));
-                               editComment.setText("");
+
                                startEdit.setVisibility(View.GONE);
                                statusbar.setVisibility(View.VISIBLE);
                                myfragment.commentList.clear();
@@ -216,15 +218,17 @@ public class ActivityActivity extends AppCompatActivity {
                 comment.setUserID(myUser.getObjectId());
                 comment.setContent(editComment.getText().toString());
                 comment.setActivityID(activityId);
+                   final String content=editComment.getText().toString();
+                   editComment.setText("");
                 comment.save(new SaveListener<String>() {
                     @Override
                     public void done(String s, BmobException e) {
                         if(e==null){
                             Toast.makeText(ActivityActivity.this,"评论成功",Toast.LENGTH_SHORT).show();
-                            myfragment.sendMessage(myUser.getUsername()+"评论了你:"+editComment.getText().toString()
+                            myfragment.sendMessage(myUser.getUsername()+"评论了你:"+content
                                     ,new BmobIMUserInfo(myfragment.activity.getHostId(),
                                             myfragment.activity.getHostName(),null));
-                            editComment.setText("");
+
                             startEdit.setVisibility(View.GONE);
                             statusbar.setVisibility(View.VISIBLE);
                             myfragment.commentList.clear();

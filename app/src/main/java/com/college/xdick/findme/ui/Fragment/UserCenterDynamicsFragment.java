@@ -73,7 +73,7 @@ public class UserCenterDynamicsFragment extends Fragment {
         adapter.SetFlag(1);
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
         adapter.addFooterView(footer);
-        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty, recyclerView, false);
+        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_dynamics, recyclerView, false);
         adapter.setEmptyView(empty);
         recyclerView.setAdapter(adapter);
         DividerItemDecoration decoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);

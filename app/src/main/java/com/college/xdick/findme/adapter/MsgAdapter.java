@@ -1,8 +1,8 @@
 package com.college.xdick.findme.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyUser;
 
@@ -27,6 +29,7 @@ import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListener;
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 import static org.greenrobot.eventbus.EventBus.TAG;
 
@@ -37,10 +40,14 @@ import static org.greenrobot.eventbus.EventBus.TAG;
 public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
 
 
+    //private int NOT = 0;
+    //private int DONE = 1;
 
     private List<BmobIMMessage> mMsgList;
     private Context mContext;
-    BmobIMConversation c;
+    private int status=1;
+
+
 
 
 
@@ -103,7 +110,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
 
     static class ViewHolder extends RecyclerView.ViewHolder{
 
-        LinearLayout leftLayout,rightLayout;
+        LinearLayout leftLayout,rightLayout,rightBackGround;
 
         TextView leftMsg,rightMsg,time;
 
@@ -121,6 +128,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
             time=view.findViewById(R.id.msg_time);
             avatar_me = view.findViewById(R.id.msg_avatar_me);
             avatar_you = view.findViewById(R.id.msg_avatar_you);
+            rightBackGround= view.findViewById(R.id.right_msg_layout);
 
         }
     }
@@ -143,12 +151,15 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+
+
+
         holder.leftLayout.setVisibility(View.VISIBLE);
         holder.rightLayout.setVisibility(View.VISIBLE);
         String currentUid="";
         currentUid = BmobUser.getCurrentUser().getObjectId();
         BmobIMMessage msg = mMsgList.get(position);
-        Log.d(TAG,"位置:"+position+"消息是"+msg.getContent()+"id:"+msg.getFromId()+"当前ID"+currentUid);
+
         long t=Long.valueOf(msg.getCreateTime());
         SimpleDateFormat sdf1= new SimpleDateFormat("yyyy/MM/dd HH:mm");
 
@@ -171,8 +182,13 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
         }
 
 
-        Glide.with(mContext).load(msg.getBmobIMConversation().getConversationIcon()).into(holder.avatar_you);
-        Glide.with(mContext).load(BmobUser.getCurrentUser(MyUser.class).getAvatar()).into(holder.avatar_me);
+        Glide.with(mContext).load(msg.getBmobIMConversation().getConversationIcon()).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(holder.avatar_you);
+        Glide.with(mContext).load(BmobUser.getCurrentUser(MyUser.class).getAvatar()).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(holder.avatar_me);
+
+
+
+
+
 
         if(msg.getFromId().equals(currentUid)) {
 
@@ -181,16 +197,31 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
 
 
 
-           Log.d(TAG,"左边消失，右边出现消息是"+msg.getContent()+"id:"+msg.getFromId()+"当前ID"+currentUid);
+
        }
        else {
 
             holder.leftMsg.setText(msg.getContent());
             holder.rightLayout.setVisibility(View.GONE);
 
-           Log.d(TAG,"右边消失，左边出现,消息是"+msg.getContent()+"id:"+msg.getFromId()+"当前ID"+currentUid);
+
         }
-    }
+
+
+
+       switch (status){
+           case 0:
+               if (position==getItemCount()-1){
+               holder.rightBackGround.setBackgroundResource(R.drawable.bubble_right_not);
+               break;}
+           case 1:
+               holder.rightBackGround.setBackgroundResource(R.drawable.bubble_right);
+               break;
+               default:
+                   break;
+       }
+
+   }
 
 
     @Override
@@ -199,6 +230,8 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
     }
 
 
-
+    public void setSendStatus(int status){
+        this.status=status;
+    }
 
 }

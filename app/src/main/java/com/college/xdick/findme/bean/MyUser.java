@@ -10,6 +10,8 @@ import cn.bmob.v3.BmobUser;
 
 public class MyUser extends BmobUser implements Serializable {
 
+
+
     private String avatar ="http://bmob-cdn-18038.b0.upaiyun.com/2018/05/18/425ce45f40a6b2208074aa1dbce9f76c.png";
 
     private String school="";

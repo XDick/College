@@ -24,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.college.xdick.findme.MyClass.GpsEvent;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.MyFragmentStatePagerAdapter;
 import com.college.xdick.findme.bean.MyUser;
@@ -36,7 +37,12 @@ import com.zyyoona7.popup.EasyPopup;
 import com.zyyoona7.popup.XGravity;
 import com.zyyoona7.popup.YGravity;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import cn.bmob.v3.Bmob;
@@ -44,6 +50,7 @@ import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 
 import cn.bmob.v3.listener.QueryListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 
 /**
@@ -68,6 +75,7 @@ public class MainActivityFragment extends Fragment {
         initViews();
         setHasOptionsMenu(true);
         Log.d("", mViewPager1.getCurrentItem() + "当前");
+        EventBus.getDefault().register(this);
         return rootView;
 
     }
@@ -164,7 +172,16 @@ public class MainActivityFragment extends Fragment {
 
 
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(final GpsEvent gpsEvent) {
+        if (bmobUser != null) {
+            String[] gps = gpsEvent.getMessage();
+            if (gps != null) {
+                gpsTextView.setText(gps[2]);
+            }
+        }
 
+    }
 
 
 
@@ -265,4 +282,6 @@ public class MainActivityFragment extends Fragment {
         }
         return true;
     }
+
+
 }

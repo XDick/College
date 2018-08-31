@@ -320,40 +320,58 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
 
         content.setText(map.get(uriList.get(mPosition)).getContent());
-        commentCount.setText(map.get(uriList.get(mPosition)).getReplycount()+"");
-        likeCount.setText(map.get(uriList.get(mPosition)).getLikeCount()+"");
-        clickToDetail.setOnClickListener(new View.OnClickListener() {
-                                             @Override
-                                             public void onClick(View v) {
-                                                 if (MyUser.getCurrentUser(MyUser.class)==null){
-                                                     mContext.startActivity(new Intent(mContext,LoginActivity.class));
-                                                     ((Activity)mContext).finish();
-                                                     Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
-                                                     return;
-                                                 }
-                                                 BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-                                                 query.addWhereEqualTo("username", map.get(uriList.get(mPosition)).getUser());
-                                                 query.getObject(map.get(uriList.get(mPosition)).getUserId(), new QueryListener<MyUser>() {
-
-                                                     @Override
-                                                     public void done(final MyUser object, BmobException e) {
-                                                         if (e == null) {
-
-                                                             Intent intent = new Intent(mContext, MainDynamicsActivity.class);
-                                                             intent.putExtra("DYNAMICS", map.get(uriList.get(mPosition)));
-                                                             intent.putExtra("USER", object);
-                                                             mContext.startActivity(intent);
-                                                         }
-                                                     }
 
 
-                                                 });
+       if (mPosition==0){
+           commentCount.setText(0+"");
+           likeCount.setText(0+"");
+           clickToDetail.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View v) {}});
 
 
-                                             }
+       }
+       else {
+           commentCount.setText(map.get(uriList.get(mPosition)).getReplycount()+"");
+           likeCount.setText(map.get(uriList.get(mPosition)).getLikeCount()+"");
+           clickToDetail.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View v) {
+
+                   if (MyUser.getCurrentUser(MyUser.class)==null){
+                       mContext.startActivity(new Intent(mContext,LoginActivity.class));
+                       ((Activity)mContext).finish();
+                       Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                       return;
+                   }
+                   BmobQuery<MyUser> query = new BmobQuery<MyUser>();
+                   query.addWhereEqualTo("username", map.get(uriList.get(mPosition)).getUser());
+                   query.getObject(map.get(uriList.get(mPosition)).getUserId(), new QueryListener<MyUser>() {
+
+                       @Override
+                       public void done(final MyUser object, BmobException e) {
+                           if (e == null) {
+
+                               Intent intent = new Intent(mContext, MainDynamicsActivity.class);
+                               intent.putExtra("DYNAMICS", map.get(uriList.get(mPosition)));
+                               intent.putExtra("USER", object);
+                               mContext.startActivity(intent);
+                           }
+                       }
 
 
-                                         });
+                   });
+
+
+               }
+
+
+           });
+
+       }
+
+
+
 
 
         pager = inflate.findViewById(R.id.gallery01);
@@ -361,41 +379,56 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             @Override
             public void onPageScrolled(final int position, float positionOffset, int positionOffsetPixels) {
 
+                if (position==0){
+                    content.setText("");
+                    commentCount.setText(0+"");
+                    likeCount.setText(0+"");
+                    clickToDetail.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                        }
+                    } );
+                }
+                else {
+                    content.setText(map.get(uriList.get(position)).getContent());
+                    commentCount.setText(map.get(uriList.get(position)).getReplycount()+"");
+                    likeCount.setText(map.get(uriList.get(position)).getLikeCount()+"");
+                    clickToDetail.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-                        content.setText(map.get(uriList.get(position)).getContent());
-                        commentCount.setText(map.get(uriList.get(position)).getReplycount()+"");
-                        likeCount.setText(map.get(uriList.get(position)).getLikeCount()+"");
-                        clickToDetail.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                                if (MyUser.getCurrentUser(MyUser.class)==null){
-                                    mContext.startActivity(new Intent(mContext,LoginActivity.class));
-                                    ((Activity)mContext).finish();
-                                    Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                                BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-                                query.addWhereEqualTo("username", map.get(uriList.get(position)).getUser());
-                                query.getObject(map.get(uriList.get(position)).getUserId(), new QueryListener<MyUser>() {
-
-                                    @Override
-                                    public void done(final MyUser object, BmobException e) {
-                                        if (e == null) {
-
-                                            Intent intent = new Intent(mContext, MainDynamicsActivity.class);
-                                            intent.putExtra("DYNAMICS", map.get(uriList.get(position)));
-                                            intent.putExtra("USER", object);
-                                            mContext.startActivity(intent);
-                                        }
-                                    }
-
-                                });
-
-
+                            if (MyUser.getCurrentUser(MyUser.class)==null){
+                                mContext.startActivity(new Intent(mContext,LoginActivity.class));
+                                ((Activity)mContext).finish();
+                                Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                                return;
                             }
+                            BmobQuery<MyUser> query = new BmobQuery<MyUser>();
+                            query.addWhereEqualTo("username", map.get(uriList.get(position)).getUser());
+                            query.getObject(map.get(uriList.get(position)).getUserId(), new QueryListener<MyUser>() {
 
-                        });
+                                @Override
+                                public void done(final MyUser object, BmobException e) {
+                                    if (e == null) {
+
+                                        Intent intent = new Intent(mContext, MainDynamicsActivity.class);
+                                        intent.putExtra("DYNAMICS", map.get(uriList.get(position)));
+                                        intent.putExtra("USER", object);
+                                        mContext.startActivity(intent);
+                                    }
+                                }
+
+                            });
+
+
+                        }
+
+                    });
+
+
+                }
+
+
 
             }
 

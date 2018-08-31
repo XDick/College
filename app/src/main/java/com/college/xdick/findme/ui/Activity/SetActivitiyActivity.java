@@ -90,7 +90,6 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
 
     Calendar now;
     List<String> selectTagList = new ArrayList<>();
-    boolean ifchooseMain= false;
     boolean ifcreateAdd =false;
     String usedAddTag="";
     String myTime;
@@ -111,6 +110,7 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
     private void initView() {
         final LabelsView labelsView =  findViewById(R.id.setac_main_labels);
         final LabelsView labelsView2 = findViewById(R.id.setac_add_labels);
+        final LabelsView labelsView_sort = findViewById(R.id.setac_sort_labels);
         createText = findViewById(R.id.setac_createtag_text);
         titleE = findViewById(R.id.setac_title_edittext);
         createE = findViewById(R.id.setac_createtag_edit);
@@ -130,8 +130,9 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
             @Override
             public void onClick(View v) {
                 if(!createText.getText().equals("没有合适的？创建标签")) {
-                    selectTagList.remove(createText.getText().toString());
+                    selectTagList.set(2,"");
                     ifcreateAdd =false;
+
 
                 }
                     createText.setVisibility(View.GONE);
@@ -156,13 +157,16 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
                 if (tag.equals("")) {
                     createText.setText("没有合适的？创建标签");
                     ifcreateAdd =false;
+                    labelsView2.setMaxSelect(1);
 
 
                 }
                 else {
-                    selectTagList.add(tag);
+                    selectTagList.set(2,tag);
                     createText.setText(tag);
                     ifcreateAdd =true;
+                    labelsView2.clearAllSelect();
+                    labelsView2.setSelectType(LabelsView.SelectType.NONE);
 
                 }
 
@@ -289,6 +293,8 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
             }
         });
 
+        String[] sort={"个人活动","团体组织","二手交易","招聘"};
+        labelsView_sort.setLabels(Arrays.asList(sort));
 
         BmobQuery<MainTagBean> query = new BmobQuery<MainTagBean>();
 
@@ -343,6 +349,27 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
             }
         });
 
+        for (int i=0;i<3;i++){
+            selectTagList.add("");
+        }
+
+
+        labelsView_sort.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
+            @Override
+            public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
+                if (isSelect) {
+                    selectTagList.set(0,label.getText().toString());
+
+
+                    Log.d("TAG", "数据" + label.getText().toString());
+                } else {
+
+                    selectTagList.set(0,"");
+
+                }
+
+            }
+        });
 
 
 
@@ -351,13 +378,13 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
             @Override
             public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
                 if (isSelect) {
-                    selectTagList.add(label.getText().toString());
-                    ifchooseMain=true;
+                    selectTagList.set(1,label.getText().toString());
+
                     Log.d("TAG", "数据" + label.getText().toString());
                 } else {
 
-                    selectTagList.remove(label.getText().toString());
-                    ifchooseMain=false;
+                    selectTagList.set(1,"");
+
                 }
 
             }
@@ -369,12 +396,12 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
             @Override
             public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
                 if (isSelect) {
-                    selectTagList.add(label.getText().toString());
+                    selectTagList.set(2,label.getText().toString());
                     usedAddTag=label.getText().toString();
 
                     Log.d("TAG", "数据" + label.getText().toString());
                 } else {
-                    selectTagList.remove(label.getText().toString());
+                    selectTagList.set(2,"");
                     usedAddTag="";
                 }
 
@@ -416,7 +443,8 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
 
 
                 if(content.length()!=0&&title.length()!=0
-                        &&place.length()!=0&&date.length()!=0&& ifchooseMain&&date.contains("年")){
+                        &&place.length()!=0&&date.length()!=0&&date.contains("年")
+                        &&!selectTagList.contains("")){
 
                  if (contentE.getText().toString().length()<=50){
                      Toast.makeText(SetActivitiyActivity.this,"活动描述不能少于50字",Toast.LENGTH_SHORT).show();

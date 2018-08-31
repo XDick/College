@@ -11,11 +11,13 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.college.xdick.findme.BmobIM.newClass.PrivateConversation;
 import com.college.xdick.findme.adapter.ConversationAdapter;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Activity.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,7 +136,7 @@ public class PrivateConversationFragment extends Fragment implements MessageList
                             initAllConversation();
                         } else {
                             //连接失败
-                            //Toast.makeText(MainActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(),e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

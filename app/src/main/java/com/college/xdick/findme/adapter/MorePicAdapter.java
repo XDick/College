@@ -138,41 +138,58 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
         clickToDetail=inflate.findViewById(R.id.layout_to_dynamics);
 
 
-        content.setText(map.get(mListPicPath.get(mPosition)).getContent());
-        commentCount.setText(map.get(mListPicPath.get(mPosition)).getReplycount()+"");
-        likeCount.setText(map.get(mListPicPath.get(mPosition)).getLikeCount()+"");
-        clickToDetail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (MyUser.getCurrentUser(MyUser.class)==null){
-                    mContext.startActivity(new Intent(mContext,LoginActivity.class));
-                    ((Activity)mContext).finish();
-                    Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-                query.addWhereEqualTo("username", map.get(mListPicPath.get(mPosition)).getUser());
-                query.getObject(map.get(mListPicPath.get(mPosition)).getUserId(), new QueryListener<MyUser>() {
 
-                    @Override
-                    public void done(final MyUser object, BmobException e) {
-                        if (e == null) {
 
-                            Intent intent = new Intent(mContext, MainDynamicsActivity.class);
-                            intent.putExtra("DYNAMICS", map.get(mListPicPath.get(mPosition)));
-                            intent.putExtra("USER", object);
-                            mContext.startActivity(intent);
-                        }
+        if (mPosition==0){
+            content.setText("");
+            commentCount.setText(0+"");
+            likeCount.setText(0+"");
+            clickToDetail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {}});
+
+
+        }
+        else {
+            content.setText(map.get(mListPicPath.get(mPosition)).getContent());
+            commentCount.setText(map.get(mListPicPath.get(mPosition)).getReplycount()+"");
+            likeCount.setText(map.get(mListPicPath.get(mPosition)).getLikeCount()+"");
+            clickToDetail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (MyUser.getCurrentUser(MyUser.class)==null){
+                        mContext.startActivity(new Intent(mContext,LoginActivity.class));
+                        ((Activity)mContext).finish();
+                        Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                        return;
                     }
+                    BmobQuery<MyUser> query = new BmobQuery<MyUser>();
+                    query.addWhereEqualTo("username", map.get(mListPicPath.get(mPosition)).getUser());
+                    query.getObject(map.get(mListPicPath.get(mPosition)).getUserId(), new QueryListener<MyUser>() {
+
+                        @Override
+                        public void done(final MyUser object, BmobException e) {
+                            if (e == null) {
+
+                                Intent intent = new Intent(mContext, MainDynamicsActivity.class);
+                                intent.putExtra("DYNAMICS", map.get(mListPicPath.get(mPosition)));
+                                intent.putExtra("USER", object);
+                                mContext.startActivity(intent);
+                            }
+                        }
 
 
-                });
+                    });
 
 
-            }
+                }
 
 
-        });
+            });
+        }
+
+
+
 
 
         pager = inflate.findViewById(R.id.gallery01);
@@ -181,40 +198,56 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
             public void onPageScrolled(final int position, float positionOffset, int positionOffsetPixels) {
 
 
-                content.setText(map.get(mListPicPath.get(position)).getContent());
-                commentCount.setText(map.get(mListPicPath.get(position)).getReplycount()+"");
-                likeCount.setText(map.get(mListPicPath.get(position)).getLikeCount()+"");
-                clickToDetail.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        if (MyUser.getCurrentUser(MyUser.class)==null){
-                            mContext.startActivity(new Intent(mContext,LoginActivity.class));
-                            ((Activity)mContext).finish();
-                            Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-                        query.addWhereEqualTo("username", map.get(mListPicPath.get(position)).getUser());
-                        query.getObject(map.get(mListPicPath.get(position)).getUserId(), new QueryListener<MyUser>() {
-
+                    if (position==0){
+                        content.setText("");
+                        commentCount.setText(0+"");
+                        likeCount.setText(0+"");
+                        clickToDetail.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void done(final MyUser object, BmobException e) {
-                                if (e == null) {
+                            public void onClick(View v) {
+                            }
+                        } );
+                    }
+                    else {
+                        content.setText(map.get(mListPicPath.get(position)).getContent());
+                        commentCount.setText(map.get(mListPicPath.get(position)).getReplycount()+"");
+                        likeCount.setText(map.get(mListPicPath.get(position)).getLikeCount()+"");
+                        clickToDetail.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-                                    Intent intent = new Intent(mContext, MainDynamicsActivity.class);
-                                    intent.putExtra("DYNAMICS", map.get(mListPicPath.get(position)));
-                                    intent.putExtra("USER", object);
-                                    mContext.startActivity(intent);
+                                if (MyUser.getCurrentUser(MyUser.class)==null){
+                                    mContext.startActivity(new Intent(mContext,LoginActivity.class));
+                                    ((Activity)mContext).finish();
+                                    Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                                    return;
                                 }
+                                BmobQuery<MyUser> query = new BmobQuery<MyUser>();
+                                query.addWhereEqualTo("username", map.get(mListPicPath.get(position)).getUser());
+                                query.getObject(map.get(mListPicPath.get(position)).getUserId(), new QueryListener<MyUser>() {
+
+                                    @Override
+                                    public void done(final MyUser object, BmobException e) {
+                                        if (e == null) {
+
+                                            Intent intent = new Intent(mContext, MainDynamicsActivity.class);
+                                            intent.putExtra("DYNAMICS", map.get(mListPicPath.get(position)));
+                                            intent.putExtra("USER", object);
+                                            mContext.startActivity(intent);
+                                        }
+                                    }
+
+                                });
+
+
                             }
 
                         });
-
-
                     }
 
-                });
+
+
+
 
             }
 

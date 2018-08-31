@@ -162,6 +162,34 @@ public class StartactivityFragment extends Fragment{
         avatar[5]=avatar6;
 
 
+        BmobQuery<MyUser> query1= new BmobQuery<>();
+        query1.getObject(activity.getHostId(), new QueryListener<MyUser>() {
+            @Override
+            public void done(MyUser myUser, BmobException e) {
+                if (e==null){
+                    ImageView hostAvatarImg= rootView.findViewById(R.id.host_avatar);
+                    String hostAvatarUri=myUser.getAvatar();
+                    Glide.with(getActivity()).load(hostAvatarUri).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(hostAvatarImg);
+                    hostAvatarImg.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            BmobQuery<MyUser>  query1 = new BmobQuery<>();
+                            query1.getObject(activity.getHostId(), new QueryListener<MyUser>() {
+                                @Override
+                                public void done(MyUser myUser, BmobException e) {
+                                    if (e==null){
+                                        Intent intent = new Intent(getActivity(), UserCenterActivity.class);
+                                        intent.putExtra("USER",myUser);
+                                        startActivity(intent);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
+
         final LinearLayout loadmore=  rootView.findViewById(R.id.activity_loadmore);
         ImageView activityImageView = rootView.findViewById(R.id.activity_image_view);
         final TextView activityContentText =  rootView.findViewById(R.id.activity_content_text);
@@ -184,9 +212,9 @@ public class StartactivityFragment extends Fragment{
         collapsingToolbar.setTitle(activityTitle);
         Glide.with(this).load(activityCover).apply(RequestOptions.bitmapTransform(new BlurTransformation())).into(activityImageView);
         activityContentText.setText(activityContent);
-        activityTimeText.setText("时间:"+activityTime);
-        activityPlaceText.setText("地点:"+activityPlace);
-        activityHostText.setText("发起人:"+activityHost);
+        activityTimeText.setText(""+activityTime);
+        activityPlaceText.setText(""+activityPlace);
+        activityHostText.setText(""+activityHost);
 
 
 
@@ -231,7 +259,7 @@ public class StartactivityFragment extends Fragment{
 
           if(bmobUser!=null&&activity.getHostName().equals(bmobUser.getUsername())){
               joinButton.setText("发送通知");
-              joinButton.setBackgroundColor(getResources().getColor(R.color.button_yellow));
+              joinButton.setBackgroundResource(R.drawable.join_button_radius_notify);
               joinButton.setOnClickListener(new View.OnClickListener() {
                   @Override
                   public void onClick(View v) {
@@ -281,7 +309,7 @@ public class StartactivityFragment extends Fragment{
                                           public void run() {
                                               joincount.setText(++joinnum+"");
                                               joinButton.setText("取消加入");
-                                              joinButton.setBackgroundColor(getResources().getColor(R.color.button_grey));
+                                              joinButton.setBackgroundResource(R.drawable.join_button_radius_true);
                                           }
                                       });
 
@@ -319,7 +347,7 @@ public class StartactivityFragment extends Fragment{
                                           public void run() {
                                               joinButton.setText("加 入!");
                                               joincount.setText(--joinnum+"");
-                                              joinButton.setBackgroundColor(getResources().getColor(R.color.button_red));
+                                              joinButton.setBackgroundResource(R.drawable.join_button_radius_false);
                                           }
                                       });
 
@@ -494,6 +522,7 @@ public  void initJoin(){
                 initRecyclerView();
                 MyActivity myActivity = new MyActivity();
                 myActivity.setObjectId(activityId);
+                myActivity.setDate(activity.getDate());
                 myActivity.increment("commentCount",1);
                 myActivity.update();
                 commentcount.setText("("+ ++commentCount+")");
@@ -530,12 +559,12 @@ public  void initJoin(){
         if (Arrays.toString(bmobUser.getJoin()).indexOf(activityId) < 0) {
             ifJoin = false;
             joinButton.setText("加 入!");
-            joinButton.setBackgroundColor(getResources().getColor(R.color.button_red));
+            joinButton.setBackgroundResource(R.drawable.join_button_radius_false);
 
         } else {
             ifJoin = true;
             joinButton.setText("取消加入");
-            joinButton.setBackgroundColor(getResources().getColor(R.color.button_grey));
+            joinButton.setBackgroundResource(R.drawable.join_button_radius_true);
         }
     }
 
@@ -562,15 +591,12 @@ public  void initJoin(){
           @Override
           public void done(List<Dynamics> list, BmobException e) {
           if (e==null){
-             if (!list.isEmpty()){
                  recyclerView.setVisibility(View.VISIBLE);
-
+              if (uriList.isEmpty()){
+                  picMap.put(activity.getCover(),null)                                  ;
+                  uriList.add(activity.getCover());
+              }
               for (Dynamics dynamics: list){
-                  if (uriList.isEmpty()){
-                      picMap.put(dynamics.getActivityCover(),dynamics)                                  ;
-                      uriList.add(dynamics.getActivityCover());
-                  }
-
                   uriList.addAll(Arrays.asList(dynamics.getPicture()));
                   List<String>uri = new ArrayList<>(Arrays.asList(dynamics.getPicture()));
                   for (String str:uri){
@@ -581,7 +607,7 @@ public  void initJoin(){
               galleryAdapter.notifyDataSetChanged();
 
 
-             }
+
           }
           }
       });

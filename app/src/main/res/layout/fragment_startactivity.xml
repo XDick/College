@@ -60,6 +60,9 @@
       <LinearLayout
           android:orientation="horizontal"
           android:layout_width="match_parent"
+          android:layout_marginRight="15dp"
+          android:layout_marginLeft="15dp"
+          android:layout_marginTop="5dp"
           android:layout_height="wrap_content">
 
           <ImageView
@@ -98,13 +101,7 @@
               android:layout_height="35dp"
               android:layout_margin="7dp"/>
 
-          <ImageView
-              android:id="@+id/ac_main_avatar_more"
-              android:layout_width="35dp"
-              android:layout_height="35dp"
-              android:layout_margin="7dp"
-              android:background="@drawable/more"
-              />
+
 
 
 
@@ -114,7 +111,9 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="10dp"
           >
 
             <TextView
@@ -141,18 +140,33 @@
                 />
         </LinearLayout>
 
-
+            <Button
+                android:id="@+id/join_ac_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#fff"
+                android:background="@drawable/join_button_radius_false"
+                android:layout_marginBottom="20dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginLeft="15dp"
+                />
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="4dp"
-                android:layout_marginBottom="10dp">
+                android:layout_marginRight="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginBottom="7dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_margin="10dp">
+                    android:layout_margin="10dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp">
 
 
                 <LinearLayout
@@ -171,8 +185,8 @@
                         android:layout_height="wrap_content"
                         android:textIsSelectable="true"
                         android:layout_margin="10dp"
-                        android:textSize="15dp"
-                        android:textStyle="bold"/>
+                        android:textColor="#262626"
+                        android:textSize="15dp" />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -191,18 +205,23 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
                         android:textIsSelectable="true"
-                        android:textSize="15dp"
-                        android:textStyle="bold"/>
+                        android:textColor="#262626"
+                        android:textSize="15dp" />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
                     >
-                    <ImageView
+                  <!--  <ImageView
                         android:layout_width="35dp"
                         android:layout_height="35dp"
                         android:background="@drawable/host"
+                        android:layout_margin="5dp"/>-->
+                    <ImageView
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:id="@+id/host_avatar"
                         android:layout_margin="5dp"/>
                     <TextView
                         android:id="@+id/activity_host_text"
@@ -210,26 +229,18 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
                         android:textSize="15dp"
-                        android:textColor="#501010"
-                        android:textStyle="bold"/>
+                        android:textColor="#262626" />
                 </LinearLayout>
 
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
-            <Button
-                android:id="@+id/join_ac_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="#fff"
-                android:background="#e23636"
-                android:layout_margin="10dp"
-                />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="15dp"
+                android:layout_marginLeft="15dp"
                 android:orientation="vertical">
 
                 <android.support.v7.widget.CardView
@@ -251,6 +262,7 @@
                        android:layout_height="wrap_content"
                        android:text="活动描述:"
                        android:textSize="15sp"
+                       android:textStyle="bold"
                        android:textColor="#5669fa"
                        android:paddingBottom="10dp"/>
 
@@ -261,8 +273,7 @@
                         android:maxLines="5"
                         android:textIsSelectable="true"
                         android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:textColor="#494949"
+                        android:textColor="#000000"
                         android:lineSpacingExtra="5dp"/>
                 <LinearLayout
                     android:id="@+id/activity_loadmore"
@@ -302,6 +313,8 @@
       <android.support.v7.widget.CardView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:layout_marginRight="15dp"
+          android:layout_marginLeft="15dp"
           android:layout_marginTop="20dp">
 
          <LinearLayout

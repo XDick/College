@@ -392,22 +392,24 @@ public class MainDynamicsActivity extends AppCompatActivity {
                     replyComment.setUserID(myUser.getObjectId());
                     fromComment.addReply();
                     fromComment.update();
+                    final String content=editComment.getText().toString();
+                    editComment.setText("");
                     replyComment.save(new SaveListener<String>() {
                         @Override
                         public void done(String s, BmobException e) {
                             if(e==null){
                                 Toast.makeText(MainDynamicsActivity.this,"回复成功",Toast.LENGTH_SHORT).show();
-                                sendMessage(bmobUser.getUsername()+"回复了你:"+editComment.getText().toString(),
+                                sendMessage(bmobUser.getUsername()+"回复了你:"+content,
                                         new BmobIMUserInfo(replyComment.getReplyuserId(),
                                                 replyComment.getUserName(),null),
                                         dynamics.getObjectId(),dynamics.getContent());
 
-                                editComment.setText("");
+
                                 commentList.clear();
                                 size=0;
                                 initComment(REPLY);
                                 ifReply=false;
-
+                                editComment.setHint("发表你的评论");
                                 Dynamics dynamics1 = new Dynamics();
                                 dynamics1.setObjectId(dynamicsId);
                                 dynamics1.increment("replycount",1);
@@ -433,6 +435,8 @@ public class MainDynamicsActivity extends AppCompatActivity {
                     comment.setUserID(myUser.getObjectId());
                     comment.setContent(editComment.getText().toString());
                     comment.setDynamicsID(dynamicsId);
+                    final String content=editComment.getText().toString();
+                    editComment.setText("");
                     comment.save(new SaveListener<String>() {
                         @Override
                         public void done(String s, BmobException e) {
@@ -446,9 +450,9 @@ public class MainDynamicsActivity extends AppCompatActivity {
 
                                 Toast.makeText(MainDynamicsActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
 
-                                sendMessage(bmobUser.getUsername()+"评论了你的动态:"+editComment.getText().toString(),new BmobIMUserInfo(dynamics.getUserId(),dynamics.getUser(),null),
+                                sendMessage(bmobUser.getUsername()+"评论了你的动态:"+content,new BmobIMUserInfo(dynamics.getUserId(),dynamics.getUser(),null),
                                         dynamics.getObjectId(),dynamics.getContent());
-                                editComment.setText("");
+
                                 commentList.clear();
                                 size=0;
                                 initComment(REPLY);
@@ -747,4 +751,23 @@ public class MainDynamicsActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
+    @Override
+    public void onBackPressed() {
+        if(ifReply){
+
+            ifReply=false;
+            imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
+            editComment.setHint("发表你的评论");
+        }
+
+        else {
+            finish();
+        }
+
+    }
+
+
 }

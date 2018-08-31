@@ -60,6 +60,8 @@ public class UserCenterActivityFragment extends Fragment {
         adapter = new ActivityAdapter3(activityList);
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
         adapter.addFooterView(footer);
+        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_activity, recyclerView, false);
+        adapter.setEmptyView(empty);
         recyclerView.setAdapter(adapter);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -88,7 +90,7 @@ public class UserCenterActivityFragment extends Fragment {
     }
     public void initData(){
         BmobQuery<MyActivity> query = new BmobQuery<>();
-        query.addWhereEqualTo("host",nowUser);
+        query.addWhereEqualTo("hostId",nowUser.getObjectId());
         query.order("-createdAt");
         query.setLimit(10);
         query.setSkip(size);

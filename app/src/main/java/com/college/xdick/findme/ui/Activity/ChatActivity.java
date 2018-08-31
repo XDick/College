@@ -152,12 +152,14 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
                 @Override
                 public void onStart(BmobIMMessage msg) {
                     super.onStart(msg);
-
+                    inputText.setText("");
                     if (!"".equals(content)) {
                         msg.setContent(content);
-                        msgRecyclerView.scrollToPosition(msgList.size() - 1);
                         msgList.add(msg);
-                        adapter.notifyItemInserted(msgList.size() - 1);
+                        msgRecyclerView.scrollToPosition(msgList.size() - 1);
+                        adapter.setSendStatus(0);
+                        adapter.notifyDataSetChanged();
+                        //adapter.notifyItemInserted(msgList.size() - 1);
                         Log.d("a", "执行3");
                     }
                     //当有新消息 刷新ListVIEW中的显示
@@ -165,10 +167,12 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
 
                 @Override
                 public void done(BmobIMMessage msg, BmobException e) {
+
                     msgRecyclerView.scrollToPosition(msgList.size() - 1);
+                    adapter.setSendStatus(1);
                     adapter.notifyDataSetChanged();
                     //讲ListView定位到最后一行
-                    inputText.setText("");
+
                     if (e != null) {
                         Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }

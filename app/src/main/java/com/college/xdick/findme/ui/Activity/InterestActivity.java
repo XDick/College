@@ -45,7 +45,7 @@ public class InterestActivity extends AppCompatActivity {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_interest);
-        final LabelsView labelsView = (LabelsView) findViewById(R.id.main_labels);
+        final LabelsView labelsView =  findViewById(R.id.main_labels);
         final LabelsView labelsView2 = findViewById(R.id.add_labels);
         Button confirm = findViewById(R.id.interest_confirm_button);
 
