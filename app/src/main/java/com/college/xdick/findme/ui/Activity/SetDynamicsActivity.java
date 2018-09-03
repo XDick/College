@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
 import com.college.xdick.findme.MyClass.MyGlideEngine;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.GridViewAddImagesAdapter;
@@ -62,6 +63,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.bean.BmobIMConversation;
+import cn.bmob.newim.bean.BmobIMMessage;
+import cn.bmob.newim.bean.BmobIMUserInfo;
+import cn.bmob.newim.core.BmobIMClient;
+import cn.bmob.newim.listener.MessageSendListener;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
@@ -239,7 +246,7 @@ public class SetDynamicsActivity extends AppCompatActivity {
                                 });
                                 Toast.makeText(SetDynamicsActivity.this, "发送成功", Toast.LENGTH_SHORT).show();
                             } else {
-                                Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
+                                Toast.makeText(SetDynamicsActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -256,8 +263,8 @@ public class SetDynamicsActivity extends AppCompatActivity {
                             public void onSuccess(List<BmobFile> list, List<String> list1) {
 
                                 if (list1.size() == picPath.size()) {
-                                    String content = contentEdit.getText().toString();
-                                    Dynamics dynamics = new Dynamics();
+                                    final String content = contentEdit.getText().toString();
+                                    final Dynamics dynamics = new Dynamics();
                                     dynamics.setContent(content);
                                     if(myActivity!=null){
                                     dynamics.setActivityTitle(myActivity.getTitle());
@@ -266,7 +273,11 @@ public class SetDynamicsActivity extends AppCompatActivity {
                                         dynamics.setActivityHost(myActivity.getHostName());
                                         dynamics.setActivityId(myActivity.getObjectId());
                                     }
-                                    dynamics.setIfAdd2Gallery(ifAddPic2Ac);
+                                    if (myActivity.getHostId().equals(myUser.getObjectId())){
+                                        dynamics.setIfAdd2Gallery(ifAddPic2Ac);
+                                    }else {
+                                        dynamics.setIfAdd2Gallery(false);
+                                    }
                                     dynamics.setLikeCount(0);
                                     dynamics.setReplycount(0);
                                     dynamics.setUserId(BmobUser.getCurrentUser().getObjectId());
@@ -276,19 +287,24 @@ public class SetDynamicsActivity extends AppCompatActivity {
                                     dynamics.save(new SaveListener<String>() {
 
                                         @Override
-                                        public void done(String objectId, BmobException e) {
+                                        public void done(final String objectId, BmobException e) {
                                             if (e == null) {
                                                 MyUser user = BmobUser.getCurrentUser(MyUser.class);
                                                 user.addUnique("dynamics",objectId);
                                                 user.update(new UpdateListener() {
                                                     @Override
                                                     public void done(BmobException e) {
+                                                 if (ifAddPic2Ac){
+                                                     sendMessage(myUser.getUsername()+"请求添加图片到活动#"+myActivity.getTitle()+"#",
+                                                     new BmobIMUserInfo(myActivity.getHostId(),myActivity.getHostName(),""),
+                                                             content+";"+myActivity.getTitle(),objectId+";"+myActivity.getObjectId());
 
+                                                 }
                                                     }
                                                 });
                                                 Toast.makeText(SetDynamicsActivity.this, "发送成功", Toast.LENGTH_SHORT).show();
                                             } else {
-                                                Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
+                                                Toast.makeText(SetDynamicsActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         }
                                     });
@@ -331,10 +347,10 @@ public class SetDynamicsActivity extends AppCompatActivity {
         BmobQuery<MyActivity> query = new BmobQuery<>();
         BmobQuery<MyActivity> q1 = new BmobQuery<>();
         BmobQuery<MyActivity> q2 = new BmobQuery<>();
-        String[] join = myUser.getJoin();
+
         List<BmobQuery<MyActivity>> queries = new ArrayList<>();
         q1.addWhereEqualTo("hostName",myUser.getUsername());
-        q2.addWhereContainedIn("objectId",Arrays.asList(join));
+        q2.addWhereContainsAll("joinUser",Arrays.asList(myUser.getObjectId()));
 
         queries.add(q1);
         queries.add(q2);
@@ -432,6 +448,34 @@ public class SetDynamicsActivity extends AppCompatActivity {
 
         }
 
+    }
+    public void sendMessage(String content ,BmobIMUserInfo info,String title,String id) {
+
+        if(!myUser.getObjectId().equals(info.getUserId())){
+
+            BmobIMConversation conversationEntrance = BmobIM.getInstance().startPrivateConversation(info, true, null);
+            BmobIMConversation messageManager = BmobIMConversation.obtain(BmobIMClient.getInstance(), conversationEntrance);
+            ActivityMessage msg = new ActivityMessage();
+            msg.setContent(content);//给对方的一个留言信息
+            Map<String, Object> map = new HashMap<>();
+            map.put("currentuser", info.getUserId());
+            map.put("userid", myUser.getObjectId());
+            map.put("username",myUser.getUsername());
+            map.put("useravatar",myUser.getAvatar());
+            map.put("activityid",id);
+            map.put("activityname",title);
+            map.put("type","dynamics_picture");
+            msg.setExtraMap(map);
+            messageManager.sendMessage(msg, new MessageSendListener() {
+                @Override
+                public void done(BmobIMMessage msg, BmobException e) {
+                    if (e == null) {//发送成功
+                    } else {//发送失败
+                        Toast.makeText(SetDynamicsActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
 
 

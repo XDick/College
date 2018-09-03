@@ -22,7 +22,7 @@ public class MyUser extends BmobUser implements Serializable {
 
     private String[] like;
 
-    private String[] join;
+    //private String[] join;
 
     private String[] tag;
 
@@ -63,13 +63,13 @@ public class MyUser extends BmobUser implements Serializable {
         this.like = like;
     }
 
-    public String[] getJoin() {
+  /*  public String[] getJoin() {
         return join;
     }
 
     public void setJoin(String[] join) {
         this.join = join;
-    }
+    }*/
 
     public String[] getGps() {
         return gps;

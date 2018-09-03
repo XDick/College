@@ -60,6 +60,7 @@
         android:background="@drawable/select_popup"
         android:clickable="true"
         android:focusable="true"
+        android:id="@+id/user_set_about"
         android:orientation="vertical">
 
         <TextView

@@ -21,10 +21,13 @@ import com.college.xdick.findme.util.SelectSchoolUtil;
 
 import cn.bmob.newim.BmobIM;
 
+import cn.bmob.v3.BmobSMS;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 
+import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Created by Administrator on 2018/4/2.
@@ -59,12 +62,12 @@ public class SignupActivity  extends AppCompatActivity {
         selectSchoolButton= findViewById(R.id.select_school_button);
         sendIdentifyButton = findViewById(R.id.sendidentity_button);
         confirmIdentityButton =findViewById(R.id.identify_confirm_button);
-  /*      TextInputLayout  mTextInputLayoutPhone =  findViewById(R.id.textInputLayout_phone_signup);
+        TextInputLayout  mTextInputLayoutPhone =  findViewById(R.id.textInputLayout_phone_signup);
         //设置可以计数
         mTextInputLayoutPhone.setCounterEnabled(true);
         //计数的最大值
         mTextInputLayoutPhone.setCounterMaxLength(11);
-*/
+
 
         SelectSchoolUtil.initPopView(this,selectSchoolButton,null,null);
 
@@ -77,7 +80,7 @@ public class SignupActivity  extends AppCompatActivity {
 
      //手机号码验证注册暂时关闭
 
-     /*   sendIdentifyButton.setOnClickListener(new View.OnClickListener() {
+      sendIdentifyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BmobSMS.requestSMSCode(phoneEdit.getText().toString(), "验证",new QueryListener<Integer>() {
@@ -88,6 +91,9 @@ public class SignupActivity  extends AppCompatActivity {
                            number = phoneEdit.getText().toString();
                            ifConfirm=false;
                            Toast.makeText(SignupActivity.this,"验证码已发送，请在十分钟内完成操作",Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(SignupActivity.this,ex.getMessage()+"",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -112,7 +118,7 @@ public class SignupActivity  extends AppCompatActivity {
                     }
                 });
             }
-        });*/
+        });
 
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,18 +131,18 @@ public class SignupActivity  extends AppCompatActivity {
                 final MyUser bu = new MyUser();
                 bu.setUsername(account);
                 bu.setPassword(password);
-              //  bu.setMobilePhoneNumber(phone);
+                bu.setMobilePhoneNumber(phone);
                 bu.setSchool(SelectSchoolUtil.getSchool());
-                bu.setMobilePhoneNumberVerified(false);
+                bu.setMobilePhoneNumberVerified(true);
                 bu.setEmailVerified(false);
                 if (password.length()<8){
                     Toast.makeText(SignupActivity.this,"密码至少8位",Toast.LENGTH_SHORT).show();
                 }
                 else {
 
-                  /*  if (ifConfirm && phoneEdit.getText().toString().equals(number)) {
+                   if (ifConfirm && phoneEdit.getText().toString().equals(number)) {
                         bu.setMobilePhoneNumberVerified(true);
-                        bu.setEmailVerified(false);*/
+                        bu.setEmailVerified(false);
 
                         bu.signUp(new SaveListener<MyUser>() {
                             @Override
@@ -149,14 +155,14 @@ public class SignupActivity  extends AppCompatActivity {
                                     BmobIM.getInstance().disConnect();
                                     finish();
                                 } else {
-                                    Toast.makeText(SignupActivity.this, "注册失败" + e, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SignupActivity.this, "注册失败" + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
-                 /*   } else {
+                  } else {
 
                         Toast.makeText(SignupActivity.this, "请确保手机信息正确", Toast.LENGTH_SHORT).show();
-                    }*/
+                    }
 
 
                 }

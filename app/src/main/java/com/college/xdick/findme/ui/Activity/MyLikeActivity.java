@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.college.xdick.findme.R;
+import com.college.xdick.findme.adapter.ActivityAdapter;
 import com.college.xdick.findme.adapter.ActivityAdapter2;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
@@ -38,7 +39,8 @@ public class MyLikeActivity extends AppCompatActivity {
     private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     private List<MyActivity> activityList= new ArrayList<>();
     private ActivityAdapter2 adapter;
-    private List<String> currentList = new ArrayList<>();
+    private boolean ifEmpty=false;
+    private  int size =0;
     private Toolbar toolbar;
 
     @Override
@@ -63,7 +65,7 @@ public class MyLikeActivity extends AppCompatActivity {
 
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new ActivityAdapter2(activityList);
@@ -73,11 +75,36 @@ public class MyLikeActivity extends AppCompatActivity {
         adapter.addFooterView(footer);
         recyclerView.setAdapter(adapter);
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if(ifEmpty){
+                    adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                }else
+                {
+                    adapter.changeMoreStatus(ActivityAdapter.LOADING_MORE);}
+                if (newState == RecyclerView.SCROLL_STATE_IDLE &&  layoutManager.findLastVisibleItemPosition()+1  == adapter.getItemCount()) {
+                    if (ifEmpty){
+                        //null
+                    }
+                    else {initData();}
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+
+
+
 
     }
 
     public void initData(){
-        activityList.clear();
         BmobQuery<MyActivity> query = new BmobQuery<>();
         final List<String> list =new ArrayList<>(Arrays.asList(myUser.getLike()));
 
@@ -85,24 +112,42 @@ public class MyLikeActivity extends AppCompatActivity {
         query.addWhereContainedIn("objectId", list);
         query.order("-date");
 
+        query.setLimit(10);
+        query.setSkip(size);
+        final int listsize = activityList.size();
         query.findObjects(new FindListener<MyActivity>() {
             @Override
             public void done(List<MyActivity> list, BmobException e) {
-                if (e==null){
+                if (e == null) {
+                    activityList.addAll(list);
 
-                    for (MyActivity activity: list){
-                        currentList.add(activity.getObjectId());
-                        activityList.add(activity);
+                    if (listsize==activityList.size()){
+                        ifEmpty=true;
+                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                        adapter.notifyDataSetChanged();
+                    }else if (listsize+10>activityList.size()){
+                        ifEmpty=true;
+                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                        adapter.notifyItemInserted(adapter.getItemCount()-1);
+
                     }
 
-                    adapter.notifyDataSetChanged();
 
+                    else {
+                        adapter.notifyItemInserted(adapter.getItemCount()-1);
+                        size = size + 10;
+                    }
+
+
+                }else{
+                    Toast.makeText(MyLikeActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
-
     }
+
+
+
 
     @Override                //ToolBar上面的按钮事件
     public boolean onOptionsItemSelected(MenuItem item) {

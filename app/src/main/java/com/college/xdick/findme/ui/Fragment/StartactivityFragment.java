@@ -128,6 +128,7 @@ public class StartactivityFragment extends Fragment{
         String activityContent = activity.getContent();
         String activityTime = activity.getTime();
         String activityPlace = activity.getPlace();
+        final String[] activityTag= activity.getTag();
         hostID=  activity.getHostId();
         commentCount=activity.getCommentCount();
         BmobQuery<MyUser>query = new BmobQuery<>();
@@ -218,7 +219,14 @@ public class StartactivityFragment extends Fragment{
 
 
 
-
+     if (activityTag[0].equals("二手交易")||activityTag[0].equals("招聘")){
+            joinButton.setVisibility(View.GONE);
+            LinearLayout linearLayout = rootView.findViewById(R.id.join_num_layout);
+            linearLayout.setVisibility(View.INVISIBLE);
+            for (int i=0;i<6;i++){
+                avatar[i].setVisibility(View.GONE);
+            }
+        }
 
         activityHostText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -282,28 +290,22 @@ public class StartactivityFragment extends Fragment{
                           Toast.makeText(getActivity(),"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
 
                       }
+
                       else {
 
 
                       if(!ifJoin){
 
-                          bmobUser.addUnique("join",activityId);
-                          bmobUser.update(new UpdateListener() {
+
+
+                          MyActivity myActivity = new MyActivity();
+                          myActivity.setObjectId(activityId);
+                          myActivity.setDate(activity.getDate());
+                          myActivity.addUnique("joinUser",bmobUser.getObjectId());
+                          myActivity.update(new UpdateListener() {
                               @Override
                               public void done(BmobException e) {
-                                  if (e == null) {
-                                       sendMessage(bmobUser.getUsername()+"加入了你的"+"#"+activity.getTitle()+"#活动"
-                                       ,new BmobIMUserInfo(hostID,activity.getHostName(),hostAvatar));
-                                      ifJoin=true;
-
-                                      MyActivity myActivity = new MyActivity();
-                                      myActivity.setObjectId(activityId);
-                                      myActivity.setDate(activity.getDate());
-                                      myActivity.addUnique("joinUser",bmobUser.getObjectId());
-                                      myActivity.update();
-
-
-
+                                  if (e==null){
                                       getActivity().runOnUiThread(new Runnable() {
                                           @Override
                                           public void run() {
@@ -313,9 +315,28 @@ public class StartactivityFragment extends Fragment{
                                           }
                                       });
 
-
-
+                                      sendMessage(bmobUser.getUsername()+"加入了你的"+"#"+activity.getTitle()+"#活动"
+                                              ,new BmobIMUserInfo(hostID,activity.getHostName(),hostAvatar));
+                                      ifJoin=true;
                                       Toast.makeText(getContext(), "成功加入", Toast.LENGTH_SHORT).show();
+                                  }
+                                  else {
+                                      Toast.makeText(getContext(), e.getMessage(),Toast.LENGTH_SHORT).show();
+                                  }
+                              }
+                          });
+
+
+
+
+
+
+                         /* bmobUser.addUnique("join",activityId);
+                          bmobUser.update(new UpdateListener() {
+                              @Override
+                              public void done(BmobException e) {
+                                  if (e == null) {
+                                     //原代码
                                   }
 
                                   else {
@@ -324,23 +345,21 @@ public class StartactivityFragment extends Fragment{
                                   }
                               }
                           });
-
+*/
                       }
 
                       else
                       {
-                          bmobUser.removeAll("join", Arrays.asList(activityId));
-                          bmobUser.update(new UpdateListener() {
+
+
+                          MyActivity myActivity = new MyActivity();
+                          myActivity.setObjectId(activityId);
+                          myActivity.setDate(activity.getDate());
+                          myActivity.removeAll("joinUser",Arrays.asList(bmobUser.getObjectId()));
+                          myActivity.update(new UpdateListener() {
                               @Override
                               public void done(BmobException e) {
-
-                                  if(e==null){
-                                      MyActivity myActivity = new MyActivity();
-                                      myActivity.setObjectId(activityId);
-                                      myActivity.setDate(activity.getDate());
-                                      myActivity.removeAll("joinUser",Arrays.asList(bmobUser.getObjectId()));
-                                      myActivity.update();
-
+                                  if (e==null){
 
                                       getActivity().runOnUiThread(new Runnable() {
                                           @Override
@@ -350,18 +369,38 @@ public class StartactivityFragment extends Fragment{
                                               joinButton.setBackgroundResource(R.drawable.join_button_radius_false);
                                           }
                                       });
-
-
-
                                       ifJoin = false;
                                       Toast.makeText(getContext(), "取消加入", Toast.LENGTH_SHORT).show();
+                                  }
+                                  else {
+                                      Toast.makeText(getContext(), e.getMessage(),Toast.LENGTH_SHORT).show();
+                                  }
+                              }
+                          });
+
+
+
+
+
+
+
+
+
+
+                         /* bmobUser.removeAll("join", Arrays.asList(activityId));
+                          bmobUser.update(new UpdateListener() {
+                              @Override
+                              public void done(BmobException e) {
+
+                                  if(e==null){
+                                     //
                                   }
 
                                   else {
                                       Toast.makeText(getContext(), e.getMessage(),Toast.LENGTH_SHORT).show();
                                   }
                               }
-                          });
+                          });*/
                       }
                   }
                   }
@@ -458,6 +497,7 @@ public  void initJoin(){
 
                     if (ifEmpty) {
                         adapter.changeMoreStatus(CommentAdapter.NO_MORE);
+
                     } else {
                         adapter.changeMoreStatus(CommentAdapter.LOADING_MORE);
                     }
@@ -490,9 +530,19 @@ public  void initJoin(){
                     commentList.addAll(list);
 
             if (state==REFRESH) {
-                     ifEmpty=false;
-                     size=10;
+                commentList.clear();
+                if(list.size()<10){
+                    ifEmpty=true;
+                    commentList.addAll(list);
+                    adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                     adapter.notifyDataSetChanged();
+                }
+                else {
+                    ifEmpty=false;
+                    commentList.addAll(list);
+                    adapter.notifyDataSetChanged();}
+                size =  10;
+
                 commentcount.setText("("+commentCount+")");
                 ((ActivityActivity)getActivity()).setText(commentCount);
             }
@@ -556,7 +606,7 @@ public  void initJoin(){
            joinButton.setText("未登录");
            return;
        }
-        if (Arrays.toString(bmobUser.getJoin()).indexOf(activityId) < 0) {
+        if (!Arrays.toString(activity.getJoinUser()).contains(bmobUser.getObjectId())) {
             ifJoin = false;
             joinButton.setText("加 入!");
             joinButton.setBackgroundResource(R.drawable.join_button_radius_false);

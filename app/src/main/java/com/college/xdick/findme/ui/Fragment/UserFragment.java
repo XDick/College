@@ -1,5 +1,7 @@
 package com.college.xdick.findme.ui.Fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -46,6 +48,7 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadFileListener;
 import jp.wasabeef.glide.transformations.BlurTransformation;
+import jp.wasabeef.glide.transformations.ColorFilterTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
@@ -58,11 +61,12 @@ public class UserFragment extends Fragment {
     private View rootview;
     private String picturePath;
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
-    private TextView user,setcountText,joincountText,likecountText,dynamicscountText;
-    private ImageView avatar,setting;
+    private TextView user,setcountText,dynamicscountText;
+    private ImageView avatar,setting,background;
     private ImagePicker imagePicker;
     private LinearLayout maytag,userset,userjoin,userlike,userexit,usersetting,userdynamics;
     private WaveView3 waveView3;
+    private LinearLayout about;
 
 
     @Override
@@ -82,16 +86,16 @@ public class UserFragment extends Fragment {
         avatar=rootview.findViewById(R.id.user_avatar);
         maytag = rootview.findViewById(R.id.user_mytag);
         setting = rootview.findViewById(R.id.setting);
-        joincountText = rootview.findViewById(R.id.user_join_count);
+
         setcountText = rootview.findViewById(R.id.user_set_count);
         userset = rootview.findViewById(R.id.user_set);
         userjoin = rootview.findViewById(R.id.user_join);
         userlike=rootview.findViewById(R.id.user_like);
-        likecountText = rootview.findViewById(R.id.user_like_count);
+
         dynamicscountText = rootview.findViewById(R.id.user_dynamics_count);
         userdynamics = rootview.findViewById(R.id.user_dynamics);
         TextView schoolText = rootview.findViewById(R.id.userschool);
-
+        background = rootview.findViewById(R.id.user_background);
         try {
             schoolText.setText("学校:"+bmobUser.getSchool());
             SelectSchoolUtil.initPopView(getActivity(),null,schoolText,bmobUser);
@@ -129,6 +133,33 @@ public class UserFragment extends Fragment {
 
         userexit = easyPopup.findViewById(R.id.exit_setting);
         usersetting = easyPopup.findViewById(R.id.account_setting);
+        about = easyPopup.findViewById(R.id.user_set_about);
+
+        about.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("关于");
+                builder.setMessage("本应用由XDick-谢德锟开发，有Bug和意见欢迎反馈QQ470471350");
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //toast("确定");
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                easyPopup.dismiss();
+
+
+            }
+        });
 
 
 
@@ -174,6 +205,8 @@ public class UserFragment extends Fragment {
                                             BmobIM.getInstance().disConnect();
                                             BmobCheckIfLogin();
                                             easyPopup.dismiss();
+                                            startActivity(new Intent(getActivity(),LoginActivity.class));
+                                            getActivity().finish();
                                         }
                                     });
 
@@ -197,6 +230,10 @@ public class UserFragment extends Fragment {
                 avatar.setLayoutParams(lp);
             }
         });
+        background.setColorFilter(Color.parseColor("#cf0606"), PorterDuff.Mode.DARKEN);
+        Glide.with(this).load(bmobUser.getAvatar())
+                        .apply(bitmapTransform(new BlurTransformation(9, 7)))
+                        .into(background);
 
 
     }
@@ -205,13 +242,7 @@ public class UserFragment extends Fragment {
 
     private void showUserInfo(){
 
-                try {
-                    joincountText.setText(bmobUser.getJoin().length+"");
 
-                }
-                catch (Exception e){
-                    e.printStackTrace();
-                }
         try{
             setcountText.setText(bmobUser.getSetAc().length+"");}
         catch (Exception e){
@@ -225,13 +256,7 @@ public class UserFragment extends Fragment {
             e.printStackTrace();
         }
 
-        try {
-           likecountText.setText(bmobUser.getLike().length+"");
 
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
                 user.setText(bmobUser.getUsername());
                 Glide.with(getActivity()).load(bmobUser.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
 
@@ -241,8 +266,7 @@ public class UserFragment extends Fragment {
     }
     private void exitUserInfo(){
             setcountText.setText(0+"");
-            joincountText.setText(0+"");
-            likecountText.setText(0+"");
+
             dynamicscountText.setText("");
                 user.setText("点击头像登录");
                 userexit.setVisibility(View.GONE);
@@ -393,12 +417,7 @@ public class UserFragment extends Fragment {
     public void onResume() {
         super.onResume();
           bmobUser=BmobUser.getCurrentUser(MyUser.class);
-        try {
-            joincountText.setText(bmobUser.getJoin().length+"");
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+
         try{
             setcountText.setText(bmobUser.getSetAc().length+"");}
         catch (Exception e){
@@ -412,13 +431,7 @@ public class UserFragment extends Fragment {
             e.printStackTrace();
         }
 
-        try {
-            likecountText.setText(bmobUser.getLike().length+"");
 
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
 
     }
 }

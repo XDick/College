@@ -46,7 +46,7 @@
                 android:textColor="#fff"
                 android:layout_margin="10dp"
                 android:text="确定"
-                android:background="#ba0505"/>
+                android:background="@drawable/join_button_radius_false"/>
 
 
         </android.support.v7.widget.Toolbar>

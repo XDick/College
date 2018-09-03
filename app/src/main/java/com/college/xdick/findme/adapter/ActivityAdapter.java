@@ -268,6 +268,11 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         Glide.with(mContext).load(activity.getCover()).apply(bitmapTransform(new BlurTransformation(9, 3))).into(holder.cover);
 
            holder.join.setText( joincount +"人参与");
+           String[] tag2 =activity.getTag();
+           if (tag2[0].equals("二手交易")||tag2[0].equals("招聘"))
+           {
+               holder.join.setVisibility(View.GONE);
+           }
 
 
 

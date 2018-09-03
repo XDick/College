@@ -569,15 +569,19 @@ public class MainDynamicsActivity extends AppCompatActivity {
                     else if (state ==REPLY){
 
                         if (list.size()<10){
+                            initRecycler();
                             adapter.changeMoreStatus(DynamicsCommentAdapter.DONTSHOW);
+                            adapter.notifyDataSetChanged();
                             ifEmpty=true;
 
+
                         }else {
+                            initRecycler();
                             ifEmpty=false;
                         }
 
                         size=10;
-                        initRecycler();
+
                         commentcount.setText("("+ ++commentCount+")");
                     }
 

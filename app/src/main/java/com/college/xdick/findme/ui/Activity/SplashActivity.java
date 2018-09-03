@@ -1,11 +1,15 @@
 package com.college.xdick.findme.ui.Activity;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Toast;
 
@@ -33,7 +37,7 @@ import cn.bmob.v3.listener.QueryListener;
  */
 
 public class SplashActivity extends Activity {
-    static boolean ifshow = true;
+
    private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
 
 
@@ -48,22 +52,14 @@ public class SplashActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(!ifshow()){
-            startActivity(new Intent(SplashActivity.this,MainActivity.class));
-            finish();
-        }
-       else{
-            initData();
-        }
-
-
+        askPermissions();
 
 
     }
 
 
     private void initData(){
-        ifshow= false;
+
         //进入主页面
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
@@ -139,15 +135,29 @@ public class SplashActivity extends Activity {
     }
 
 
-   static private boolean ifshow(){
-        Handler mHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                ifshow = true;
-            }
-        };
-        mHandler.sendEmptyMessageDelayed(0, 120000);
-        return ifshow;
-    }
+
+    private void askPermissions() {
+        List<String> permissionList = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(SplashActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.
+                PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(SplashActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.
+                PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (ContextCompat.checkSelfPermission(SplashActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.
+                PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.READ_PHONE_STATE);
+        }
+
+
+        if (!permissionList.isEmpty()) {
+            String[] permission = permissionList.toArray(new String[permissionList.size()]);
+            ActivityCompat.requestPermissions(SplashActivity.this, permission, 1);
+        } else {
+            initData();
+        }
+}
+
 }

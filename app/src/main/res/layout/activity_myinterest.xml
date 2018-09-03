@@ -76,7 +76,7 @@
         android:textColor="#fff"
         android:layout_margin="5dp"
         android:text="删除"
-        android:background="#d75050"/>
+        android:background="@drawable/join_button_radius_false"/>
     </LinearLayout>
 </LinearLayout>
 
@@ -169,7 +169,7 @@
                     android:textColor="#fff"
                     android:layout_margin="5dp"
                     android:text="添加"
-                    android:background="#d75050"/>
+                    android:background="@drawable/join_button_radius_false"/>
             </LinearLayout>
         </LinearLayout>
 

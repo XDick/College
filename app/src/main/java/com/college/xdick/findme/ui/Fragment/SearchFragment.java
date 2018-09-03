@@ -63,10 +63,11 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
     private DotsTextView dots;
     private LinearLayout loadlayout;
     private RecyclerView recyclerView;
-
+    private Banner banner;
     private SearchView searchView;
-    private  List<String> imageList = new ArrayList<>();
-    private   List<String> titleList = new ArrayList<>();
+    private  static List<String> imageList = new ArrayList<>();
+    private   static List<String> titleList = new ArrayList<>();
+    private  static List<MyActivity> activityList = new ArrayList<>();
 
 
 
@@ -75,14 +76,15 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
        rootView =inflater.inflate(R.layout.fragment_search,container,false);
         initBaseView();
-        initRecyclerView();
         if(flag_search==0){
             loadlayout.setVisibility(View.VISIBLE);
             dots.start();
             initNews();
-            flag_search=1;}
+            initBanner();
 
 
+        }
+        initRecyclerView();
         setHasOptionsMenu(true);
 
         return  rootView;
@@ -147,68 +149,28 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
         recyclerView.setLayoutManager(layoutManager);
         adapter = new FindNewsAdapter(newsList);
         View header = LayoutInflater.from(getContext()).inflate(R.layout.item_header_banner, recyclerView, false);
-        final Banner banner =  header.findViewById(R.id.banner);
+        banner =  header.findViewById(R.id.banner);
         //设置图片加载器
         banner.setImageLoader(new MyBannerImageLoader());
         //设置图片集合
 
-        Bmob.getServerTime(new QueryListener<Long>() {
+        banner.setImages(imageList)
+                .setDelayTime(3000)
+                .setBannerTitles(titleList)
+                .setBannerAnimation(Transformer.Default)
+                .setBannerStyle(BannerConfig.CIRCLE_INDICATOR_TITLE_INSIDE)
+                .setIndicatorGravity(BannerConfig.RIGHT);
+
+        banner.setOnBannerListener(new OnBannerListener() {
             @Override
-            public void done(Long aLong, BmobException e) {
-           if (e==null){
-               BmobQuery<MyActivity> query = new BmobQuery();
-               //query.addWhereGreaterThan("date", aLong*1000L-60*60*24*1000);
-               query.addWhereLessThan("date", aLong*1000L+60*60*24*1000);
-               query.order("-joinCount");
-               query.setLimit(5);
-               query.findObjects(new FindListener<MyActivity>() {
-                   @Override
-                   public void done(final List<MyActivity> list, BmobException e) {
-                  if (e==null){
-                      for (MyActivity activity:list){
-                          imageList.add(activity.getCover());
-                          String[] gps=activity.getGps();
-                          titleList.add(activity.getTitle()+"("+gps[1]+")");
-                      }
-
-                      banner.setImages(imageList)
-                              .setDelayTime(3000)
-                              .setBannerTitles(titleList)
-                              .setBannerAnimation(Transformer.ScaleInOut)
-                              .setBannerStyle(BannerConfig.CIRCLE_INDICATOR_TITLE_INSIDE)
-                              .setIndicatorGravity(BannerConfig.RIGHT);
-
-
-                      banner.setOnBannerListener(new OnBannerListener() {
-                          @Override
-                          public void OnBannerClick(int position) {
-                                Intent intent = new Intent(getContext(), ActivityActivity.class);
-                                intent.putExtra("ACTIVITY",list.get(position));
-                                startActivity(intent);
-                          }
-                      });
-                      //banner设置方法全部调用完毕时最后调用
-                      banner.start();
-
-                  }
-
-                   }
-               });
-
-
-           }
+            public void OnBannerClick(int position) {
+                Intent intent = new Intent(getContext(), ActivityActivity.class);
+                intent.putExtra("ACTIVITY",activityList.get(position));
+                startActivity(intent);
             }
         });
-
-
-
-
-
-
-
-
-
-
+        //banner设置方法全部调用完毕时最后调用
+        banner.start();
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
         adapter.addHeaderView(header);
         View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty, recyclerView, false);
@@ -227,6 +189,7 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
                 try{
                     newsList.clear();
                     initNews();
+                    initBanner();
                     Thread.sleep(2000);
                 }
                 catch (InterruptedException e){
@@ -244,6 +207,45 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
                 });
             }
         }).start();
+    }
+
+    private void initBanner(){
+        activityList.clear();
+        imageList.clear();
+        titleList.clear();
+        Bmob.getServerTime(new QueryListener<Long>() {
+            @Override
+            public void done(Long aLong, BmobException e) {
+                if (e==null){
+                    BmobQuery<MyActivity> query = new BmobQuery();
+                    query.addWhereGreaterThan("date", aLong*1000L-60*60*240*1000);//60*60*24*1000
+                    query.addWhereLessThan("date", aLong*1000L+60*60*24*1000);
+                    query.order("-joinCount");
+                    query.setLimit(5);
+                    query.findObjects(new FindListener<MyActivity>() {
+                        @Override
+                        public void done(final List<MyActivity> list, BmobException e) {
+                            if (e==null){
+                                activityList.addAll(list);
+                                for (MyActivity activity:list){
+                                    imageList.add(activity.getCover());
+                                    String[] gps=activity.getGps();
+                                    titleList.add(activity.getTitle()+"("+gps[1]+")");
+                                }
+                               if (flag_search==0){
+                                   initRecyclerView();
+                                   flag_search=1;
+                               }
+
+                            }
+
+                        }
+                    });
+
+
+                }
+            }
+        });
     }
 
     private void initNews(){

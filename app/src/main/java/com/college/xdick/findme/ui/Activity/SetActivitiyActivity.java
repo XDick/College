@@ -293,7 +293,7 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
             }
         });
 
-        String[] sort={"个人活动","团体组织","二手交易","招聘"};
+        String[] sort={"个人活动","团体组织","安利活动","二手交易","招聘"};
         labelsView_sort.setLabels(Arrays.asList(sort));
 
         BmobQuery<MainTagBean> query = new BmobQuery<MainTagBean>();

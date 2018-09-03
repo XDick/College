@@ -25,11 +25,15 @@ import java.util.List;
 import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.bean.BmobIMUserInfo;
+import cn.bmob.newim.core.ConnectionStatus;
 import cn.bmob.newim.event.MessageEvent;
 import cn.bmob.newim.listener.ConnectListener;
+import cn.bmob.newim.listener.ConnectStatusChangeListener;
 import cn.bmob.newim.listener.MessageListHandler;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
+
+import static cn.bmob.v3.Bmob.getApplicationContext;
 
 /**
  * Created by Administrator on 2018/4/2.
@@ -39,14 +43,36 @@ public class PrivateConversationFragment extends Fragment implements MessageList
     View rootview;
     private List<PrivateConversation> conversationList = new ArrayList<>();
     private ConversationAdapter adapter;
-
+    private SwipeRefreshLayout swipeRefresh;
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootview =inflater.inflate(R.layout.fragment_conversation,container,false);
-        initRecyclerView();
+        initView();
+        BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+            @Override
+            public void onChange(ConnectionStatus status) {
+                if ( status.getMsg().equals("connecting")) {
+                    Toast.makeText(getApplicationContext(),"正在连接服务器",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+
         return rootview;
 
 
+    }
+    private void initView(){
+        initRecyclerView();
+        swipeRefresh =rootview.findViewById(R.id.swipe_refresh);
+        swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
     }
     private void initRecyclerView(){
 
@@ -144,5 +170,33 @@ public class PrivateConversationFragment extends Fragment implements MessageList
         }
     }
 
+    private void refresh(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            initAllConversation();
+                        }
+                    });
 
+                    Thread.sleep(2000);
+                }
+                catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+                if (getActivity() == null)
+                    return;
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefresh.setRefreshing(false);
+                    }
+                });
+            }
+        }).start();
+    }
 }

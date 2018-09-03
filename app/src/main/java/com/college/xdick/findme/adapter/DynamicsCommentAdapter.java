@@ -107,7 +107,16 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
             View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_dynamics_comment,parent,false);
        final   ViewHolder holder = new  DynamicsCommentAdapter.ViewHolder(view);
+            holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
 
+             //
+
+
+                    return true;
+                }
+            });
        holder.layout.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {

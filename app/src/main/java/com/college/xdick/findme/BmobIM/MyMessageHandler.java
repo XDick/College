@@ -15,6 +15,7 @@ import android.util.Log;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.FutureTarget;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
+import com.college.xdick.findme.MyClass.ReadEvent;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.ActivityMessageBean;
 import com.college.xdick.findme.bean.MyUser;
@@ -54,7 +55,7 @@ public class MyMessageHandler extends BmobIMMessageHandler {
     private Context context;
 
     public MyMessageHandler(Context context) {
-        this.context = context;}
+        this.context = context; }
 
     public MyMessageHandler() {
        }
@@ -150,6 +151,8 @@ private void executeMessage(final MessageEvent event){
                             .build();
 
                     manager.notify(1, notification);
+                    EventBus.getDefault().post(new ReadEvent(""));
+
 
 
                 }
@@ -178,6 +181,7 @@ private void executeMessage(final MessageEvent event){
                         .build();
 
                 manager.notify(1,notification);
+                EventBus.getDefault().post(new ReadEvent(""));
             }
         }
     });

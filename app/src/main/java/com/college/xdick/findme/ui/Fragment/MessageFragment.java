@@ -11,10 +11,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.college.xdick.findme.MyClass.ReadEvent;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.ActivityMessageAdapter;
 import com.college.xdick.findme.bean.ActivityMessageBean;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
@@ -83,8 +86,11 @@ public class MessageFragment extends Fragment {
     public void read(){
 
         for (ActivityMessageBean bean :activityList){
-            bean.setIfCheck("true");
-            bean.save();
+            if (!bean.getType().equals("dynamics_picture")){
+                bean.setIfCheck("true");
+                bean.save();
+            }
+
         }
     }
     private void refresh(){

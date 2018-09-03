@@ -258,23 +258,33 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
 
                     case 0: {
 
-                        user.removeAll("join", Arrays.asList(activity.getObjectId()));
-                        user.update(new UpdateListener() {
+                        MyActivity myActivity = new MyActivity();
+                        myActivity.setObjectId(activity.getObjectId());
+                        myActivity.setDate(activity.getDate());
+                        myActivity.removeAll("joinUser", Arrays.asList(user.getObjectId()));
+                        myActivity.increment("joinCount",-1);
+                        myActivity.update(new UpdateListener() {
                             @Override
                             public void done(BmobException e) {
-                                if (e == null) {
-                                    MyActivity myActivity = new MyActivity();
-                                    myActivity.setObjectId(activity.getObjectId());
-                                    myActivity.setDate(activity.getDate());
-                                    myActivity.removeAll("joinUser", Arrays.asList(user.getObjectId()));
-                                    myActivity.increment("joinCount",-1);
-                                    myActivity.update();
+                                if (e==null){
                                     holder.setVisibility(false);
                                     Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
                                 }
                             }
-
                         });
+
+
+
+                       /* user.removeAll("join", Arrays.asList(activity.getObjectId()));
+                        user.update(new UpdateListener() {
+                            @Override
+                            public void done(BmobException e) {
+                                if (e == null) {
+                                //
+                                }
+                            }
+
+                        });*/
                         break;
 
                     }

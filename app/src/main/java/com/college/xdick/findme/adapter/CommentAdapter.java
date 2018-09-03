@@ -109,6 +109,18 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 .inflate(R.layout.item_comment,parent,false);
        final   ViewHolder holder = new  CommentAdapter.ViewHolder(view);
 
+
+       holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
+           @Override
+           public boolean onLongClick(View v) {
+
+               //
+
+
+               return true;
+           }
+       });
+
        holder.layout.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {

@@ -41,6 +41,7 @@ public class ModifyNameActivity extends AppCompatActivity {
             public void onClick(View v) {
                 MyUser myUser= new MyUser();
                 myUser.setUsername(modifynameEdit.getText().toString());
+                myUser.setMobilePhoneNumberVerified(false);
                 myUser.update(BmobUser.getCurrentUser(MyUser.class).getObjectId(), new UpdateListener() {
                     @Override
                     public void done(BmobException e) {

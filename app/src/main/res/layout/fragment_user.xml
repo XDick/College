@@ -18,7 +18,11 @@
             android:layout_height="160dp"
             android:background="?attr/colorPrimary">
 
-
+         <ImageView
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:scaleType="centerCrop"
+             android:id="@+id/user_background"/>
 
             <com.college.xdick.findme.MyClass.WaveView3
                 android:id="@+id/wave_view"
@@ -109,7 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="我发起的活动"
+                android:text="我的活动"
                 android:textSize="15dp"
                 android:textColor="#1b1b1b"
                 android:layout_gravity="center" />
@@ -192,14 +196,7 @@
             android:layout_weight="7"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/user_join_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="0"
-                android:textColor="#afafaf"
-                android:textSize="20dp" />
+
 
             <ImageView
                 android:layout_width="30dp"
@@ -249,14 +246,7 @@
             android:layout_weight="7"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/user_like_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="0"
-                android:textColor="#afafaf"
-                android:textSize="20dp" />
+
 
             <ImageView
                 android:layout_width="30dp"
@@ -296,6 +286,7 @@
                 android:textColor="#1b1b1b"
                 android:layout_gravity="center"
                 />
+
         </LinearLayout>
 
         <LinearLayout
@@ -304,7 +295,11 @@
             android:layout_height="match_parent"
             android:layout_weight="7"
             android:orientation="horizontal">
-
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/arrow_right"
+                android:layout_gravity="center"/>
 
         </LinearLayout>
     </LinearLayout>

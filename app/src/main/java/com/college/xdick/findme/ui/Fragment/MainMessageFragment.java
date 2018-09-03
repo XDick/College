@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.college.xdick.findme.MyClass.ReadEvent;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.MessageFragmentStatePagerAdapter;
 import com.college.xdick.findme.adapter.MyFragmentStatePagerAdapter;
@@ -22,7 +23,9 @@ import com.college.xdick.findme.bean.ActivityMessageBean;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.MainActivity;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.crud.DataSupport;
 
 import java.util.List;
@@ -51,7 +54,7 @@ public class MainMessageFragment extends Fragment implements MessageListHandler 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView =inflater.inflate(R.layout.fragment_main_message,container,false);
         initView();
-
+        EventBus.getDefault().register(this);
         return  rootView;
     }
 
@@ -139,5 +142,9 @@ public class MainMessageFragment extends Fragment implements MessageListHandler 
                 badgeView.setBadgeNumber(msgNum);
             }
         }
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(final ReadEvent readEvent) {
+        setBadgeItem();
     }
 }
