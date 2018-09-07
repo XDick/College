@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -26,8 +27,11 @@ import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMTextMessage;
 import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.newim.core.BmobIMClient;
+import cn.bmob.newim.core.ConnectionStatus;
+import cn.bmob.newim.listener.ConnectListener;
 import cn.bmob.newim.listener.MessageSendListener;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 
@@ -47,22 +51,25 @@ public class HostNotifyActivity extends AppCompatActivity {
         initView();
     }
 
-    private void initView(){
+    private void initView() {
 
         Intent intent = getIntent();
-       final MyActivity activity = (MyActivity) intent.getSerializableExtra("ACTIVITY");
+        final MyActivity activity = (MyActivity) intent.getSerializableExtra("ACTIVITY");
 
-        BmobQuery<MyUser> query =new BmobQuery<>();
-        query.addWhereContainsAll("join", Arrays.asList(activity.getObjectId()));
+        BmobQuery<MyUser> query = new BmobQuery<>();
+        query.setLimit(500);
+        query.addWhereContainedIn("objectId", Arrays.asList(activity.getJoinUser()));
         query.findObjects(new FindListener<MyUser>() {
             @Override
             public void done(List<MyUser> list, BmobException e) {
-                       if (e==null){
-                           joinMember =list;
-                       }
+                if (e == null) {
+                    joinMember = list;
+                }
+                else {
+                    Toast.makeText(HostNotifyActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
-
 
 
         final EditText editMessage = findViewById(R.id.edit_message);
@@ -71,50 +78,82 @@ public class HostNotifyActivity extends AppCompatActivity {
         layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editMessage .setFocusable(true);
-                editMessage .setFocusableInTouchMode(true);
-                editMessage .requestFocus();
-                editMessage .findFocus();
+                editMessage.setFocusable(true);
+                editMessage.setFocusableInTouchMode(true);
+                editMessage.requestFocus();
+                editMessage.findFocus();
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(editMessage , 0);
+                imm.showSoftInput(editMessage, 0);
             }
         });
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BmobIMConversation conversationEntrance;
-                BmobIMConversation messageManager;
-                BmobIMTextMessage msg = new BmobIMTextMessage();
-                msg.setContent(editMessage.getText().toString()+'\n'+'\n'+"【来自活动#"+activity.getTitle()+"#】");
-                 finish();
-               for ( int i=0;i<joinMember.size();i++){
-                   editMessage.setText("");
-                   final int k =i;
-                MyUser user = joinMember.get(i);
-                   conversationEntrance = BmobIM.getInstance()
-                           .startPrivateConversation(new BmobIMUserInfo(user.getObjectId(),user.getUsername(),user.getAvatar()), true, null);
-                   messageManager = BmobIMConversation.obtain(BmobIMClient.getInstance(), conversationEntrance);
-                   messageManager.sendMessage(msg, new MessageSendListener() {
-                       @Override
-                       public void done(BmobIMMessage bmobIMMessage, BmobException e) {
-                           if (e==null){
-                                if (k==joinMember.size()-1) {
-                                    Toast.makeText(HostNotifyActivity.this, "发送成功", Toast.LENGTH_SHORT).show();
-                                }   }
-                       }
-                   });
-               }
 
+                if (editMessage.getText().toString().equals("")){
+                    return;
+                }
+                if (BmobIM.getInstance().getCurrentStatus().
+                        equals(ConnectionStatus.CONNECTED)) {
+                    BmobIMConversation conversationEntrance;
+                    BmobIMConversation messageManager;
+                    BmobIMTextMessage msg = new BmobIMTextMessage();
+                    msg.setContent(editMessage.getText().toString() + '\n' + '\n' + "【来自活动#" + activity.getTitle() + "#】");
+                    finish();
+                    Toast.makeText(HostNotifyActivity.this, "正在发送", Toast.LENGTH_SHORT).show();
+                    for (int i = 0; i < joinMember.size(); i++) {
+                        editMessage.setText("");
+                        final int k = i;
+                        MyUser user = joinMember.get(i);
+                        conversationEntrance = BmobIM.getInstance()
+                                .startPrivateConversation(new BmobIMUserInfo(user.getObjectId(), user.getUsername(), user.getAvatar()), true, null);
+                        messageManager = BmobIMConversation.obtain(BmobIMClient.getInstance(), conversationEntrance);
+                        messageManager.sendMessage(msg, new MessageSendListener() {
+                            @Override
+                            public void done(BmobIMMessage bmobIMMessage, BmobException e) {
+                                if (e == null) {
+                                    if (k == joinMember.size() - 1) {
+                                        Toast.makeText(HostNotifyActivity.this, "发送成功", Toast.LENGTH_SHORT).show();
+                                    }
 
+                                }
+                                else {
+                                    Toast.makeText(HostNotifyActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
 
+                } else {
+                    Toast.makeText(HostNotifyActivity.this, "正在连接服务器请稍等...", Toast.LENGTH_SHORT).show();
+                    final MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
+                    if (bmobUser != null) {
+                        if (!TextUtils.isEmpty(bmobUser.getObjectId())) {
+                            BmobIM.connect(bmobUser.getObjectId(), new ConnectListener() {
+                                @Override
+                                public void done(String uid, BmobException e) {
+                                    if (e == null) {
+                                        try {
+                                            BmobIM.getInstance().
+                                                    updateUserInfo(new BmobIMUserInfo(bmobUser.getObjectId(),
+                                                            bmobUser.getUsername(), bmobUser.getAvatar()));
+                                        } catch (Exception e2) {
+                                            e2.printStackTrace();
+                                        }
 
-
-
-
+                                    } else {
+                                        //连接失败
+                                        Toast.makeText(HostNotifyActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
             }
-        });
 
+        });
     }
 }
 

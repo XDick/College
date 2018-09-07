@@ -48,6 +48,7 @@ public class MyLikeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_ac);
         initView();
+        initData();
 
     }
 
@@ -105,6 +106,9 @@ public class MyLikeActivity extends AppCompatActivity {
     }
 
     public void initData(){
+        if (myUser.getLike()==null){
+            return;
+        }
         BmobQuery<MyActivity> query = new BmobQuery<>();
         final List<String> list =new ArrayList<>(Arrays.asList(myUser.getLike()));
 
@@ -166,9 +170,5 @@ public class MyLikeActivity extends AppCompatActivity {
 
         return true;
     }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initData();
-    }
+
 }

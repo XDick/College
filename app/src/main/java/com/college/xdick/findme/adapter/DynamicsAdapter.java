@@ -5,12 +5,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -31,9 +33,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.target.Target;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
+import com.college.xdick.findme.MyClass.DownLoadImageService;
+import com.college.xdick.findme.MyClass.ImageDownLoadCallBack;
 import com.college.xdick.findme.MyClass.PicturePageAdapter;
 import com.college.xdick.findme.MyClass.ViewPagerFixed;
 import com.college.xdick.findme.R;
@@ -46,8 +51,11 @@ import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.ChatActivity;
 import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
+import com.college.xdick.findme.ui.Fragment.DynamicsFragment;
+import com.college.xdick.findme.ui.Fragment.UserCenterDynamicsFragment;
 import com.college.xdick.findme.util.DownloadUtil;
 
+import com.college.xdick.findme.util.FileUtil;
 import com.jaeger.ninegridimageview.NineGridImageView;
 import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
 
@@ -56,7 +64,7 @@ import com.zyyoona7.popup.XGravity;
 import com.zyyoona7.popup.YGravity;
 
 
-
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,6 +73,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMConversation;
@@ -89,7 +98,9 @@ import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 import static android.view.View.GONE;
+import static cn.bmob.v3.Bmob.getApplicationContext;
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/4/3.
@@ -109,6 +120,8 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
     public static final int  NO_MORE=2;
 
+    private int fragmentNum;
+
 
 
     private View mHeaderView;
@@ -122,6 +135,8 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
            private ViewPagerFixed pager;
        private int flag=0;
+       private     DynamicsFragment fragment1;
+       private UserCenterDynamicsFragment fragment2;
 
 
 
@@ -183,6 +198,14 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
            this.flag=flag;
        }
 
+       public void setFragment(DynamicsFragment fragment){
+        fragment1=fragment;
+        fragmentNum=1;
+       }
+    public void setFragment(UserCenterDynamicsFragment fragment){
+        fragment2=fragment;
+        fragmentNum=2;
+    }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -315,7 +338,8 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
             public void done(final MyUser object, BmobException e) {
                 if (e == null) {
                         user.add(object);
-                    Glide.with(mContext).load(object.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
+                    Glide.with(mContext).load(object.getAvatar())
+                            .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
 
 
                     holder.layout.setOnClickListener(new View.OnClickListener() {
@@ -342,7 +366,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
             @Override
             protected void onDisplayImage(Context context, ImageView imageView, String photo) {
-                Glide.with(mContext).load(photo).into(imageView);
+                Glide.with(mContext).load(photo) .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(imageView);
             }
 
             @Override
@@ -371,7 +395,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
           holder.time2.setText(dynamics.getActivityTime());
 
-          Glide.with(mContext).load(dynamics.getActivityCover()).into(holder.cover);
+          Glide.with(mContext).load(dynamics.getActivityCover())    .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover);
 
           holder.host.setText("由"+dynamics.getActivityHost()+"发起");
 
@@ -428,7 +452,8 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                delete.setOnClickListener(new View.OnClickListener() {
                    @Override
                    public void onClick(View v) {
-                       bmobUser.removeAll("dynamics", Arrays.asList(dynamics.getObjectId()));
+                       easyPopup.dismiss();
+                       bmobUser.increment("dynamicsCount",-1);
                        bmobUser.update(new UpdateListener() {
                            @Override
                            public void done(BmobException e) {
@@ -439,49 +464,67 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                                    dynamics1.delete(new UpdateListener() {
                                        @Override
                                        public void done(BmobException e) {
-                                           BmobQuery<DynamicsComment>query =new BmobQuery<>();
-                                           query.addWhereEqualTo("dynamicsID",dynamics.getObjectId());
-                                           query.findObjects(new FindListener<DynamicsComment>() {
-                                               @Override
-                                               public void done(List<DynamicsComment> list, BmobException e) {
-                                                   List<BmobObject> commentList= new ArrayList<BmobObject>();
-                                                   commentList.addAll(list);
-                                                   new BmobBatch().deleteBatch(commentList).doBatch(new QueryListListener<BatchResult>() {
-                                                       @Override
-                                                       public void done(List<BatchResult> list, BmobException e) {
-                                                           if (e==null){
+                                           if (e==null) {
+                                              switch (fragmentNum){
+                                                  case 1:
+                                                  {
+                                                      fragment1.setSize(0);
+                                                      fragment1.initData(DynamicsFragment.REFRESH);
+                                                  }
+                                                  case 2:
+                                                      fragment2.setSize(0);
+                                                      fragment2.initData(UserCenterDynamicsFragment.REFRESH);
+
+
+                                              }
+                                              Toast.makeText(mContext,"成功删除",Toast.LENGTH_SHORT).show();
+
+                                               BmobQuery<DynamicsComment> query = new BmobQuery<>();
+                                               query.addWhereEqualTo("dynamicsID", dynamics.getObjectId());
+                                               query.findObjects(new FindListener<DynamicsComment>() {
+                                                   @Override
+                                                   public void done(List<DynamicsComment> list, BmobException e) {
+                                                       List<BmobObject> commentList = new ArrayList<BmobObject>();
+                                                       commentList.addAll(list);
+                                                       new BmobBatch().deleteBatch(commentList).doBatch(new QueryListListener<BatchResult>() {
+                                                           @Override
+                                                           public void done(List<BatchResult> list, BmobException e) {
+                                                               if (e == null) {
+
+                                                               }
+                                                           }
+                                                       });
+
+                                                   }
+                                               });
+
+
+                                               String[] pic = dynamics.getPicture();
+                                               BmobFile.deleteBatch(pic, new DeleteBatchListener() {
+
+                                                   @Override
+                                                   public void done(String[] failUrls, BmobException e) {
+                                                       if (e == null) {
+
+                                                       } else {
+                                                           if (failUrls != null) {
+
+                                                           } else {
 
                                                            }
                                                        }
-                                                   });
-                                               }
-                                           });
-
-
-                                           String[] pic =dynamics.getPicture();
-                                           BmobFile.deleteBatch(pic, new DeleteBatchListener() {
-
-                                               @Override
-                                               public void done(String[] failUrls, BmobException e) {
-                                                   if(e==null){
-
-                                                   }else{
-                                                       if(failUrls!=null){
-
-                                                       }else{
-
-                                                       }
                                                    }
-                                               }
-                                           });
+                                               });
 
 
-                                           holder.setVisibility(false);
-                                           easyPopup.dismiss();
-                                       }
+
+                                           }}
                                    });
 
 
+                               }
+                               else {
+                                   Toast.makeText(mContext,e.getMessage(),Toast.LENGTH_SHORT).show();
                                }
                            }
                        });
@@ -791,7 +834,14 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                  savepic.setOnClickListener(new View.OnClickListener() {
                      @Override
                      public void onClick(View v) {
-                         downloadFile(mListPicPath.get(mPosition));
+
+                         new Thread(new Runnable() {
+                             @Override
+                             public void run() {
+                                 downloadFile(mListPicPath.get(mPosition));
+                             }
+                         }).start();
+
                          savePop.dismiss();
                      }
                  });
@@ -831,26 +881,42 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
         }
     }
     public void downloadFile(final String url) {
+            DownLoadImageService service = new DownLoadImageService(getApplicationContext(),
+                    url,
+                    new ImageDownLoadCallBack() {
 
-               DownloadUtil.getInstance().download(url, "file:///FindMe/Picture", new DownloadUtil.OnDownloadListener() {
-                   @Override
-                   public void onDownloadSuccess(String path) {
-                       Toast.makeText(mContext, "保存成功", Toast.LENGTH_SHORT).show();
-                   }
+                        @Override
+                        public void onDownLoadSuccess(File file) {
+                        }
+                        @Override
+                        public void onDownLoadSuccess(Bitmap bitmap) {
+                            // 在这里执行图片保存方法
+                            ((Activity)mContext).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(mContext,"保存成功",Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
 
-                   @Override
-                   public void onDownloading(int progress) {
+                        @Override
+                        public void onDownLoadFailed() {
+                            // 图片保存失败
+                            ((Activity)mContext).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(mContext,"保存失败",Toast.LENGTH_SHORT).show();
+                                }
+                            });
 
-                   }
 
-                   @Override
-                   public void onDownloadFailed() {
+                        }
+                    });
+            //启动图片下载线程
+            new Thread(service).start();
 
-                       Toast.makeText(mContext, "保存失败", Toast.LENGTH_SHORT).show();
-                   }
 
-               });
-           }
+    }
 
 
 

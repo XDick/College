@@ -161,6 +161,9 @@ public class ActivityschoolFragment extends Fragment {
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
             public void done(Long aLong, BmobException e) {
+              if (getContext()!=null) {
+                  ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
+              }
 
                 if (bmobUser!=null) {
                     BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
@@ -168,7 +171,7 @@ public class ActivityschoolFragment extends Fragment {
 
                     query.addWhereEqualTo("hostSchool", bmobUser.getSchool());
                     if (e==null){
-                       // query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);
+                        query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
                     }
 
                     query.order("-createdAt");
@@ -275,14 +278,18 @@ public class ActivityschoolFragment extends Fragment {
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
             public void done(Long aLong, BmobException e) {
-
+                if (getContext()!=null) {
+                    if (getContext()!=null) {
+                        ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
+                    }
+                }
                 if (bmobUser != null) {
                     BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
 
 
                     query.addWhereEqualTo("hostSchool", bmobUser.getSchool());
                     if (e == null) {
-                       // query.addWhereGreaterThan("date", aLong * 1000L - 1.5 * 60 * 60 * 24 * 1000);
+                        query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
                     }
                     query.setSkip(size);
                     query.setLimit(10);

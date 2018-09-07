@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,6 +27,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.bean.BmobIMUserInfo;
+import cn.bmob.newim.core.ConnectionStatus;
+import cn.bmob.newim.listener.ConnectListener;
+import cn.bmob.newim.listener.ConnectStatusChangeListener;
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
@@ -39,6 +46,7 @@ import cn.bmob.v3.listener.QueryListener;
 public class SplashActivity extends Activity {
 
    private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
+   private Intent intent;
 
 
 
@@ -47,6 +55,11 @@ public class SplashActivity extends Activity {
         final View view = View.inflate(this, R.layout.activity_splash, null);
         setContentView(view);
         super.onCreate(arg0);
+        List<MyActivity> list = new ArrayList<>();
+        intent= new Intent(SplashActivity.this, MainActivity.class);
+        intent.putExtra("TIME", 0);
+        intent.putExtra("LISTDATA", (Serializable) list);
+
     }
 
     @Override
@@ -63,7 +76,7 @@ public class SplashActivity extends Activity {
         //进入主页面
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
-            public void done(Long aLong, BmobException e) {
+            public void done(final Long aLong, BmobException e) {
 
                     BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
                     List<BmobQuery<MyActivity>> queries = new ArrayList<>();
@@ -81,7 +94,7 @@ public class SplashActivity extends Activity {
                                    BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
                                    q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
                                    queries.add(q);
-                                   query.or(queries);//临时
+                                   query.or(queries);
                                }
 
                            }
@@ -91,34 +104,54 @@ public class SplashActivity extends Activity {
 
                     }
                 if (e == null) {
-                    //query.addWhereGreaterThan("date", aLong * 1000L - 1.5*60 * 60 * 24 * 1000);
+                    query.addWhereGreaterThan("date", aLong * 1000L - 2.5*60 * 60 * 24 * 1000);
                 }
 
 
 
                      query.setLimit(10);
-                     //query.or(queries);
-                  query.order("-createdAt");
+
+                    query.order("-createdAt");
 //执行查询方法
                     query.findObjects(new FindListener<MyActivity>() {
                         @Override
                         public void done(List<MyActivity> object, BmobException e) {
+
+
+
+                                IMconnectBomob();
+
                             if (e == null) {
 
-
-
-                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                                 intent.putExtra("LISTDATA", (Serializable)object);
-                                startActivity(intent);
-                                finish();
-                                //Toast.makeText(SplashActivity.this,"成功接收内容",Toast.LENGTH_SHORT).show();
+                                intent.putExtra("TIME", aLong * 1000L);
+
 
                             } else {
-                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                List<MyActivity> list = new ArrayList<>();
-                                intent.putExtra("LISTDATA", (Serializable) list);
                                 Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+
+                            if (bmobUser!=null){
+                                BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+                                    @Override
+                                    public void onChange(ConnectionStatus status) {
+
+                                        if (status.getMsg().equals("connected")) {
+                                            startActivity(intent);
+
+                                            finish();
+
+                                        }
+                                        else if (status.getMsg().equals("disconnect")){
+                                            IMconnectBomob();
+
+                                        }
+                                    }
+                                });
+                            }
+                            else {
+                                startActivity(intent);
+                                finish();
                             }
                         }
                     });
@@ -159,5 +192,33 @@ public class SplashActivity extends Activity {
             initData();
         }
 }
+    private void IMconnectBomob() {
 
+        final MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
+        if (bmobUser != null) {
+            if (!TextUtils.isEmpty(bmobUser.getObjectId())) {
+                BmobIM.connect(bmobUser.getObjectId(), new ConnectListener() {
+                    @Override
+                    public void done(String uid, BmobException e) {
+                        if (e == null) {
+                            try {
+                                BmobIM.getInstance().
+                                        updateUserInfo(new BmobIMUserInfo( bmobUser.getObjectId(),
+                                                bmobUser.getUsername(),  bmobUser.getAvatar()));
+                            }
+                            catch (Exception e2){
+                                e2.printStackTrace();
+                            }
+
+                        } else {
+                          // startActivity(intent);
+                           //finish();
+                            //连接失败
+                            Toast.makeText(getBaseContext(),"无法连接服务器", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }
+    }
 }

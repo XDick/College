@@ -18,21 +18,24 @@ public class MyUser extends BmobUser implements Serializable {
 
     private String[] gps;
 
-    private String[] setAc;
+
 
     private String[] like;
-
-    //private String[] join;
 
     private String[] tag;
 
     private String setAcTime;
 
-    private String[] dynamics;
 
     private String[] following;
 
     private String[] fans;
+
+    private boolean isGod;
+
+    private Integer setAcCount=0;
+
+    private Integer dynamicsCount=0;
 
 
 
@@ -63,13 +66,7 @@ public class MyUser extends BmobUser implements Serializable {
         this.like = like;
     }
 
-  /*  public String[] getJoin() {
-        return join;
-    }
 
-    public void setJoin(String[] join) {
-        this.join = join;
-    }*/
 
     public String[] getGps() {
         return gps;
@@ -95,21 +92,9 @@ public class MyUser extends BmobUser implements Serializable {
         this.setAcTime = setAcTime;
     }
 
-    public String[] getSetAc() {
-        return setAc;
-    }
 
-    public void setSetAc(String[] setAc) {
-        this.setAc = setAc;
-    }
 
-    public String[] getDynamics() {
-        return dynamics;
-    }
 
-    public void setDynamics(String[] dynamics) {
-        this.dynamics = dynamics;
-    }
 
 
     public String[] getFollowing() {
@@ -126,6 +111,30 @@ public class MyUser extends BmobUser implements Serializable {
 
     public void setFans(String[] fans) {
         this.fans = fans;
+    }
+
+    public boolean isGod() {
+        return isGod;
+    }
+
+    public void setGod(boolean god) {
+        isGod = god;
+    }
+
+    public int getSetAcCount() {
+        return setAcCount;
+    }
+
+    public void setSetAcCount(int setAcCount) {
+        this.setAcCount = setAcCount;
+    }
+
+    public int getDynamicsCount() {
+        return dynamicsCount;
+    }
+
+    public void setDynamicsCount(int dynamicsCount) {
+        this.dynamicsCount = dynamicsCount;
     }
 }
 

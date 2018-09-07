@@ -11,11 +11,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyUser;
+import com.sqk.emojirelease.EmojiUtil;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -31,6 +34,7 @@ import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListener;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 import static org.greenrobot.eventbus.EventBus.TAG;
 
 /**
@@ -175,6 +179,11 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
 
         if (nowtime.equals(rawdate)){
             holder.time.setText(time);
+            if (position-1>=0&&msg.getCreateTime()-mMsgList.get(position-1).getCreateTime()<60*1000){
+                holder.time.setText("");
+            }else {
+                holder.time.setText(time);
+            }
         }
         else{
 
@@ -182,8 +191,12 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
         }
 
 
-        Glide.with(mContext).load(msg.getBmobIMConversation().getConversationIcon()).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(holder.avatar_you);
-        Glide.with(mContext).load(BmobUser.getCurrentUser(MyUser.class).getAvatar()).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(holder.avatar_me);
+        Glide.with(mContext).load(msg.getBmobIMConversation()
+                .getConversationIcon())
+                .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(holder.avatar_you);
+        Glide.with(mContext).load(BmobUser.getCurrentUser(MyUser.class)
+                .getAvatar())
+                .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(holder.avatar_me);
 
 
 
@@ -191,8 +204,16 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
 
 
         if(msg.getFromId().equals(currentUid)) {
+            try {
 
-            holder.rightMsg.setText(msg.getContent());
+                EmojiUtil.handlerEmojiText( holder.rightMsg,msg.getContent(),mContext);
+
+            }
+            catch (IOException e){
+                e.printStackTrace();
+            }
+
+           // holder.rightMsg.setText(msg.getContent());
             holder.leftLayout.setVisibility(View.GONE);
 
 
@@ -200,8 +221,15 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder>{
 
        }
        else {
+            try {
 
-            holder.leftMsg.setText(msg.getContent());
+                EmojiUtil.handlerEmojiText(holder.leftMsg,msg.getContent(),mContext);
+            }
+            catch (IOException e){
+                e.printStackTrace();
+            }
+
+           // holder.leftMsg.setText(msg.getContent());
             holder.rightLayout.setVisibility(View.GONE);
 
 

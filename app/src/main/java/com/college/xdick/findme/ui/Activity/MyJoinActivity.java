@@ -52,6 +52,7 @@ public class MyJoinActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_ac);
         initView();
+        initData();
 
     }
 
@@ -170,9 +171,5 @@ public class MyJoinActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initData();
-    }
+
 }

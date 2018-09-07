@@ -68,7 +68,7 @@ public class InterestActivity extends AppCompatActivity {
 
 
 
-                    if (user.getUsername().equals("叉地克")) {
+                    if (user.isGod()) {
                         final EditText editText = findViewById(R.id.tag_edit);
                         Button addmain = findViewById(R.id.addmain);
                         final Button addadd = findViewById(R.id.addadd);

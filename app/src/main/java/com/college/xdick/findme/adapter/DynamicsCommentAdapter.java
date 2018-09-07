@@ -13,15 +13,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.DynamicsComment;
+import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.ChatActivity;
 import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
+import com.college.xdick.findme.ui.Fragment.StartactivityFragment;
+import com.zyyoona7.popup.EasyPopup;
+import com.zyyoona7.popup.XGravity;
+import com.zyyoona7.popup.YGravity;
 
 import java.util.List;
 
@@ -30,11 +36,14 @@ import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.newim.listener.ConversationListener;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.QueryListener;
+import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/5/3.
@@ -107,21 +116,66 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
             View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_dynamics_comment,parent,false);
        final   ViewHolder holder = new  DynamicsCommentAdapter.ViewHolder(view);
-            holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
+
+
+       final MainDynamicsActivity activity = (MainDynamicsActivity)mContext;
+       final Dynamics dynamics=(Dynamics)activity.getIntent().getSerializableExtra("DYNAMICS");
+       holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    final DynamicsComment comment = mCommentList.get(position);
+                    final EasyPopup deletePop = EasyPopup.create()
+                            .setContentView(mContext, R.layout.popup_comment)
+                            .setWidth(400)
+                            .setBackgroundDimEnable(true)
+                            //变暗的透明度(0-1)，0为完全透明
+                            .setDimValue(0.4f)
+                            //变暗的背景颜色
+                            .apply();
 
-             //
+                    deletePop.showAtAnchorView(holder.layout, YGravity.CENTER, XGravity.CENTER, 0, 0);
 
+                    LinearLayout delete =  deletePop.findViewById(R.id.delete_comment);
+                    if (!BmobUser.getCurrentUser().getObjectId().equals(dynamics.getUserId())&&!BmobUser.getCurrentUser().getObjectId().equals(comment.getUserID()))
+                        delete.setVisibility(View.GONE);
+                    delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            comment.delete(new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                    if (e==null){
+                                        Dynamics dynamics1 = new Dynamics();
+                                        dynamics1.setObjectId(dynamics.getObjectId());
+                                        dynamics1.increment("replycount",-1);
+                                        dynamics1.setIfAdd2Gallery(dynamics.isIfAdd2Gallery());
+                                        dynamics1.update();
+                                         activity.setSize(0);
+                                         activity.setCount(0);
+                                         activity.initComment(MainDynamicsActivity.REFRESH);
+
+                                        deletePop.dismiss();
+                                        Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
+                                    }else {
+                                        Toast.makeText(mContext,"删除失败",Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+
+                        }
+                    });
 
                     return true;
                 }
             });
-       holder.layout.setOnClickListener(new View.OnClickListener() {
+
+            holder.layout.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
 
-              MainDynamicsActivity activity = (MainDynamicsActivity)mContext;
+
                 activity.ifReply=false;
                int position = holder.getAdapterPosition();
                DynamicsComment comment = mCommentList.get(position);
@@ -250,7 +304,9 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
 
                         }
                     });
-                    Glide.with(mContext).load(object.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
+                    Glide.with(mContext).load(object.getAvatar())
+                            .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
+                            .apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
 
 
                 }else{

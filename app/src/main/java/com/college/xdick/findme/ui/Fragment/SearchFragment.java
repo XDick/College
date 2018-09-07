@@ -218,8 +218,8 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
             public void done(Long aLong, BmobException e) {
                 if (e==null){
                     BmobQuery<MyActivity> query = new BmobQuery();
-                    query.addWhereGreaterThan("date", aLong*1000L-60*60*240*1000);//60*60*24*1000
-                    query.addWhereLessThan("date", aLong*1000L+60*60*24*1000);
+                    query.addWhereGreaterThan("date", aLong*1000L-60*60*24*2.5*1000);//60*60*24*1000
+
                     query.order("-joinCount");
                     query.setLimit(5);
                     query.findObjects(new FindListener<MyActivity>() {
@@ -230,7 +230,7 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
                                 for (MyActivity activity:list){
                                     imageList.add(activity.getCover());
                                     String[] gps=activity.getGps();
-                                    titleList.add(activity.getTitle()+"("+gps[1]+")");
+                                    titleList.add("("+gps[1]+")"+activity.getTitle());
                                 }
                                if (flag_search==0){
                                    initRecyclerView();

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.MyActivity;
@@ -23,8 +24,13 @@ import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.ChatActivity;
 import com.college.xdick.findme.ui.Activity.LoginActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
+import com.college.xdick.findme.ui.Fragment.StartactivityFragment;
+import com.zyyoona7.popup.EasyPopup;
+import com.zyyoona7.popup.XGravity;
+import com.zyyoona7.popup.YGravity;
 
 
+import java.util.Arrays;
 import java.util.List;
 
 import cn.bmob.newim.BmobIM;
@@ -35,9 +41,11 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.QueryListener;
+import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/5/3.
@@ -93,7 +101,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
 
         if(mContext == null){
             mContext = parent.getContext();
@@ -109,13 +117,55 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 .inflate(R.layout.item_comment,parent,false);
        final   ViewHolder holder = new  CommentAdapter.ViewHolder(view);
 
-
+            final ActivityActivity activity = ( ActivityActivity)mContext;
+           final MyActivity activity2=(MyActivity)activity.getIntent().getSerializableExtra("ACTIVITY");
        holder.layout.setOnLongClickListener(new View.OnLongClickListener() {
            @Override
            public boolean onLongClick(View v) {
 
-               //
+               final EasyPopup  deletePop = EasyPopup.create()
+                       .setContentView(mContext, R.layout.popup_comment)
+                       .setWidth(400)
+                       .setBackgroundDimEnable(true)
+                       //变暗的透明度(0-1)，0为完全透明
+                       .setDimValue(0.4f)
+                       //变暗的背景颜色
+                       .apply();
 
+               int position = holder.getAdapterPosition();
+               final Comment comment = mCommentList.get(position);
+               deletePop.showAtAnchorView(holder.layout, YGravity.CENTER, XGravity.CENTER, 0, 0);
+
+               LinearLayout delete =  deletePop.findViewById(R.id.delete_comment);
+               if (!BmobUser.getCurrentUser().getObjectId().equals(activity2.getHostId())&&!BmobUser.getCurrentUser().getObjectId().equals(comment.getUserID()))
+                   delete.setVisibility(View.GONE);
+                   delete.setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View v) {
+
+                       comment.delete(new UpdateListener() {
+                           @Override
+                           public void done(BmobException e) {
+                               if (e==null){
+                                   MyActivity myActivity = new MyActivity();
+                                   myActivity.setObjectId(activity2.getObjectId());
+                                   myActivity.setDate(activity2.getDate());
+                                   myActivity.increment("commentCount",-1);
+                                   myActivity.update();
+                                   activity.myfragment.setSize(0);
+                                   activity.myfragment.setCount(0);
+                                   activity.myfragment.initComment(StartactivityFragment.REFRESH);
+
+                                   deletePop.dismiss();
+                                   Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
+                               }else {
+                                   Toast.makeText(mContext,"删除失败",Toast.LENGTH_SHORT).show();
+                               }
+                           }
+                       });
+
+                   }
+               });
 
                return true;
            }
@@ -125,24 +175,54 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
            @Override
            public void onClick(View v) {
 
+
                        if (MyUser.getCurrentUser(MyUser.class)==null){
                            mContext.startActivity(new Intent(mContext,LoginActivity.class));
                            ((Activity)mContext).finish();
                            Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                            return;
                        }
-                ActivityActivity activity = ( ActivityActivity)mContext;
-                activity.ifReply=false;
-               int position = holder.getAdapterPosition();
-               Comment comment = mCommentList.get(position);
-               Comment comment2 = new Comment();
-               comment2.setReplyusername(comment.getUserName());
-               comment2.setReplyuserId(comment.getUserID());
-               comment2.setReplycontent(comment.getContent());
-               comment2.setActivityID(comment.getActivityID());
-               activity.reply(comment,comment2);
 
-           }
+               if (activity2.getHostId().equals(MyUser.getCurrentUser(MyUser.class).getObjectId())){
+                       activity.ifReply=false;
+                       int position = holder.getAdapterPosition();
+                       Comment comment = mCommentList.get(position);
+                       Comment comment2 = new Comment();
+                       comment2.setReplyusername(comment.getUserName());
+                       comment2.setReplyuserId(comment.getUserID());
+                       comment2.setReplycontent(comment.getContent());
+                       comment2.setActivityID(comment.getActivityID());
+                       activity.reply(comment,comment2);
+                   }
+                   else{
+                   if (activity2.getJoinUser()==null) {
+                   Toast.makeText(mContext,"加入活动才可以评论",Toast.LENGTH_SHORT).show();
+                   return;
+               }
+               if (activity.ifJoin||Arrays.asList(activity2.getJoinUser()).contains(MyUser.getCurrentUser(MyUser.class).getObjectId()))
+               { activity.ifReply=false;
+                   int position = holder.getAdapterPosition();
+                   Comment comment = mCommentList.get(position);
+                   Comment comment2 = new Comment();
+                   comment2.setReplyusername(comment.getUserName());
+                   comment2.setReplyuserId(comment.getUserID());
+                   comment2.setReplycontent(comment.getContent());
+                   comment2.setActivityID(comment.getActivityID());
+                   activity.reply(comment,comment2);
+
+               }
+               else {
+                   Toast.makeText(mContext,"加入活动才可以评论",Toast.LENGTH_SHORT).show();
+               }
+
+
+               }
+
+               }
+
+
+
+
        });
 
 
@@ -240,7 +320,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                         }
                     });
 
-                    Glide.with(mContext).load(object.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
+                    Glide.with(mContext).load(object.getAvatar())
+                            .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
+                            .apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
 
 
                 }else{

@@ -62,8 +62,8 @@ public  class DynamicsFragment extends Fragment {
     private static boolean flag=true;
     private static int size =0;
     private static boolean ifEmpty=false;
-    private int REFRESH=1;
-    private int ADD=2;
+    static public int REFRESH=1;
+    static public int ADD=2;
     private FloatingActionButton floatingActionButton;
 
 
@@ -151,6 +151,7 @@ public  class DynamicsFragment extends Fragment {
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new DynamicsAdapter(dynamicsList);
+        adapter.setFragment(this);
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
         adapter.addFooterView(footer);
         View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_dynamics, recyclerView, false);
@@ -190,12 +191,7 @@ public  class DynamicsFragment extends Fragment {
 
     }
 
-  private void initData(final int state){
-
-
-
-
-
+  public void initData(final int state){
                   BmobQuery<Dynamics> query = new BmobQuery<Dynamics>();
 
                   String following[] = bmobUser.getFollowing();
@@ -214,8 +210,6 @@ public  class DynamicsFragment extends Fragment {
               @Override
               public void done(List<Dynamics> object, BmobException e) {
                   if (e == null) {
-
-
                       dynamicsList.addAll(object);
                       if (state==ADD) {
                           if (listsize == dynamicsList.size()) {
@@ -236,14 +230,23 @@ public  class DynamicsFragment extends Fragment {
                           }
                       }
                       else if (state==REFRESH){
-                          ifEmpty=false;
-                          adapter.notifyDataSetChanged();
-                          loadlayout.setVisibility(View.GONE);
+
+                          dynamicsList.clear();
+
+                          if(object.size()<20){
+                              ifEmpty=true;
+                              dynamicsList.addAll(object);
+                              adapter.notifyDataSetChanged();
+                          }
+                          else {
+                              ifEmpty=false;
+                              dynamicsList.addAll(object);
+                              adapter.notifyDataSetChanged();}
                           size=20;
+
+                          loadlayout.setVisibility(View.GONE);
+
                       }
-
-
-
 
                   } else {
                       Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -305,7 +308,9 @@ public  class DynamicsFragment extends Fragment {
     }
 
 
-
+public void setSize(int size){
+        this.size=size;
+}
 
 
 }

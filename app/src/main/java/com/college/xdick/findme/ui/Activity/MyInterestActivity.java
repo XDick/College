@@ -1,5 +1,6 @@
 package com.college.xdick.findme.ui.Activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,7 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +32,7 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 
 /**
@@ -36,16 +40,18 @@ import cn.bmob.v3.listener.UpdateListener;
  */
 
 public class MyInterestActivity extends AppCompatActivity{
-       LabelsView myTagLabel,myTagLabelmain,myTagLabeladd;
-       Button add,delete;
-       LinearLayout layout ,chooselayout;
-       TextView mytagText;
-      android.support.v7.widget.Toolbar toolbar;
-       MyUser user = BmobUser.getCurrentUser(MyUser.class);
-    List< String> selectTagList = new ArrayList<>();
-    List<String> selectAddTagList= new ArrayList<>();
-    List< MainTagBean> mainTagList = new ArrayList<>();
-    List< AddTagBean> addTagList = new ArrayList<>();
+    private   LabelsView myTagLabel,myTagLabelmain,myTagLabeladd;
+    private   Button add,delete,createButton;
+    private   LinearLayout layout,chooselayout ;
+    private   TextView mytagText,createText;
+    private   android.support.v7.widget.Toolbar toolbar;
+    private   MyUser user = BmobUser.getCurrentUser(MyUser.class);
+    private  List< String> selectTagList = new ArrayList<>();
+    private  List<String> selectAddTagList= new ArrayList<>();
+    private  List< MainTagBean> mainTagList = new ArrayList<>();
+    private  List< AddTagBean> addTagList = new ArrayList<>();
+    private String createdTag="";
+    private EditText createE;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +70,9 @@ public class MyInterestActivity extends AppCompatActivity{
         }
         setSupportActionBar(toolbar);
 
-
+        createE = findViewById(R.id.tag_edit);
+        createButton= findViewById(R.id.tag_button);
+        createText= findViewById(R.id.search_tag_text);
         mytagText = findViewById(R.id.mytag_text);
         myTagLabel = findViewById(R.id.mytag_labels);
         myTagLabel.setLabels(Arrays.asList(user.getTag()));
@@ -177,9 +185,9 @@ public class MyInterestActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
 
-               if (selectAddTagList.isEmpty()){
+               if (selectAddTagList.isEmpty()&&createdTag.equals("")){
 
-                   if (user.getUsername().equals("叉地克")){
+                   if (user.isGod()){
                        Toast.makeText(MyInterestActivity.this,"欢迎编辑标签，我的主人^_^",Toast.LENGTH_SHORT).show();
                        startActivity(new Intent(MyInterestActivity.this,InterestActivity.class));
                    }
@@ -189,29 +197,131 @@ public class MyInterestActivity extends AppCompatActivity{
                }
                else {
 
-                user.addAll("tag", selectAddTagList);
-                user.update(new UpdateListener() {
-                    @Override
-                    public void done(BmobException e) {
-                        selectAddTagList.clear();
-                        runOnUiThread(new Runnable() {
+                    if (createdTag.equals("")){
+                        user.addAll("tag", selectAddTagList);
+                        user.update(new UpdateListener() {
                             @Override
-                            public void run() {
-                                user = BmobUser.getCurrentUser(MyUser.class);
-                                myTagLabel.setLabels(Arrays.asList(user.getTag()));
-                                initLabels();
-                                Toast.makeText(MyInterestActivity.this,"添加成功",Toast.LENGTH_SHORT).show();
+                            public void done(BmobException e) {
+                                selectAddTagList.clear();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        user = BmobUser.getCurrentUser(MyUser.class);
+                                        myTagLabel.setLabels(Arrays.asList(user.getTag()));
+                                        initLabels();
+                                        Toast.makeText(MyInterestActivity.this,"添加成功",Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
 
                             }
-                        });
 
+
+                        });
+                    }
+                    else {
+                        BmobQuery<AddTagBean> query = new BmobQuery<AddTagBean>();
+                        query.addWhereEqualTo("addTag", createText.getText().toString());
+                        query.findObjects(new FindListener<AddTagBean>() {
+                            @Override
+                            public void done(List<AddTagBean> list, BmobException e) {
+                                if (e==null){
+                                    selectAddTagList.add(list.get(0).getAddTag());
+                                    user.addAll("tag", selectAddTagList);
+                                    user.update(new UpdateListener() {
+                                        @Override
+                                        public void done(BmobException e) {
+                                            selectAddTagList.clear();
+                                            createdTag="";
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    user = BmobUser.getCurrentUser(MyUser.class);
+                                                    myTagLabel.setLabels(Arrays.asList(user.getTag()));
+                                                    initLabels();
+                                                    createText.setVisibility(View.VISIBLE);
+                                                    createText.setText("搜索标签");
+                                                    createE.setVisibility(View.GONE);
+                                                    createButton.setVisibility(View.GONE);
+                                                    createE.setText("");
+                                                    Toast.makeText(MyInterestActivity.this,"添加成功",Toast.LENGTH_SHORT).show();
+
+                                                }
+                                            });
+
+                                        }
+
+
+                                    });
+
+
+
+
+                                       list.get(0).UserCountAdd1();
+                                       list.get(0).update( list.get(0).getObjectId(), new UpdateListener() {
+                                            @Override
+                                            public void done(BmobException e) {
+                                            }
+                                        });
+
+                                }
+                                else {
+
+                                    Toast.makeText(MyInterestActivity.this,"无此标签，可在发布活动时创建",Toast.LENGTH_SHORT).show();
+
+                                }
+
+                            } });
                     }
 
 
-                });
+
+
             }
             }
 
+        });
+
+
+        createText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!createText.getText().equals("搜索标签")) {
+                    createdTag="";
+                }
+                createText.setVisibility(View.GONE);
+                createE.setVisibility(View.VISIBLE);
+                createButton.setVisibility(View.VISIBLE);
+
+                createE.setFocusable(true);
+                createE.setFocusableInTouchMode(true);
+                createE.requestFocus();
+                createE.findFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(createE, 0);
+            }
+
+
+        });
+
+        createButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String tag = createE.getText().toString();
+                if (tag.equals("")) {
+                    createText.setText("搜索标签");
+                    createdTag="";
+                }
+                else {
+                    createdTag=tag;
+                    createText.setText(tag);
+                }
+
+                createText.setVisibility(View.VISIBLE);
+                createE.setVisibility(View.GONE);
+                createButton.setVisibility(View.GONE);
+
+            }
         });
     }
 

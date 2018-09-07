@@ -95,7 +95,7 @@ public class MainActivityFragment extends Fragment {
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                         String date = sdf.format(new Date(aLong * 1000L));
                         if (bmobUser != null) {
-                            if (!date.equals(bmobUser.getSetAcTime()) || bmobUser.getUsername().equals("叉地克")) {
+                            if (!date.equals(bmobUser.getSetAcTime()) || bmobUser.isGod()) {
                                 Intent intent = new Intent(getContext(), SetActivitiyActivity.class);
                                 startActivity(intent);
                             } else {
@@ -130,7 +130,7 @@ public class MainActivityFragment extends Fragment {
             });
         }
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        //ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
 
         for (int i = 0; i < tabTitle.length; i++) {

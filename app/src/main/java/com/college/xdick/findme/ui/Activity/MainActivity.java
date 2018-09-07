@@ -1,23 +1,19 @@
 package com.college.xdick.findme.ui.Activity;
 
-import android.Manifest;
-import android.app.Notification;
+
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
@@ -47,7 +43,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.crud.DataSupport;
 
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -70,15 +66,14 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
     private TextBadgeItem mBadgeItem;
     public LocationClient mLocationClient;
     private int unReadNum;
+    private long bmobTime=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         CancelNotify();
-        IMconnectBomob();
-
-
+        bmobTime=getIntent().getLongExtra("TIME",0);
 
         mLocationClient = new LocationClient(getApplicationContext());
         mLocationClient.registerLocationListener(new MyLocationListener());
@@ -91,22 +86,25 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
                 startActivity(new Intent(this, InterestActivity.class));
                 Toast.makeText(this, "请选择喜欢的标签", Toast.LENGTH_SHORT).show();
             }
-
-            IMconnectBomob();
-
-            BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
-                @Override
-                public void onChange(ConnectionStatus status) {
-
-                   if (BmobUser.getCurrentUser() != null && status.getMsg().equals("disconnect")) {
-                        IMconnectBomob();
-                    }
-                    //Toast.makeText(getApplicationContext(),status.getMsg(),Toast.LENGTH_SHORT).show();
-
-                }
-            });
-
         }
+
+        if (BmobIM.getInstance().getCurrentStatus().equals(ConnectionStatus.DISCONNECT)){
+            IMconnectBomob();
+        }
+
+        BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+            @Override
+            public void onChange(ConnectionStatus status) {
+
+                if (status.getMsg().equals("disconnect")) {
+                    IMconnectBomob();
+                }
+                //Toast.makeText(getApplicationContext(),status.getMsg(),Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+
         IMMLeaks.fixFocusedViewLeak(getApplication());
 
         //自动检查更新
@@ -305,7 +303,11 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
     public void Event(final GpsEvent gpsEvent) {
 
         MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
-        if (myUser!=null&&gpsEvent.getMessage()!=null){
+        if (gpsEvent.getMessage()==null){
+            return;
+        }
+        if (myUser!=null&&!Arrays.asList(gpsEvent.getMessage()).contains(null)){
+
             myUser.setGps(gpsEvent.getMessage());
             myUser.update(myUser.getObjectId(), new UpdateListener() {
                 @Override
@@ -339,6 +341,31 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
 
     }
 
+
+    @Override
+    public void onBackPressed() {
+        if (!BackHandlerHelper.handleBackPress(this)) {
+            super.onBackPressed();
+        }
+    }
+
+
+   private void CancelNotify(){
+
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(1);    }
+
+    public  void setBmobTime(long bmobTime) {
+        this.bmobTime = bmobTime;
+    }
+    public  long getBmobTime(){
+        return this.bmobTime;
+    }
+
+
+
+
+
     private void IMconnectBomob() {
 
         final MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
@@ -348,34 +375,30 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
                     @Override
                     public void done(String uid, BmobException e) {
                         if (e == null) {
-                            if (BmobUser.getCurrentUser() != null){
+                            try {
                                 BmobIM.getInstance().
                                         updateUserInfo(new BmobIMUserInfo( bmobUser.getObjectId(),
                                                 bmobUser.getUsername(),  bmobUser.getAvatar()));
                             }
+                            catch (Exception e2){
+                                e2.printStackTrace();
+                            }
 
                         } else {
                             //连接失败
-                            Toast.makeText(MainActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
             }
         }
     }
-    @Override
-    public void onBackPressed() {
-        if (!BackHandlerHelper.handleBackPress(this)) {
-            super.onBackPressed();
-        }
-    }
 
 
-    void CancelNotify(){
 
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.cancel(1);    }
+
 }
+
 
 
 

@@ -19,12 +19,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.college.xdick.findme.R;
 
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
+import com.college.xdick.findme.ui.Activity.MainActivity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,9 +39,11 @@ import java.util.Random;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListener;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/4/11.
@@ -67,9 +71,6 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
     private View mFooterView;
     private View mEmptyView;
 
-   // private String selectedcolor[]={"#7e07ce","#0d80c2","#c4c414","#0daf33","#cf0003"};
-   // private List<String> colorList = Arrays.asList(selectedcolor);
-    private boolean ifShuffle=true;
 
 
 
@@ -78,7 +79,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
     static class ViewHolder extends RecyclerView.ViewHolder{
 
         TextView place,title,host,time,join,gps,tag,date,comment;
-        ImageView cover,avatar;
+        ImageView cover,avatar,finish;
         CardView cardView;
 
 
@@ -96,6 +97,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
             date = view. findViewById(R.id.date_ac);
             avatar = view.findViewById(R.id.host_avatar);
             comment = view.findViewById(R.id.comment_ac);
+            finish=view.findViewById(R.id.finished_ac);
         }
     }
 
@@ -104,13 +106,12 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         mActivityList = activity;
     }
 
+
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        /*if(ifShuffle) {
-            Collections.shuffle(colorList);
-        ifShuffle=false;
-        }*/
+
 
         if(mContext == null){
             mContext = parent.getContext();
@@ -128,6 +129,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_activity, parent, false);
             final ViewHolder holder = new ActivityAdapter.ViewHolder(view);
+
 
 
             holder.cardView.setOnClickListener(new View.OnClickListener() {
@@ -195,10 +197,6 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
 
         int realPos = getRealItemPosition(position);
-
-       /* String[] newColor =  (String[]) colorList.toArray();
-        String color;
-        color = newColor[(realPos)%5];*/
         MyActivity activity = mActivityList.get(realPos);
         int joincount=0;
         try{
@@ -244,16 +242,17 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         holder.place.setText(activity.getPlace());
         holder.host.setText(activity.getHostName());
         BmobQuery<MyUser> query = new BmobQuery();
-        query.addWhereEqualTo("username",activity.getHostName());
-       query.findObjects(new FindListener<MyUser>() {
-           @Override
-           public void done(List<MyUser> list, BmobException e) {
-               for (MyUser user:list){
-                   Glide.with(mContext).load(user.getAvatar()).apply(bitmapTransform(new CircleCrop())).into(holder.avatar);
-               }
+        query.getObject(activity.getHostId(), new QueryListener<MyUser>() {
+            @Override
+            public void done(MyUser myUser, BmobException e) {
+                if (e==null){
+                    Glide.with(mContext).load(myUser.getAvatar())
+                            .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
+                            .apply(bitmapTransform(new CircleCrop())).into(holder.avatar);
+                }
+            }
+        });
 
-           }
-       });
 
         holder.comment.setText(activity.getCommentCount()+"评论");
 
@@ -265,7 +264,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
        if (gps!=null){
         holder.gps.setText(gps[2]);}
-        Glide.with(mContext).load(activity.getCover()).apply(bitmapTransform(new BlurTransformation(9, 3))).into(holder.cover);
+        Glide.with(mContext).load(activity.getCover())
+                .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new BlurTransformation(9, 3))).into(holder.cover);
 
            holder.join.setText( joincount +"人参与");
            String[] tag2 =activity.getTag();
@@ -275,7 +275,12 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
            }
 
 
-
+        if (activity.getDate()+60*60*24*1000*2<  ((MainActivity)mContext).getBmobTime()){
+               holder.finish.setBackground(mContext.getDrawable(R.drawable.finish));
+        }
+        else {
+            holder.finish.setBackground(mContext.getDrawable(R.drawable.blank_pic));
+        }
 
 
 

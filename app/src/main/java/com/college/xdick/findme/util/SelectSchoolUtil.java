@@ -124,7 +124,7 @@ public class SelectSchoolUtil {
                 try {
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
-                            .url("http://bmob-cdn-18038.b0.upaiyun.com/2018/05/18/110ccaab4016ce0e80afae4dfb2f4357.json")
+                            .url("http://bmob-cdn-18038.b0.upaiyun.com/2018/09/03/6d79c71840f01a4c800930a92c0b5b23.json")
                             .build();
                     Response response = client.newCall(request).execute();
                     JsonData = response.body().string();

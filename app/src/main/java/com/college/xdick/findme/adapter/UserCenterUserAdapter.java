@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyUser;
@@ -21,6 +22,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
+
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/5/19.
@@ -171,7 +174,10 @@ public class UserCenterUserAdapter extends RecyclerView.Adapter<UserCenterUserAd
 
          holder.school.setText(myUser.getSchool());
 
-         Glide.with(mContext).load(myUser.getAvatar()).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(holder.cover);
+         Glide.with(mContext).load(myUser.getAvatar())
+                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
+
+                 .apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(holder.cover);
 
 
 

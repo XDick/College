@@ -293,7 +293,7 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
             }
         });
 
-        String[] sort={"个人活动","团体组织","安利活动","二手交易","招聘"};
+        String[] sort={"个人活动","团体组织","安利活动","二手交易"};
         labelsView_sort.setLabels(Arrays.asList(sort));
 
         BmobQuery<MainTagBean> query = new BmobQuery<MainTagBean>();
@@ -488,7 +488,7 @@ public class SetActivitiyActivity extends AppCompatActivity implements TimePicke
                                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                                                     String date = sdf.format(new Date(aLong * 1000L));
                                                     user.setSetAcTime(date);
-                                                    user.addUnique("setAc", objectId);
+                                                    user.increment("setAcCount",1);
                                                     user.update(new UpdateListener() {
                                                         @Override
                                                         public void done(BmobException e) {

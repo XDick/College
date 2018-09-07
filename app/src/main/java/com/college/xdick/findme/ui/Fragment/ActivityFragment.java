@@ -73,6 +73,7 @@ public class ActivityFragment extends Fragment {
         if(flag==0){
             FirstInitFromActivity();
         }
+
         initBaseView();
         initRecyclerView();
 
@@ -170,7 +171,9 @@ public class ActivityFragment extends Fragment {
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
             public void done(Long aLong, BmobException e) {
-
+                if (getContext()!=null) {
+                    ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
+                }
 
                 BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
                 List<BmobQuery<MyActivity>> queries = new ArrayList<>();
@@ -186,7 +189,7 @@ public class ActivityFragment extends Fragment {
                             BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
                             q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
                             queries.add(q);
-                            query.or(queries);//临时
+                            query.or(queries);
                         }
 
                     }
@@ -194,7 +197,7 @@ public class ActivityFragment extends Fragment {
                 }
 
                 if (e==null){
-                    //query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);
+                    query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
                 }
 
                 Log.d("","时间"+aLong);
@@ -202,7 +205,7 @@ public class ActivityFragment extends Fragment {
 
                 query.order("-createdAt");
                 query.setLimit(10);
-                //query.or(queries);
+
                 query.setSkip(size);
                 final int listsize = activityList.size();
                 query.findObjects(new FindListener<MyActivity>() {
@@ -301,6 +304,7 @@ public class ActivityFragment extends Fragment {
     private  void FirstInitFromActivity(){
             MainActivity activity = (MainActivity) getActivity();
             List<MyActivity>list=(List<MyActivity>)activity.getIntent().getSerializableExtra("LISTDATA");;
+
             if (list!=null) {
                 if (list.size()<10){
                     ifEmpty=true;
@@ -324,7 +328,9 @@ public class ActivityFragment extends Fragment {
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
             public void done(Long aLong, BmobException e) {
-
+                if (getContext()!=null) {
+                    ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
+                }
 
                 BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
                 List<BmobQuery<MyActivity>> queries = new ArrayList<>();
@@ -337,7 +343,7 @@ public class ActivityFragment extends Fragment {
                 }
 
                 if (e==null){
-                    //query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);
+                    query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
                 }
 
                 Log.d("","时间"+aLong);

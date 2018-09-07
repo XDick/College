@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -19,20 +20,34 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Fragment.StartactivityFragment;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.bean.BmobIMConversation;
+import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMUserInfo;
+import cn.bmob.newim.core.BmobIMClient;
+import cn.bmob.newim.listener.MessageSendListener;
+import cn.bmob.v3.BmobBatch;
+import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.datatype.BatchResult;
+import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 
@@ -48,10 +63,12 @@ public class ActivityActivity extends AppCompatActivity {
    private boolean ifLike ;
    public boolean ifReply=false;
    private String activityId;
-   private StartactivityFragment myfragment;
+   public StartactivityFragment myfragment;
    private Comment replyComment,fromComment;
    private   InputMethodManager imm ;
     private TextView  commentcount;
+    private MyActivity activity;
+    public boolean ifJoin=false;
 
 
 
@@ -77,7 +94,7 @@ public class ActivityActivity extends AppCompatActivity {
 
         commentcount = findViewById(R.id.activity_comment_count);
         final Intent intent =getIntent();
-        final MyActivity activity = (MyActivity)intent.getSerializableExtra("ACTIVITY");
+        activity = (MyActivity)intent.getSerializableExtra("ACTIVITY");
         activityId =activity.getObjectId();
         comment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,16 +107,40 @@ public class ActivityActivity extends AppCompatActivity {
                     return;
                 }
 
-                startEdit.setVisibility(View.VISIBLE);
-                statusbar.setVisibility(View.GONE);
 
-                editComment.setFocusable(true);
-                editComment.setFocusableInTouchMode(true);
-                editComment.requestFocus();
-                editComment.findFocus();
+                    if (activity.getHostId().equals(myUser.getObjectId()))
+                    {
+                        startEdit.setVisibility(View.VISIBLE);
+                        statusbar.setVisibility(View.GONE);
+                        editComment.setFocusable(true);
+                        editComment.setFocusableInTouchMode(true);
+                        editComment.requestFocus();
+                        editComment.findFocus();
+                        imm.showSoftInput( editComment, 0);
+                    }
+                    else {
+                        if (activity.getJoinUser() == null) {
+                            Toast.makeText(ActivityActivity.this, "加入活动才可以评论", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                imm.showSoftInput( editComment, 0);
+                            if (ifJoin||Arrays.asList(activity.getJoinUser()).contains(myUser.getObjectId())) {
+                                startEdit.setVisibility(View.VISIBLE);
+                                statusbar.setVisibility(View.GONE);
+                                editComment.setFocusable(true);
+                                editComment.setFocusableInTouchMode(true);
+                                editComment.requestFocus();
+                                editComment.findFocus();
+                                imm.showSoftInput(editComment, 0);
+                            } else {
+                                Toast.makeText(ActivityActivity.this, "加入活动才可以评论", Toast.LENGTH_SHORT).show();
 
+                            }
+
+
+
+
+                    }
 
             }
         });
@@ -247,16 +288,130 @@ public class ActivityActivity extends AppCompatActivity {
 
     }
 
+    public boolean onCreateOptionsMenu(Menu menu) {
 
+        getMenuInflater().inflate(R.menu.toolbar_startactivity, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
             case android.R.id.home:
-                finish();
+            {finish();
+                return true;}
+            case R.id.menu_delete_activity: {
+                if (!myUser.isGod()||activity.getHostId().equals(myUser.getObjectId())){
+                    myUser.increment("setAcCount",-1);
+                }
+                myUser.update(new UpdateListener() {
+                    @Override
+                    public void done(BmobException e) {
+                        if (e == null) {
+                            MyActivity myActivity = new MyActivity();
+                            myActivity.setObjectId(activity.getObjectId());
+                            myActivity.delete(new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                    if (e==null){
+                                        if (myUser.isGod()){
+                                            try {
+                                                sendMessage("因你的活动违规已被删除",new BmobIMUserInfo(activity.getHostId(),activity.getHostName(),
+                                                        null));
+                                            }
+                                            catch (Exception e1){
+                                                e1.printStackTrace();
+                                            }
+
+                                        }
+                                        BmobQuery<Comment>query =new BmobQuery<>();
+                                        query.addWhereEqualTo("ActivityID",activity.getObjectId());
+                                        query.findObjects(new FindListener<Comment>() {
+                                            @Override
+                                            public void done(List<Comment> list, BmobException e) {
+                                                List<BmobObject> commentList= new ArrayList<BmobObject>();
+                                                commentList.addAll(list);
+                                                new BmobBatch().deleteBatch(commentList).doBatch(new QueryListListener<BatchResult>() {
+                                                    @Override
+                                                    public void done(List<BatchResult> list, BmobException e) {
+                                                        if (e==null){
+
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        });
+
+                                        BmobFile file = new BmobFile();
+                                        file.setUrl(activity.getCover());
+                                        file.delete(new UpdateListener() {
+
+                                            @Override
+                                            public void done(BmobException e) {
+                                                if(e==null){
+
+                                                }else{
+
+                                                }
+                                            }
+                                        });
+
+                                        finish();
+                                        Toast.makeText(ActivityActivity.this,"删除成功",Toast.LENGTH_SHORT).show();
+                                    }
+                                    else {
+                                        Toast.makeText(ActivityActivity.this,"删除失败",Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                });
                 return true;
+            }
+            case R.id.menu_upload_pic:{
+
+                if (activity.getHostId().equals(MyUser.getCurrentUser(MyUser.class).getObjectId())){
+                    startActivity(new Intent(ActivityActivity.this,SetDynamicsActivity.class));
+                    Toast.makeText(this,"插入活动上传照片",Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                else{
+                    if (activity.getJoinUser()==null) {
+                        Toast.makeText(this,"加入活动才可以评论",Toast.LENGTH_SHORT).show();
+                       return true;
+                    }
+                    if (myfragment.ifJoin||Arrays.asList(activity.getJoinUser()).contains(MyUser.getCurrentUser(MyUser.class).getObjectId()))
+                    {
+                        startActivity(new Intent(ActivityActivity.this,SetDynamicsActivity.class));
+                        Toast.makeText(this,"插入活动上传照片",Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                    else {
+                        Toast.makeText(this,"加入活动才可以评论",Toast.LENGTH_SHORT).show();
+                    }
+
+
+                }
+
+
+            }
+
         }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        if(!activity.getHostId().equals(myUser.getObjectId())&&!myUser.isGod())
+        {
+            menu.findItem(R.id.menu_delete_activity).setVisible(false);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
 
@@ -318,8 +473,46 @@ public class ActivityActivity extends AppCompatActivity {
         commentcount .setText("评论:"+count);
     }
 
+    public void joinChange(int state){
+        //0减少1增加
+        if (state==0){
+           ifJoin=false;
+        }
+        else if (state==1){
+            ifJoin=true;
+        }
 
+    }
 
+    public void sendMessage(String content ,BmobIMUserInfo info) {
+
+        if(!myUser.getObjectId().equals(info.getUserId())){
+
+            BmobIMConversation conversationEntrance = BmobIM.getInstance().startPrivateConversation(info, true, null);
+            BmobIMConversation messageManager = BmobIMConversation.obtain(BmobIMClient.getInstance(), conversationEntrance);
+            ActivityMessage msg = new ActivityMessage();
+            msg.setContent(content);//给对方的一个留言信息
+            Map<String, Object> map = new HashMap<>();
+            map.put("currentuser", info.getUserId());
+            map.put("userid", "4d820b1379");
+            map.put("username","泛觅");
+            map.put("useravatar", "http://bmob-cdn-18038.b0.upaiyun.com/2018/09/05/077f49d24e434680b55edef4ce015be2.jpg");
+            map.put("activityid",activity.getObjectId());
+            map.put("activityname",activity.getTitle());
+            map.put("type","user");
+            msg.setExtraMap(map);
+            messageManager.sendMessage(msg, new MessageSendListener() {
+                @Override
+                public void done(BmobIMMessage msg, BmobException e) {
+                    if (e == null) {//发送成功
+
+                    } else {//发送失败
+                        Toast.makeText(ActivityActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+    }
 
 }
 

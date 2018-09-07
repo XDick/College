@@ -243,18 +243,14 @@ public class UserFragment extends Fragment {
     private void showUserInfo(){
 
 
-        try{
-            setcountText.setText(bmobUser.getSetAc().length+"");}
-        catch (Exception e){
-            e.printStackTrace();
-        }
 
-        try {
-            dynamicscountText.setText(bmobUser.getDynamics().length+"");
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+            setcountText.setText(bmobUser.getSetAcCount()+"");
+
+
+
+            dynamicscountText.setText(bmobUser.getDynamicsCount()+"");
+
+
 
 
                 user.setText(bmobUser.getUsername());
@@ -418,18 +414,14 @@ public class UserFragment extends Fragment {
         super.onResume();
           bmobUser=BmobUser.getCurrentUser(MyUser.class);
 
-        try{
-            setcountText.setText(bmobUser.getSetAc().length+"");}
-        catch (Exception e){
-            e.printStackTrace();
-        }
 
-        try {
-           dynamicscountText.setText(bmobUser.getDynamics().length+"");
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+            setcountText.setText(bmobUser.getSetAcCount()+"");
+
+
+
+           dynamicscountText.setText(bmobUser.getDynamicsCount()+"");
+
+
 
 
 

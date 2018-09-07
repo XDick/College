@@ -1,7 +1,10 @@
 package com.college.xdick.findme.ui.Activity;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,7 +31,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.bean.BmobIMUserInfo;
+import cn.bmob.newim.core.ConnectionStatus;
 import cn.bmob.newim.listener.ConnectListener;
+import cn.bmob.newim.listener.ConnectStatusChangeListener;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.LogInListener;
@@ -44,12 +50,14 @@ public class LoginActivity extends AppCompatActivity {
     private Tencent mTencent;
     private BaseUiListener mIUiListener;
     private UserInfo mUserInfo;
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         initView();
+
         mTencent = Tencent.createInstance("1106736587"
                 ,LoginActivity.this.getApplicationContext());
 
@@ -87,11 +95,29 @@ public class LoginActivity extends AppCompatActivity {
 
                     @Override
                     public void done(Object o, BmobException e) {
+
                         if (e == null) {
-                            Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
+                            IMconnectBomob();
+                           showDialog();
+                           final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+
+                                BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+                                    @Override
+                                    public void onChange(ConnectionStatus status) {
+
+                                        if (status.getMsg().equals("connected")) {
+                                            Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                                            startActivity(intent);
+                                           // dialog.dismiss();
+                                            finish();
+
+                                        }
+                                        else if (status.getMsg().equals("disconnect")){
+                                            IMconnectBomob();
+
+                                        }
+                                    }
+                                });
                         } else {
                             Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -118,8 +144,9 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onComplete(Object response) {
-            Toast.makeText(LoginActivity.this, "授权成功", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(LoginActivity.this, "授权成功", Toast.LENGTH_SHORT).show();
             Log.e("", "response:" + response);
+            showDialog();
             JSONObject obj = (JSONObject) response;
             try {
                 final String openID = obj.getString("openid");
@@ -132,37 +159,52 @@ public class LoginActivity extends AppCompatActivity {
                 mUserInfo.getUserInfo(new IUiListener() {
                     @Override
                     public void onComplete(final Object response) {
+
                         BmobUser.BmobThirdUserAuth authInfo = new BmobUser.BmobThirdUserAuth("qq",accessToken, expires,openID);
                         BmobUser.loginWithAuthData(authInfo, new LogInListener<JSONObject>() {
 
                             @Override
                             public void done(JSONObject userAuth,BmobException e) {
                                if (e==null){
+                                   IMconnectBomob();
+                                   BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+                                       @Override
+                                       public void onChange(ConnectionStatus status) {
 
-                                   if (BmobUser.getCurrentUser().getUpdatedAt()==null){
-                                       try {
-                                           String nickName = ((JSONObject) response).getString("nickname");
-                                           Intent intent =new Intent(LoginActivity.this, ModifyNameActivity.class);
-                                           intent.putExtra("NICKNAME",nickName);
-                                           intent.putExtra("ACCESSTOKEN",accessToken);
-                                           intent.putExtra("EXPIRES",expires);
-                                           intent.putExtra("OPENID",openID);
-                                           startActivity(intent);
-                                           finish();
+                                           if (status.getMsg().equals("connected")) {
+                                               if (BmobUser.getCurrentUser().getUpdatedAt()==null){
+                                                   try {
+                                                       String nickName = ((JSONObject) response).getString("nickname");
+                                                       Intent intent =new Intent(LoginActivity.this, ModifyNameActivity.class);
+                                                       intent.putExtra("NICKNAME",nickName);
+                                                       intent.putExtra("ACCESSTOKEN",accessToken);
+                                                       intent.putExtra("EXPIRES",expires);
+                                                       intent.putExtra("OPENID",openID);
+                                                       startActivity(intent);
+                                                      // dialog.dismiss();
+                                                       finish();
 
+                                                   }
+                                                   catch (Exception e2){
+                                                       e2.printStackTrace();
+                                                   }
+
+                                               }
+
+                                               else {
+
+                                                   startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                                   finish();
+
+                                               }
+
+                                           }
+                                           else if (status.getMsg().equals("disconnect")){
+                                               IMconnectBomob();
+                                           }
                                        }
-                                       catch (Exception e2){
-                                           e2.printStackTrace();
-                                       }
+                                   });
 
-                                  }
-
-                                  else {
-
-                                      startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                      finish();
-
-                                  }
 
 
                                }
@@ -240,6 +282,41 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    private void IMconnectBomob() {
 
+        final MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
+        if (bmobUser != null) {
+            if (!TextUtils.isEmpty(bmobUser.getObjectId())) {
+                BmobIM.connect(bmobUser.getObjectId(), new ConnectListener() {
+                    @Override
+                    public void done(String uid, BmobException e) {
+                        if (e == null) {
+                            try {
+                                BmobIM.getInstance().
+                                        updateUserInfo(new BmobIMUserInfo( bmobUser.getObjectId(),
+                                                bmobUser.getUsername(),  bmobUser.getAvatar()));
+                            }
+                            catch (Exception e2){
+                                e2.printStackTrace();
+                            }
 
+                        } else {
+                            // startActivity(intent);
+                            //finish();
+                            //连接失败
+                            dialog.dismiss();
+                            Toast.makeText(getBaseContext(),"无法连接服务器", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }
+    }
+    private void showDialog() {
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("正在连接服务器...");
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        dialog.show();
+    }
 }

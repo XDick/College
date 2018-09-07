@@ -214,11 +214,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
                     >
-                  <!--  <ImageView
-                        android:layout_width="35dp"
-                        android:layout_height="35dp"
-                        android:background="@drawable/host"
-                        android:layout_margin="5dp"/>-->
+
                     <ImageView
                         android:layout_width="35dp"
                         android:layout_height="35dp"
@@ -266,6 +262,16 @@
                        android:textStyle="bold"
                        android:textColor="#5669fa"
                        android:paddingBottom="10dp"/>
+
+                   <TextView
+                       android:id="@+id/activity_tag_text"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:textIsSelectable="true"
+                       android:layout_marginBottom="5dp"
+                       android:textSize="12sp"
+                       android:textColor="#999999"
+                       android:lineSpacingExtra="5dp"/>
 
                     <TextView
                         android:id="@+id/activity_content_text"

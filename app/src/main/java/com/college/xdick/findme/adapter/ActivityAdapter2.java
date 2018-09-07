@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.college.xdick.findme.MyClass.ItemTouchHelperAdapter;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Comment;
@@ -50,6 +51,7 @@ import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/5/19.
@@ -238,7 +240,8 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
 
          holder.time.setText(activity.getTime());
 
-         Glide.with(mContext).load(activity.getCover()).into(holder.cover);
+         Glide.with(mContext).load(activity.getCover())
+                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover);
 
           holder.host.setText("由"+activity.getHostName()+"发起");
 
@@ -269,22 +272,13 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
                                 if (e==null){
                                     holder.setVisibility(false);
                                     Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(mContext,"删除失败",Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
 
 
-
-                       /* user.removeAll("join", Arrays.asList(activity.getObjectId()));
-                        user.update(new UpdateListener() {
-                            @Override
-                            public void done(BmobException e) {
-                                if (e == null) {
-                                //
-                                }
-                            }
-
-                        });*/
                         break;
 
                     }
@@ -299,6 +293,8 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
                                     holder.setVisibility(false);
                                     Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
 
+                                } else {
+                                    Toast.makeText(mContext,"删除失败",Toast.LENGTH_SHORT).show();
                                 }
                             }
 
@@ -309,7 +305,7 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
                     case 2:
 
                     {
-                        user.removeAll("setAc", Arrays.asList(activity.getObjectId()));
+                        user.increment("setAcCount",-1);
                         user.update(new UpdateListener() {
                             @Override
                             public void done(BmobException e) {
@@ -355,6 +351,9 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
 
                                                 holder.setVisibility(false);
                                                 Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
+                                            }
+                                            else {
+                                                Toast.makeText(mContext,"删除失败",Toast.LENGTH_SHORT).show();
                                             }
                                         }
                                     });

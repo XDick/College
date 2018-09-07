@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +25,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.college.xdick.findme.MyClass.DownLoadImageService;
+import com.college.xdick.findme.MyClass.ImageDownLoadCallBack;
 import com.college.xdick.findme.MyClass.PicDynamicsMap;
 import com.college.xdick.findme.MyClass.PicturePageAdapter;
 import com.college.xdick.findme.MyClass.ViewPagerFixed;
@@ -35,9 +39,13 @@ import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.GalleryActivity;
 import com.college.xdick.findme.ui.Activity.LoginActivity;
 import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
+import com.zyyoona7.popup.EasyPopup;
+import com.zyyoona7.popup.XGravity;
+import com.zyyoona7.popup.YGravity;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +56,9 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.QueryListener;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
+import static cn.bmob.v3.Bmob.getApplicationContext;
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/5/19.
@@ -219,13 +229,15 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
 
         if (realPos==0){
-            Glide.with(mContext).load(picUri).apply(bitmapTransform(new BlurTransformation(10, 8))).into(holder.pic);
+            Glide.with(mContext).load(picUri)
+                    .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new BlurTransformation(10, 8))).into(holder.pic);
 
             holder.more.setVisibility(View.VISIBLE);
         }
         else {
             holder.more.setVisibility(View.INVISIBLE);
-            Glide.with(mContext).load(picUri).into(holder.pic);
+            Glide.with(mContext).load(picUri)
+                    .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.pic);
         }
 
 
@@ -466,9 +478,73 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             @Override
             public void OnLongClick() {
                 //展示保存取消dialog
-                //showPicDialog();
+                final EasyPopup savePop = EasyPopup.create()
+                        .setContentView(mContext, R.layout.popup_savepic)
+                        .setWidth(400)
+                        .setBackgroundDimEnable(true)
+                        //变暗的透明度(0-1)，0为完全透明
+                        .setDimValue(0.4f)
+                        //变暗的背景颜色
+                        .apply();
+
+
+                savePop.showAtAnchorView(pager, YGravity.CENTER, XGravity.CENTER, 0, 0);
+
+                LinearLayout savepic = savePop.findViewById(R.id.save_pic);
+                savepic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                downloadFile(mListPicPath.get(mPosition));
+                            }
+                        }).start();
+
+                        savePop.dismiss();
+                    }
+                });
             }
         });
+    }
+
+    public void downloadFile(final String url) {
+        DownLoadImageService service = new DownLoadImageService(getApplicationContext(),
+                url,
+                new ImageDownLoadCallBack() {
+
+                    @Override
+                    public void onDownLoadSuccess(File file) {
+                    }
+                    @Override
+                    public void onDownLoadSuccess(Bitmap bitmap) {
+                        // 在这里执行图片保存方法
+                        ((Activity)mContext).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext,"保存成功",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onDownLoadFailed() {
+                        // 图片保存失败
+                        ((Activity)mContext).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext,"保存失败",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+
+                    }
+                });
+        //启动图片下载线程
+        new Thread(service).start();
+
+
     }
 }
 

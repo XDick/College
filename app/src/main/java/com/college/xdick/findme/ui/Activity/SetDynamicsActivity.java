@@ -237,7 +237,7 @@ public class SetDynamicsActivity extends AppCompatActivity {
                         public void done(String objectId, BmobException e) {
                             if (e == null) {
                                 MyUser user = BmobUser.getCurrentUser(MyUser.class);
-                                user.addUnique("dynamics",objectId);
+                                user.increment("dynamicsCount",1);
                                 user.update(new UpdateListener() {
                                     @Override
                                     public void done(BmobException e) {
@@ -257,7 +257,7 @@ public class SetDynamicsActivity extends AppCompatActivity {
                     for (Uri u : mSelected) {
                         picPath.add(FileUtil.uriToFile(u, this));
                     }
-                    finish();
+                           finish();
                         BmobFile.uploadBatch(picPath.toArray(new String[picPath.size()]), new UploadBatchListener() {
                             @Override
                             public void onSuccess(List<BmobFile> list, List<String> list1) {
@@ -272,12 +272,13 @@ public class SetDynamicsActivity extends AppCompatActivity {
                                         dynamics.setActivityTime(myActivity.getTime());
                                         dynamics.setActivityHost(myActivity.getHostName());
                                         dynamics.setActivityId(myActivity.getObjectId());
+                                        if (myActivity.getHostId().equals(myUser.getObjectId())){
+                                            dynamics.setIfAdd2Gallery(ifAddPic2Ac);
+                                        }else {
+                                            dynamics.setIfAdd2Gallery(false);
+                                        }
                                     }
-                                    if (myActivity.getHostId().equals(myUser.getObjectId())){
-                                        dynamics.setIfAdd2Gallery(ifAddPic2Ac);
-                                    }else {
-                                        dynamics.setIfAdd2Gallery(false);
-                                    }
+
                                     dynamics.setLikeCount(0);
                                     dynamics.setReplycount(0);
                                     dynamics.setUserId(BmobUser.getCurrentUser().getObjectId());
@@ -290,7 +291,7 @@ public class SetDynamicsActivity extends AppCompatActivity {
                                         public void done(final String objectId, BmobException e) {
                                             if (e == null) {
                                                 MyUser user = BmobUser.getCurrentUser(MyUser.class);
-                                                user.addUnique("dynamics",objectId);
+                                                user.increment("dynamicsCount",1);
                                                 user.update(new UpdateListener() {
                                                     @Override
                                                     public void done(BmobException e) {
@@ -308,8 +309,8 @@ public class SetDynamicsActivity extends AppCompatActivity {
                                             }
                                         }
                                     });
-                                    finish();
                                 }
+
                             }
 
                             @Override

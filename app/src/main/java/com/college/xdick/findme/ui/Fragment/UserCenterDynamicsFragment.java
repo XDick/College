@@ -8,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListener;
+import cn.bmob.v3.listener.UpdateListener;
 import pl.tajchert.waitingdots.DotsTextView;
 
 /**
@@ -48,6 +50,9 @@ public class UserCenterDynamicsFragment extends Fragment {
     private MyUser nowUser ;
     private  boolean ifEmpty=false;
     private  int size =0;
+    static public int ADD=0;
+    static public int REFRESH=1;
+    private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -57,7 +62,7 @@ public class UserCenterDynamicsFragment extends Fragment {
         initView();
         loadlayout.setVisibility(View.VISIBLE);
         dots.start();
-       initData();
+        initData(REFRESH);
 
         return rootView;
     }
@@ -70,6 +75,7 @@ public class UserCenterDynamicsFragment extends Fragment {
        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new DynamicsAdapter(dynamicsList);
+        adapter.setFragment(this);
         adapter.SetFlag(1);
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
         adapter.addFooterView(footer);
@@ -93,7 +99,7 @@ public class UserCenterDynamicsFragment extends Fragment {
                     if (ifEmpty){
                         //null
                     }
-                    else {initData();}
+                    else {initData(ADD);}
                 }
             }
 
@@ -108,13 +114,11 @@ public class UserCenterDynamicsFragment extends Fragment {
     }
 
 
-    private void initData(){
+    public void initData(final int state){
 
 
-
-
-                    BmobQuery<Dynamics> query = new BmobQuery<Dynamics>();
-                    query.addWhereEqualTo("user",nowUser.getUsername());
+        BmobQuery<Dynamics> query = new BmobQuery<Dynamics>();
+        query.addWhereEqualTo("user",nowUser.getUsername());
         query.order("-createdAt");
         query.setLimit(20);
         query.setSkip(size);
@@ -122,33 +126,65 @@ public class UserCenterDynamicsFragment extends Fragment {
                     query.findObjects(new FindListener<Dynamics>() {
                         @Override
                         public void done(List<Dynamics> object, BmobException e) {
-                            if(e==null){
+                            if(e==null) {
                                 dynamicsList.addAll(object);
+                                if (state == ADD) {
+                                    if (listsize == dynamicsList.size()) {
+                                        ifEmpty = true;
+                                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                                        adapter.notifyDataSetChanged();
 
-                                if (listsize==dynamicsList.size()){
-                                    ifEmpty=true;
-                                    adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
-                                    adapter.notifyDataSetChanged();
-                                }else if (listsize+20>dynamicsList.size()){
-                                    ifEmpty=true;
-                                    adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
-                                    adapter.notifyItemInserted(adapter.getItemCount()-1);
+                                    } else if (listsize + 20 > dynamicsList.size()) {
+                                        ifEmpty = true;
+                                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                                        adapter.notifyItemInserted(adapter.getItemCount() - 1);
 
+                                    } else {
+                                        adapter.notifyItemInserted(adapter.getItemCount() - 1);
+                                        size = size + 20;
+                                    }
+                                } else if (state == REFRESH) {
+
+                                    dynamicsList.clear();
+
+                                    if (object.size() < 20) {
+                                        ifEmpty = true;
+                                        dynamicsList.addAll(object);
+                                        adapter.notifyDataSetChanged();
+
+                                    } else {
+                                        ifEmpty = false;
+                                        dynamicsList.addAll(object);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                    size = 20;
+
+                                    loadlayout.setVisibility(View.GONE);
+
+                                } else {
+                                    Toast.makeText(getContext(), "", Toast.LENGTH_SHORT).show();
                                 }
 
+                                if (ifEmpty&&dynamicsList.size()!=myUser.getDynamicsCount()&&nowUser.getObjectId().equals(myUser.getObjectId())){
+                                    myUser.setDynamicsCount(dynamicsList.size());
+                                    myUser.update(BmobUser.getCurrentUser(MyUser.class).getObjectId(),new UpdateListener() {
+                                        @Override
+                                        public void done(BmobException e) {
+                                            if (e==null){
 
-                                else {
-                                    adapter.notifyItemInserted(adapter.getItemCount()-1);
-                                    size = size + 20;
+                                            }
+                                        }
+                                    });
                                 }
-
-                                loadlayout.setVisibility(View.GONE);
-                            }else{
-                                Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
                 }
+
+    public void setSize(int size){
+        this.size=size;
+    }
+
 
 
 

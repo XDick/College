@@ -12,11 +12,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.FindNews;
 import com.college.xdick.findme.ui.Activity.NewsActivity;
 
 import java.util.List;
+
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 
 /**
@@ -132,7 +135,8 @@ public class FindNewsAdapter extends RecyclerView.Adapter<FindNewsAdapter.ViewHo
 
         FindNews news =mNewsList.get(realPos);
         holder.title.setText(news.getTitle());
-        Glide.with(mContext).load(news.getPic()).into(holder.cover);
+        Glide.with(mContext).load(news.getPic())
+                .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover);
         holder.pre.setText(news.getPre());
 
 

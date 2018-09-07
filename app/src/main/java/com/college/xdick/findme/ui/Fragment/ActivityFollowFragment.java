@@ -17,6 +17,7 @@ import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.ActivityAdapter;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Activity.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -156,8 +157,9 @@ public class ActivityFollowFragment extends Fragment {
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
             public void done(Long aLong, BmobException e) {
-
-
+                if (getContext()!=null) {
+                    ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
+                }
                 if(bmobUser!=null){
 
 
@@ -171,7 +173,7 @@ public class ActivityFollowFragment extends Fragment {
 
                         query.addWhereContainedIn("hostId", list);}
                     if (e==null){
-                        // query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);
+                         query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
                     }
                     query.order("-createdAt");
                     query.setSkip(size);
@@ -281,7 +283,9 @@ public class ActivityFollowFragment extends Fragment {
             public void done(Long aLong, BmobException e) {
 
 
-
+                if (getContext()!=null) {
+                    ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
+                }
 
                 if(bmobUser!=null){
 
@@ -296,7 +300,7 @@ public class ActivityFollowFragment extends Fragment {
 
                         query.addWhereContainedIn("hostId", list);}
                     if (e==null){
-                        //query.addWhereGreaterThan("date", aLong*1000L-1.5*60*60*24*1000);
+                        query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
                     }
                     query.setSkip(size);
                     query.setLimit(10);

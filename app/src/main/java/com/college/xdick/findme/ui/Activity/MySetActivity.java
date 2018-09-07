@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,6 +50,7 @@ public class MySetActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_ac);
         initView();
+        initData();
 
 
     }
@@ -122,11 +124,15 @@ public class MySetActivity extends AppCompatActivity {
                     activityList.addAll(list);
 
                     if (listsize==activityList.size()){
+                        activityList.clear();
                         ifEmpty=true;
+                        activityList.addAll(list);
                         adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                         adapter.notifyDataSetChanged();
+
                     }else if (listsize+10>activityList.size()){
                         ifEmpty=true;
+
                         adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                         adapter.notifyItemInserted(adapter.getItemCount()-1);
 
@@ -139,11 +145,30 @@ public class MySetActivity extends AppCompatActivity {
                     }
 
 
+               if (ifEmpty&&activityList.size()!=myUser.getSetAcCount()){
+
+                   myUser.setSetAcCount(activityList.size());
+                   myUser.update(myUser.getObjectId(),new UpdateListener() {
+                       @Override
+                       public void done(BmobException e) {
+                           if (e==null){
+
+                           }
+                       }
+                   });
+
+               }
+
                 }else{
                     Toast.makeText(MySetActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+
+
+
+
     }
 
     @Override                //ToolBar上面的按钮事件
@@ -163,9 +188,12 @@ public class MySetActivity extends AppCompatActivity {
 
         return true;
     }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initData();
-    }
+
+
+
+
+
+
 }
+
+

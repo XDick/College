@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.MyActivity;
@@ -39,6 +40,7 @@ import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/5/19.
@@ -221,7 +223,8 @@ public class ActivityAdapter3 extends RecyclerView.Adapter<ActivityAdapter3.View
 
 
 
-        Glide.with(mContext).load(activity.getCover()).apply(bitmapTransform(new BlurTransformation(10, 8))).into(holder.cover);
+        Glide.with(mContext).load(activity.getCover())
+                .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new BlurTransformation(10, 8))).into(holder.cover);
 
 
 

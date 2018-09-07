@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -21,6 +22,9 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -32,9 +36,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
+import com.college.xdick.findme.MyClass.DownLoadImageService;
 import com.college.xdick.findme.MyClass.GalleryLayoutManager;
+import com.college.xdick.findme.MyClass.ImageDownLoadCallBack;
 import com.college.xdick.findme.MyClass.PicturePageAdapter;
 import com.college.xdick.findme.MyClass.ScaleTransformer;
 import com.college.xdick.findme.MyClass.ViewPagerFixed;
@@ -50,9 +57,11 @@ import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.HostNotifyActivity;
 import com.college.xdick.findme.ui.Activity.LoginActivity;
 import com.college.xdick.findme.ui.Activity.MainActivity;
+import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
 import com.youth.banner.Transformer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -66,14 +75,22 @@ import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.newim.core.BmobIMClient;
 import cn.bmob.newim.listener.MessageSendListener;
+import cn.bmob.v3.BmobBatch;
+import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.datatype.BatchResult;
+import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
+
+import static cn.bmob.v3.Bmob.getApplicationContext;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/4/12.
@@ -92,7 +109,7 @@ public class StartactivityFragment extends Fragment{
     public List<Comment> commentList = new ArrayList<>();
     private View rootView;
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
-    private boolean ifJoin;
+    public boolean ifJoin;
    public   MyActivity activity;
    private GalleryAdapter galleryAdapter;
    private Map<String,Dynamics>picMap = new HashMap<>();
@@ -135,7 +152,9 @@ public class StartactivityFragment extends Fragment{
         query.getObject(hostID, new QueryListener<MyUser>() {
             @Override
             public void done(MyUser myUser, BmobException e) {
-                hostAvatar =myUser.getAvatar();
+                if (e==null){
+                    hostAvatar =myUser.getAvatar();
+                }
             }
         });
         activityId = activity.getObjectId();
@@ -170,7 +189,9 @@ public class StartactivityFragment extends Fragment{
                 if (e==null){
                     ImageView hostAvatarImg= rootView.findViewById(R.id.host_avatar);
                     String hostAvatarUri=myUser.getAvatar();
-                    Glide.with(getActivity()).load(hostAvatarUri).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(hostAvatarImg);
+                    Glide.with(getActivity()).load(hostAvatarUri)
+                            .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
+                            .apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(hostAvatarImg);
                     hostAvatarImg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -197,6 +218,7 @@ public class StartactivityFragment extends Fragment{
         TextView activityHostText =  rootView.findViewById(R.id.activity_host_text);
         TextView activityTimeText =  rootView.findViewById(R.id.activity_time_text);
         TextView activityPlaceText =  rootView.findViewById(R.id.activity_place_text);
+        TextView activityTagText =  rootView.findViewById(R.id.activity_tag_text);
         commentcount = rootView.findViewById(R.id.activity_comment_count);
         joincount = rootView.findViewById(R.id.ac_main_joincount);
         joinButton = rootView.findViewById(R.id.join_ac_button);
@@ -211,15 +233,23 @@ public class StartactivityFragment extends Fragment{
 
 
         collapsingToolbar.setTitle(activityTitle);
-        Glide.with(this).load(activityCover).apply(RequestOptions.bitmapTransform(new BlurTransformation())).into(activityImageView);
+        Glide.with(this).load(activityCover)
+                .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
+                .apply(RequestOptions.bitmapTransform(new BlurTransformation())).into(activityImageView);
         activityContentText.setText(activityContent);
         activityTimeText.setText(""+activityTime);
         activityPlaceText.setText(""+activityPlace);
         activityHostText.setText(""+activityHost);
+        String tag=Arrays.toString(activity.getTag());
+        tag = tag.replace("[","");
+        tag = tag.replace("]","");
+        tag = tag.replace(","," ");
+        activityTagText.setText(""+tag);
 
 
 
-     if (activityTag[0].equals("二手交易")||activityTag[0].equals("招聘")){
+
+     if (activityTag[0].equals("二手交易")){
             joinButton.setVisibility(View.GONE);
             LinearLayout linearLayout = rootView.findViewById(R.id.join_num_layout);
             linearLayout.setVisibility(View.INVISIBLE);
@@ -227,7 +257,12 @@ public class StartactivityFragment extends Fragment{
                 avatar[i].setVisibility(View.GONE);
             }
         }
-
+        try {
+         joinnum=activity.getJoinUser().length;
+        }catch (Exception e){
+         e.printStackTrace();
+        }
+        joincount.setText(joinnum+"");
         activityHostText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -297,7 +332,7 @@ public class StartactivityFragment extends Fragment{
                       if(!ifJoin){
 
 
-
+                          ((ActivityActivity)getActivity()).joinChange(1);
                           MyActivity myActivity = new MyActivity();
                           myActivity.setObjectId(activityId);
                           myActivity.setDate(activity.getDate());
@@ -314,6 +349,10 @@ public class StartactivityFragment extends Fragment{
                                               joinButton.setBackgroundResource(R.drawable.join_button_radius_true);
                                           }
                                       });
+                                      if (count<5){
+                                          Glide.with(getContext()).load(bmobUser.getAvatar())
+                                                  .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar[++count]);
+                                      }
 
                                       sendMessage(bmobUser.getUsername()+"加入了你的"+"#"+activity.getTitle()+"#活动"
                                               ,new BmobIMUserInfo(hostID,activity.getHostName(),hostAvatar));
@@ -326,32 +365,13 @@ public class StartactivityFragment extends Fragment{
                               }
                           });
 
-
-
-
-
-
-                         /* bmobUser.addUnique("join",activityId);
-                          bmobUser.update(new UpdateListener() {
-                              @Override
-                              public void done(BmobException e) {
-                                  if (e == null) {
-                                     //原代码
-                                  }
-
-                                  else {
-                                      Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
-                                      Toast.makeText(getContext(), e.getMessage(),Toast.LENGTH_SHORT).show();
-                                  }
-                              }
-                          });
-*/
                       }
 
                       else
                       {
 
 
+                          ((ActivityActivity)getActivity()).joinChange(0);
                           MyActivity myActivity = new MyActivity();
                           myActivity.setObjectId(activityId);
                           myActivity.setDate(activity.getDate());
@@ -360,7 +380,10 @@ public class StartactivityFragment extends Fragment{
                               @Override
                               public void done(BmobException e) {
                                   if (e==null){
-
+                                      if (count<5) {
+                                          Glide.with(getContext()).load(R.drawable.blank_pic)
+                                                  .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar[count--]);
+                                      }
                                       getActivity().runOnUiThread(new Runnable() {
                                           @Override
                                           public void run() {
@@ -378,29 +401,6 @@ public class StartactivityFragment extends Fragment{
                               }
                           });
 
-
-
-
-
-
-
-
-
-
-                         /* bmobUser.removeAll("join", Arrays.asList(activityId));
-                          bmobUser.update(new UpdateListener() {
-                              @Override
-                              public void done(BmobException e) {
-
-                                  if(e==null){
-                                     //
-                                  }
-
-                                  else {
-                                      Toast.makeText(getContext(), e.getMessage(),Toast.LENGTH_SHORT).show();
-                                  }
-                              }
-                          });*/
                       }
                   }
                   }
@@ -414,15 +414,17 @@ public class StartactivityFragment extends Fragment{
 
 
 public  void initJoin(){
+     if (activity.getJoinUser()==null){
+         return;
+     }
         BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-    query.addWhereContainsAll("join", Arrays.asList(activityId));
-    query.setLimit(500);
+    query.addWhereContainedIn("objectId", Arrays.asList(activity.getJoinUser()));
+    query.setLimit(6);
     query.findObjects(new FindListener<MyUser>() {
         @Override
         public void done(List<MyUser> list, BmobException e) {
             if(e==null){
-                  joinnum=list.size();
-                joincount.setText(joinnum+"");
+
                 for(final MyUser user :list){
                     avatar[count].setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -440,9 +442,10 @@ public  void initJoin(){
 
                         }
                     });
-                    Glide.with(getContext()).load(user.getAvatar()).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar[count]);
+                    Glide.with(getContext()).load(user.getAvatar())
+                            .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar[count]);
 
-                    if(count==5){
+                    if(count==list.size()-1){
                         break;
                     }
                     count++;
@@ -546,6 +549,7 @@ public  void initJoin(){
                 commentcount.setText("("+commentCount+")");
                 ((ActivityActivity)getActivity()).setText(commentCount);
             }
+
             else if (state == ADD){
                 if (listsize == commentList.size()) {
                     ifEmpty = true;
@@ -594,6 +598,7 @@ public  void initJoin(){
 
 
 
+
     public void setSize(int size){
 
        this. size =size;
@@ -634,6 +639,7 @@ public  void initJoin(){
       BmobQuery<Dynamics> q1 = new BmobQuery<>();
       q1.addWhereEqualTo("ifAdd2Gallery",true);
       query.and(Arrays.asList(q1));
+      query.setLimit(500);
       query.addWhereEqualTo("activityId",activity.getObjectId());
       query.order("-likeCount");
 
@@ -704,6 +710,16 @@ public  void initJoin(){
             }
         });
     }
+    }
+
+    public void setCount(int state){
+        if (state==0){
+            commentCount=--commentCount;
+        }
+        else if (state==1){
+            commentCount=++commentCount;
+        }
+
     }
 
 

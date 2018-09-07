@@ -61,7 +61,7 @@
         android:id="@+id/account_login"
         android:layout_height="wrap_content"
         android:layout_width="200dp"
-        android:hint="用户名"
+        android:hint="用户名/手机号"
         android:textColor="#ffcdcd"
         android:textSize="14dp"
         android:inputType="text"

@@ -5,10 +5,12 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.college.xdick.findme.Broadcast.NetWorkChangReceiver;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Activity.MainActivity;
 
 import org.litepal.LitePalApplication;
 import org.litepal.crud.DataSupport;
@@ -17,13 +19,19 @@ import org.litepal.tablemanager.Connector;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.logging.Logger;
 
 import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.newim.core.ConnectionStatus;
 import cn.bmob.newim.listener.ConnectListener;
 import cn.bmob.newim.listener.ConnectStatusChangeListener;
+import cn.bmob.push.BmobPush;
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobInstallation;
+import cn.bmob.v3.BmobInstallationManager;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.InstallationListener;
 import cn.bmob.v3.exception.BmobException;
 
 /**
@@ -59,9 +67,29 @@ public class BmobIMApplication extends Application {
             Bmob.initialize(this, "b689cf6ecc75e3fafd3588b88ede6fcc");
             //Bmob 服务器的初始化也放在Application
             BmobIM.init(this);
-            registerNetWorkReceiver();
             BmobIM.registerDefaultMessageHandler(new MyMessageHandler(this));
-        }
+
+
+            //推送服务
+            BmobInstallationManager.getInstance().initialize(new InstallationListener<BmobInstallation>() {
+                @Override
+                public void done(BmobInstallation bmobInstallation, BmobException e) {
+                    if (e == null) {
+                        Log.i("成功",bmobInstallation.getObjectId() + "-" + bmobInstallation.getInstallationId());
+                    } else {
+                        Log.e("失败",e.getMessage());
+                    }
+                }
+            });
+// 启动推送服务
+            BmobPush.startWork(this);
+
+
+            }
+
+
+
+
     }
 
     /**
@@ -87,13 +115,6 @@ public class BmobIMApplication extends Application {
 
 
 
-    private void registerNetWorkReceiver(){
-        netWorkChangReceiver = new NetWorkChangReceiver();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(netWorkChangReceiver, filter);
-    }
+
 
 }

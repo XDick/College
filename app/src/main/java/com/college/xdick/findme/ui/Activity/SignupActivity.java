@@ -135,6 +135,7 @@ public class SignupActivity  extends AppCompatActivity {
                 bu.setSchool(SelectSchoolUtil.getSchool());
                 bu.setMobilePhoneNumberVerified(true);
                 bu.setEmailVerified(false);
+                bu.setGod(false);
                 if (password.length()<8){
                     Toast.makeText(SignupActivity.this,"密码至少8位",Toast.LENGTH_SHORT).show();
                 }

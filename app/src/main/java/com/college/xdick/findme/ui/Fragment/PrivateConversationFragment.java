@@ -48,14 +48,9 @@ public class PrivateConversationFragment extends Fragment implements MessageList
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootview =inflater.inflate(R.layout.fragment_conversation,container,false);
         initView();
-        BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
-            @Override
-            public void onChange(ConnectionStatus status) {
-                if ( status.getMsg().equals("connecting")) {
-                    Toast.makeText(getApplicationContext(),"正在连接服务器",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+
+
+
 
 
 
@@ -89,26 +84,22 @@ public class PrivateConversationFragment extends Fragment implements MessageList
 
     public void initAllConversation() {
 
-        try {
-            if (BmobUser.getCurrentUser() != null) {
-                conversationList.clear();
-                List<BmobIMConversation> list = BmobIM.getInstance().loadAllConversation();
-                for (BmobIMConversation c : list) {
+       if (BmobIM.getInstance().getCurrentStatus().equals(ConnectionStatus.CONNECTED)){
+           if (BmobUser.getCurrentUser() != null) {
+               conversationList.clear();
+               List<BmobIMConversation> list = BmobIM.getInstance().loadAllConversation();
+               for (BmobIMConversation c : list) {
+                   conversationList.add(new PrivateConversation(c));
 
-                    conversationList.add(new PrivateConversation(c));
-
-                }
-                adapter.notifyDataSetChanged();
-            }
-            else
-            {
-                //Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
-
-            }
-            }
-        catch (Exception e){
-            e.printStackTrace();
-
+               }
+               adapter.notifyDataSetChanged();
+           }
+           else
+           {
+               //Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
+           }
+       }
+      else {
             try {
                 IMconnectBomob();
             }
@@ -147,7 +138,7 @@ public class PrivateConversationFragment extends Fragment implements MessageList
     }
 
     private void IMconnectBomob() {
-
+        Toast.makeText(getActivity(),"正在连接服务器请稍等...",Toast.LENGTH_SHORT).show();
         //TODO 连接：3.1、登录成功、注册成功或处于登录状态重新打开应用后执行连接IM服务器的操作
         final MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
         if (bmobUser != null) {

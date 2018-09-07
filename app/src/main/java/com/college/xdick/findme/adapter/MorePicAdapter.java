@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.college.xdick.findme.MyClass.DownLoadImageService;
+import com.college.xdick.findme.MyClass.ImageDownLoadCallBack;
 import com.college.xdick.findme.MyClass.PicturePageAdapter;
 import com.college.xdick.findme.MyClass.ViewPagerFixed;
 import com.college.xdick.findme.R;
@@ -29,7 +33,11 @@ import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.bean.School;
 import com.college.xdick.findme.ui.Activity.LoginActivity;
 import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
+import com.zyyoona7.popup.EasyPopup;
+import com.zyyoona7.popup.XGravity;
+import com.zyyoona7.popup.YGravity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +46,9 @@ import java.util.Map;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.QueryListener;
+
+import static cn.bmob.v3.Bmob.getApplicationContext;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHolder> {
 
@@ -91,7 +102,9 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
 
 
             String uri =picList.get(position);
-            Glide.with(mContext).load(uri).into(holder.image);
+            Glide.with(mContext).load(uri)
+                    .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
+                    .into(holder.image);
 
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -285,8 +298,71 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
             @Override
             public void OnLongClick() {
                 //展示保存取消dialog
-                //showPicDialog();
+                final EasyPopup savePop = EasyPopup.create()
+                        .setContentView(mContext, R.layout.popup_savepic)
+                        .setWidth(400)
+                        .setBackgroundDimEnable(true)
+                        //变暗的透明度(0-1)，0为完全透明
+                        .setDimValue(0.4f)
+                        //变暗的背景颜色
+                        .apply();
+
+
+                savePop.showAtAnchorView(pager, YGravity.CENTER, XGravity.CENTER, 0, 0);
+
+                LinearLayout savepic = savePop.findViewById(R.id.save_pic);
+                savepic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                downloadFile(mListPicPath.get(mPosition));
+                            }
+                        }).start();
+
+                        savePop.dismiss();
+                    }
+                });
             }
         });
+    }
+    public void downloadFile(final String url) {
+        DownLoadImageService service = new DownLoadImageService(getApplicationContext(),
+                url,
+                new ImageDownLoadCallBack() {
+
+                    @Override
+                    public void onDownLoadSuccess(File file) {
+                    }
+                    @Override
+                    public void onDownLoadSuccess(Bitmap bitmap) {
+                        // 在这里执行图片保存方法
+                        ((Activity)mContext).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext,"保存成功",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onDownLoadFailed() {
+                        // 图片保存失败
+                        ((Activity)mContext).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext,"保存失败",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+
+                    }
+                });
+        //启动图片下载线程
+        new Thread(service).start();
+
+
     }
 }

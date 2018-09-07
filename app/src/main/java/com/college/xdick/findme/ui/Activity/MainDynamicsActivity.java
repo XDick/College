@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,8 +38,11 @@ import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
 import com.college.xdick.findme.MyClass.CommentScrollView;
+import com.college.xdick.findme.MyClass.DownLoadImageService;
+import com.college.xdick.findme.MyClass.ImageDownLoadCallBack;
 import com.college.xdick.findme.MyClass.PicturePageAdapter;
 import com.college.xdick.findme.MyClass.ViewPagerFixed;
 import com.college.xdick.findme.R;
@@ -49,9 +54,15 @@ import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.DynamicsComment;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Fragment.DynamicsFragment;
+import com.college.xdick.findme.ui.Fragment.UserCenterDynamicsFragment;
 import com.jaeger.ninegridimageview.NineGridImageView;
 import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
+import com.zyyoona7.popup.EasyPopup;
+import com.zyyoona7.popup.XGravity;
+import com.zyyoona7.popup.YGravity;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,10 +80,16 @@ import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.newim.core.BmobIMClient;
 import cn.bmob.newim.listener.ConversationListener;
 import cn.bmob.newim.listener.MessageSendListener;
+import cn.bmob.v3.BmobBatch;
+import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.datatype.BatchResult;
+import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.DeleteBatchListener;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
@@ -80,7 +97,9 @@ import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import pl.tajchert.waitingdots.DotsTextView;
 
 import static android.view.View.GONE;
+import static cn.bmob.v3.Bmob.getApplicationContext;
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/5/16.
@@ -235,7 +254,8 @@ public class MainDynamicsActivity extends AppCompatActivity {
         });
 
                     avatar=findViewById(R.id.dynamics_main_avatar);
-                    Glide.with(this).load(nowUser.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
+                    Glide.with(this).load(nowUser.getAvatar())
+                            .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
                     avatar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -276,7 +296,8 @@ public class MainDynamicsActivity extends AppCompatActivity {
 
             time2.setText(dynamics.getActivityTime());
 
-            Glide.with(this).load(dynamics.getActivityCover()).into(cover);
+            Glide.with(this).load(dynamics.getActivityCover())
+                    .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(cover);
 
             host.setText("由"+dynamics.getActivityHost()+"发起");
 
@@ -307,7 +328,8 @@ public class MainDynamicsActivity extends AppCompatActivity {
         mAdapter = new NineGridImageViewAdapter<String>() {
             @Override
             protected void onDisplayImage(Context context, ImageView imageView, String photo) {
-                Glide.with(MainDynamicsActivity.this).load(photo).into(imageView);
+                Glide.with(MainDynamicsActivity.this).load(photo)
+                        .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(imageView);
             }
 
             @Override
@@ -532,12 +554,14 @@ public class MainDynamicsActivity extends AppCompatActivity {
                     commentList.addAll(list);
 
                     if (state==REFRESH) {
-
+                         commentList.clear();
                         if (list.size()<10){
+                            commentList.addAll(list);
                             adapter.changeMoreStatus(DynamicsCommentAdapter.DONTSHOW);
                             ifEmpty=true;
 
                         }else {
+                            commentList.addAll(list);
                             ifEmpty=false;
                         }
 
@@ -634,6 +658,16 @@ public class MainDynamicsActivity extends AppCompatActivity {
 
 
 
+    public boolean onCreateOptionsMenu(Menu menu){
+
+
+        if (dynamics.getUser().equals(bmobUser.getUsername())){
+            getMenuInflater().inflate(R.menu.toolbar_delete_dynamics,menu);
+        }
+
+        return true;
+    }
+
     @Override                //ToolBar上面的按钮事件
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -643,6 +677,73 @@ public class MainDynamicsActivity extends AppCompatActivity {
                 finish();
                 break;
             }
+
+            case R.id.menu_delete_dynamics:
+            {
+                bmobUser.removeAll("dynamics", Arrays.asList(dynamics.getObjectId()));
+                bmobUser.update(new UpdateListener() {
+                    @Override
+                    public void done(BmobException e) {
+                        if (e==null){
+
+                            Dynamics dynamics1 = new Dynamics();
+                            dynamics1.setObjectId(dynamics.getObjectId());
+                            dynamics1.delete(new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                    if (e==null) {
+                                        Toast.makeText(MainDynamicsActivity.this,"成功删除",Toast.LENGTH_SHORT).show();
+                                        finish();
+                                        BmobQuery<DynamicsComment> query = new BmobQuery<>();
+                                        query.addWhereEqualTo("dynamicsID", dynamics.getObjectId());
+                                        query.findObjects(new FindListener<DynamicsComment>() {
+                                            @Override
+                                            public void done(List<DynamicsComment> list, BmobException e) {
+                                                List<BmobObject> commentList = new ArrayList<BmobObject>();
+                                                commentList.addAll(list);
+                                                new BmobBatch().deleteBatch(commentList).doBatch(new QueryListListener<BatchResult>() {
+                                                    @Override
+                                                    public void done(List<BatchResult> list, BmobException e) {
+                                                        if (e == null) {
+
+                                                        }
+                                                    }
+                                                });
+
+                                            }
+                                        });
+
+
+                                        String[] pic = dynamics.getPicture();
+                                        BmobFile.deleteBatch(pic, new DeleteBatchListener() {
+
+                                            @Override
+                                            public void done(String[] failUrls, BmobException e) {
+                                                if (e == null) {
+
+                                                } else {
+                                                    if (failUrls != null) {
+
+                                                    } else {
+
+                                                    }
+                                                }
+                                            }
+                                        });
+
+
+
+                                    }}
+                            });
+
+
+                        }
+                        else {
+                            Toast.makeText(MainDynamicsActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });}
+
 
 
             default:
@@ -665,7 +766,8 @@ public class MainDynamicsActivity extends AppCompatActivity {
                   public void done(List<MyUser> list, BmobException e) {
                       if (e==null){
                           if(!list.isEmpty()){  for (int i =0; i<list.size();i++) {
-                              Glide.with(MainDynamicsActivity.this).load(list.get(i).getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(avatarView[i]);
+                              Glide.with(MainDynamicsActivity.this).load(list.get(i).getAvatar())
+                                      .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new CropCircleTransformation())).into(avatarView[i]);
                               Log.d("","头像"+list.get(i).getAvatar());
                               if (i==5){
                                   break;
@@ -685,7 +787,7 @@ public class MainDynamicsActivity extends AppCompatActivity {
 
           }
 
-    public void showPictureDialog(final int mPosition,List<String> mListPicPath) {
+    public void showPictureDialog(final int mPosition,final List<String> mListPicPath) {
 
         TextView content,likeCount,commentCount;
 
@@ -751,7 +853,33 @@ public class MainDynamicsActivity extends AppCompatActivity {
             @Override
             public void OnLongClick() {
                 //展示保存取消dialog
-                //showPicDialog();
+                final EasyPopup savePop = EasyPopup.create()
+                        .setContentView(MainDynamicsActivity.this, R.layout.popup_savepic)
+                        .setWidth(400)
+                        .setBackgroundDimEnable(true)
+                        //变暗的透明度(0-1)，0为完全透明
+                        .setDimValue(0.4f)
+                        //变暗的背景颜色
+                        .apply();
+
+
+                savePop.showAtAnchorView(pager, YGravity.CENTER, XGravity.CENTER, 0, 0);
+
+                LinearLayout savepic = savePop.findViewById(R.id.save_pic);
+                savepic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                downloadFile(mListPicPath.get(mPosition));
+                            }
+                        }).start();
+
+                        savePop.dismiss();
+                    }
+                });
             }
         });
     }
@@ -772,6 +900,54 @@ public class MainDynamicsActivity extends AppCompatActivity {
         }
 
     }
+public void setSize(int size1){
+        size=size1;
+}
+
+public void setCount(int state){
+    if (state==0){
+       commentCount=--commentCount;
+    }
+    else if (state==1){
+        commentCount=++commentCount;
+    }
+
+}
+    public void downloadFile(final String url) {
+        DownLoadImageService service = new DownLoadImageService(getApplicationContext(),
+                url,
+                new ImageDownLoadCallBack() {
+
+                    @Override
+                    public void onDownLoadSuccess(File file) {
+                    }
+                    @Override
+                    public void onDownLoadSuccess(Bitmap bitmap) {
+                        // 在这里执行图片保存方法
+                         runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainDynamicsActivity.this,"保存成功",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onDownLoadFailed() {
+                        // 图片保存失败
+                       runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainDynamicsActivity.this,"保存失败",Toast.LENGTH_SHORT).show();
+                            }
+                        });
 
 
+                    }
+                });
+        //启动图片下载线程
+        new Thread(service).start();
+
+
+    }
 }

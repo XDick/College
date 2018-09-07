@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
 import com.college.xdick.findme.MyClass.ReadEvent;
 import com.college.xdick.findme.R;
@@ -60,6 +61,7 @@ import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/5/19.
@@ -245,8 +247,8 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
                             new BmobIMUserInfo(activity.getUserId(), activity.getUsername(), activity.getUserAvatar())
                             , activity.getActivityname().substring(activity.getActivityname().lastIndexOf(";") + 1)
                             , activity.getActivityId().substring(activity.getActivityId().lastIndexOf(";") + 1));
-                    activity.setActivityname("(拒绝)"+activity.getActivityname().substring(0,activity.getActivityname().lastIndexOf(";")));
                     activity.setIfCheck("true");
+                    activity.setActivityname("(拒绝)"+activity.getActivityname());
                     activity.save();
                     holder.askLayout.setVisibility(View.GONE);
                     EventBus.getDefault().post(new ReadEvent(""));
@@ -293,15 +295,22 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
         });
         holder.content.setText(activity.getContent());
        if (activity.getType().equals("dynamics_picture"))
-        {
+        {   try {
+
             holder.acname.setText(activity.getActivityname().substring(0,activity.getActivityname().lastIndexOf(";")));
+        }
+        catch (Exception e){
+
+        }
+
             }
             else {
             holder.acname.setText(activity.getActivityname());
         }
 
 
-         Glide.with(mContext).load(activity.getUserAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(holder.cover);
+         Glide.with(mContext).load(activity.getUserAvatar())
+                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new CropCircleTransformation())).into(holder.cover);
 
       holder.cover.setOnClickListener(new View.OnClickListener() {
           @Override
@@ -322,13 +331,13 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
           @Override
           public void onClick(View v) {
               if (activity.getType().equals("activity")){
-                  BmobQuery<MyActivity> query = new BmobQuery<>();
+                 BmobQuery<MyActivity> query = new BmobQuery<>();
                   query.getObject(activity.getActivityId(), new QueryListener<MyActivity>() {
                       @Override
                       public void done(MyActivity activity, BmobException e) {
-                          Intent intent = new Intent(mContext, ActivityActivity.class);
-                          intent.putExtra("ACTIVITY",activity);
-                          mContext.startActivity(intent);
+                          if (e==null){Intent intent = new Intent(mContext, ActivityActivity.class);
+                              intent.putExtra("ACTIVITY",activity);
+                              mContext.startActivity(intent);}
 
                       }
                   });
@@ -342,19 +351,21 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
                                    query.getObject(activity.getActivityId(), new QueryListener<Dynamics>() {
                                        @Override
                                        public void done(final Dynamics dynamics, BmobException e) {
-                                          BmobQuery<MyUser> query1 = new BmobQuery<>();
-                                          query1.getObject(dynamics.getUserId(), new QueryListener<MyUser>() {
-                                              @Override
-                                              public void done(MyUser myUser, BmobException e) {
-                                                  if (e==null){
-                                                      Intent intent = new Intent(mContext, MainDynamicsActivity.class);
-                                                      intent.putExtra("DYNAMICS", dynamics);
-                                                      intent.putExtra("USER",myUser);
-                                                      mContext.startActivity(intent);
+                                        if (e==null){
+                                            BmobQuery<MyUser> query1 = new BmobQuery<>();
+                                            query1.getObject(dynamics.getUserId(), new QueryListener<MyUser>() {
+                                                @Override
+                                                public void done(MyUser myUser, BmobException e) {
+                                                    if (e==null){
+                                                        Intent intent = new Intent(mContext, MainDynamicsActivity.class);
+                                                        intent.putExtra("DYNAMICS", dynamics);
+                                                        intent.putExtra("USER",myUser);
+                                                        mContext.startActivity(intent);
 
-                                                  }
-                                              }
-                                          });
+                                                    }
+                                                }
+                                            });
+                                        }
 
                     }
                 });
@@ -366,19 +377,20 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
                   query.getObject(activity.getActivityId().substring(0,activity.getActivityId().lastIndexOf(";")), new QueryListener<Dynamics>() {
                       @Override
                       public void done(final Dynamics dynamics, BmobException e) {
-                          BmobQuery<MyUser> query1 = new BmobQuery<>();
-                          query1.getObject(dynamics.getUserId(), new QueryListener<MyUser>() {
-                              @Override
-                              public void done(MyUser myUser, BmobException e) {
-                                  if (e==null){
-                                      Intent intent = new Intent(mContext, MainDynamicsActivity.class);
-                                      intent.putExtra("DYNAMICS", dynamics);
-                                      intent.putExtra("USER",myUser);
-                                      mContext.startActivity(intent);
+                          if (e==null){  BmobQuery<MyUser> query1 = new BmobQuery<>();
+                              query1.getObject(dynamics.getUserId(), new QueryListener<MyUser>() {
+                                  @Override
+                                  public void done(MyUser myUser, BmobException e) {
+                                      if (e==null){
+                                          Intent intent = new Intent(mContext, MainDynamicsActivity.class);
+                                          intent.putExtra("DYNAMICS", dynamics);
+                                          intent.putExtra("USER",myUser);
+                                          mContext.startActivity(intent);
 
+                                      }
                                   }
-                              }
-                          });
+                              });}
+
 
                       }
                   });
@@ -483,18 +495,7 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
     }
 
 
-  /*  @Override
-    public void onItemMove(int fromPosition, int toPosition) {
-        Collections.swap(mActivityList,fromPosition,toPosition);
-        notifyItemMoved(fromPosition,toPosition);
-    }
 
-    @Override
-    public void onItemDissmiss(int position) {
-        //移除数据
-        mActivityList.remove(position);
-        notifyItemRemoved(position);
-    }*/
 
 
 }

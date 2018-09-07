@@ -40,7 +40,8 @@ public class MyLocationListener implements BDLocationListener {
         province = bdLocation.getProvince();
         final String[] gps = {country, province, city, district, street};
         EventBus.getDefault().post(new GpsEvent(gps));
-        Log.d("TAG", "更新地址了");
+
+        Log.d("TAG", "更新地址了"+Arrays.toString(gps));
 
 
 

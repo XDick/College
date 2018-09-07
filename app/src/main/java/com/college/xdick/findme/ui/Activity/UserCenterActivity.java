@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
 import com.college.xdick.findme.R;
@@ -40,6 +42,8 @@ import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.newim.core.BmobIMClient;
+import cn.bmob.newim.core.ConnectionStatus;
+import cn.bmob.newim.listener.ConnectListener;
 import cn.bmob.newim.listener.MessageSendListener;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
@@ -50,6 +54,7 @@ import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 
 /**
@@ -232,8 +237,10 @@ public class UserCenterActivity extends AppCompatActivity {
         background=findViewById(R.id.center_background);
         avatar=findViewById(R.id.center_useravatar);
         username= findViewById(R.id.center_username);
-        Glide.with(this).load(nowUser.getAvatar()).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar);
-        Glide.with(this).load(nowUser.getAvatar()).apply(bitmapTransform(new BlurTransformation(9, 7))
+        Glide.with(this).load(nowUser.getAvatar())
+                .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar);
+        Glide.with(this).load(nowUser.getAvatar())
+                .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new BlurTransformation(9, 7))
         ).into(background);
         message_layout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -280,16 +287,45 @@ public class UserCenterActivity extends AppCompatActivity {
 
 
        private void startChatting(String id,String name,String avatar){
+        if (BmobIM.getInstance().getCurrentStatus()== ConnectionStatus.CONNECTED){
+            BmobIMUserInfo info = new BmobIMUserInfo(id, name, avatar);
+            BmobIMConversation conversationEntrance=  BmobIM.getInstance().startPrivateConversation( info,null);
 
-        BmobIMUserInfo info = new BmobIMUserInfo(id, name, avatar);
-        BmobIMConversation conversationEntrance=  BmobIM.getInstance().startPrivateConversation( info,null);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("c",conversationEntrance);
+            Intent intent = new Intent(UserCenterActivity.this,
+                    ChatActivity.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
+        else {
+            Toast.makeText(this,"正在连接服务器请稍等...",Toast.LENGTH_SHORT).show();
+            final MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
+            if (bmobUser != null) {
+                if (!TextUtils.isEmpty(bmobUser.getObjectId())) {
+                    BmobIM.connect(bmobUser.getObjectId(), new ConnectListener() {
+                        @Override
+                        public void done(String uid, BmobException e) {
+                            if (e == null) {
+                                try {
+                                    BmobIM.getInstance().
+                                            updateUserInfo(new BmobIMUserInfo( bmobUser.getObjectId(),
+                                                    bmobUser.getUsername(),  bmobUser.getAvatar()));
+                                }
+                                catch (Exception e2){
+                                    e2.printStackTrace();
+                                }
 
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("c",conversationEntrance);
-        Intent intent = new Intent(UserCenterActivity.this,
-                ChatActivity.class);
-        intent.putExtras(bundle);
-        startActivity(intent);
+                            } else {
+                                //连接失败
+                                Toast.makeText(UserCenterActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
 
 
     }
