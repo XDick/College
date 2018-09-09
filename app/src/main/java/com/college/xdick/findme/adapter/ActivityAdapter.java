@@ -275,7 +275,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
            }
 
 
-        if (activity.getDate()+60*60*24*1000*2<  ((MainActivity)mContext).getBmobTime()){
+        if (activity.getDate()+60*60*24*1000*1.5<  ((MainActivity)mContext).getBmobTime()){
                holder.finish.setBackground(mContext.getDrawable(R.drawable.finish));
         }
         else {

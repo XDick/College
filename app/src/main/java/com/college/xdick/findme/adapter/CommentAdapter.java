@@ -182,8 +182,16 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                            Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                            return;
                        }
-
-               if (activity2.getHostId().equals(MyUser.getCurrentUser(MyUser.class).getObjectId())){
+               activity.ifReply=false;
+               int position = holder.getAdapterPosition();
+               Comment comment = mCommentList.get(position);
+               Comment comment2 = new Comment();
+               comment2.setReplyusername(comment.getUserName());
+               comment2.setReplyuserId(comment.getUserID());
+               comment2.setReplycontent(comment.getContent());
+               comment2.setActivityID(comment.getActivityID());
+               activity.reply(comment,comment2);
+             /*  if (activity2.getHostId().equals(MyUser.getCurrentUser(MyUser.class).getObjectId())){
                        activity.ifReply=false;
                        int position = holder.getAdapterPosition();
                        Comment comment = mCommentList.get(position);
@@ -216,7 +224,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                }
 
 
-               }
+               }*/
 
                }
 

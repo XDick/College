@@ -140,7 +140,7 @@ public class UserFragment extends Fragment {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("关于");
-                builder.setMessage("本应用由XDick-谢德锟开发，有Bug和意见欢迎反馈QQ470471350");
+                builder.setMessage("本应用由XDick-谢德锟开发，有Bug和意见欢迎加QQ群815191255 反馈");
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

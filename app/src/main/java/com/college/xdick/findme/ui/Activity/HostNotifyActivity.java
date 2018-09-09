@@ -39,7 +39,7 @@ import cn.bmob.v3.listener.FindListener;
  * Created by Administrator on 2018/5/21.
  */
 
-public class HostNotifyActivity extends AppCompatActivity {
+public class HostNotifyActivity extends BaseActivity {
 
     List<MyUser> joinMember = new ArrayList<>();
 

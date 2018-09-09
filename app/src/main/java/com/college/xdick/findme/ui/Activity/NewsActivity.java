@@ -13,7 +13,7 @@ import com.college.xdick.findme.R;
  * Created by Administrator on 2018/5/6.
  */
 
-public class NewsActivity extends AppCompatActivity {
+public class NewsActivity extends BaseActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

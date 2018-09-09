@@ -34,7 +34,7 @@ import cn.bmob.v3.listener.FindListener;
  * Created by Administrator on 2018/6/3.
  */
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends BaseActivity {
     private Toolbar toolbar;
 
      List<MyActivity> placeActivityList = new ArrayList<>();
@@ -92,7 +92,7 @@ public class SearchActivity extends AppCompatActivity {
         recyclerViewAcplace.setLayoutManager(layoutManager2);
 
         adapterPlace= new SearchActivityAdapter(placeActivityList);
-
+         adapterPlace.setSearchMark(searchMark);
         recyclerViewAcplace.setNestedScrollingEnabled(false);
         recyclerViewAcplace.setAdapter(adapterPlace);
 
@@ -104,7 +104,7 @@ public class SearchActivity extends AppCompatActivity {
         recyclerViewUser.setLayoutManager(layoutManager3);
 
         adapterUser = new SearchUserAdapter(userList);
-
+        adapterUser.setSearchMark(searchMark);
         recyclerViewUser.setNestedScrollingEnabled(false);
         recyclerViewUser.setAdapter(adapterUser);
 
@@ -135,6 +135,7 @@ public class SearchActivity extends AppCompatActivity {
 
         BmobQuery<MyUser> query = new BmobQuery<>();
         query.or(queries);
+        query.setLimit(10);
         query.findObjects(new FindListener<MyUser>() {
             @Override
             public void done(List<MyUser> list, BmobException e) {
@@ -146,7 +147,7 @@ public class SearchActivity extends AppCompatActivity {
                         adapterUser.addFooterView(footer);
                         adapterUser.setList(list);
                         recyclerViewUser.setAdapter(adapterUser);
-                        more.setText("查看更多("+(list.size()-3)+")");
+                        more.setText("查看更多");
                     }
 
                     for (MyUser user:list){
@@ -156,9 +157,6 @@ public class SearchActivity extends AppCompatActivity {
                         }
                     }
                     adapterUser.notifyDataSetChanged();
-
-
-
                 }
             }
         });
@@ -187,6 +185,7 @@ public class SearchActivity extends AppCompatActivity {
 
         BmobQuery<MyActivity> query = new BmobQuery<>();
         query.or(queries);
+        query.setLimit(10);
         query.findObjects(new FindListener<MyActivity>() {
             @Override
             public void done(List<MyActivity> list, BmobException e) {
@@ -199,7 +198,7 @@ public class SearchActivity extends AppCompatActivity {
                       adapterPlace.addFooterView(footer);
                       adapterPlace.setList(list);
                       recyclerViewAcplace.setAdapter(adapterPlace);
-                      more.setText("查看更多("+(list.size()-3)+")");
+                      more.setText("查看更多");
                   }
                      Collections.reverse(list);
                     for (MyActivity activity:list){

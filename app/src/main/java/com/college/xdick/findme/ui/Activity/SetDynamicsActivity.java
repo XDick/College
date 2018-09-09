@@ -84,7 +84,7 @@ import cn.bmob.v3.listener.UploadFileListener;
  * Created by Administrator on 2018/4/3.
  */
 
-public class SetDynamicsActivity extends AppCompatActivity {
+public class SetDynamicsActivity extends BaseActivity {
     private EditText contentEdit;
     private MyActivity myActivity;
     private LinearLayout layout,selectActivity,checkboxLayout;

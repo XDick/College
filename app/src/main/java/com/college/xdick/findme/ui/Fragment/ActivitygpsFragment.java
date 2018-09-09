@@ -165,22 +165,23 @@ public class ActivitygpsFragment extends Fragment {
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
             public void done(Long aLong, BmobException e) {
-                if (getContext()!=null) {
-                    ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
-                }
 
-                if(bmobUser!=null){
-
-
-
-                    String[] gps = bmobUser.getGps();
-
-                    BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
-                    if (gps!=null){
-                    query.addWhereEqualTo("gps", gps[2]);}
                     if (e==null){
-                        query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
+                        if (getContext()!=null) {
+                            ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
                         }
+
+                        if(bmobUser!=null){
+
+
+
+                            String[] gps = bmobUser.getGps();
+
+                            BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
+                            if (gps!=null){
+                                query.addWhereEqualTo("gps", gps[2]);}
+                        query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
+
                     query.order("-createdAt");
                     query.setSkip(size);
                     query.setLimit(10);
@@ -233,7 +234,7 @@ public class ActivitygpsFragment extends Fragment {
                         }
                     });
 
-
+                        }
                 }
 
             }
@@ -289,22 +290,23 @@ public class ActivitygpsFragment extends Fragment {
             public void done(Long aLong, BmobException e) {
 
 
-                if (getContext()!=null) {
-                    ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
-                }
 
-                if(bmobUser!=null){
-
-
-
-                    String[] gps = bmobUser.getGps();
-
-                    BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
-                    if (gps!=null){
-                        query.addWhereEqualTo("gps", gps[2]);}
                     if (e==null){
+                        if (getContext()!=null) {
+                            ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
+                        }
+
+                        if(bmobUser!=null){
+
+
+
+                            String[] gps = bmobUser.getGps();
+
+                            BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
+                            if (gps!=null){
+                                query.addWhereEqualTo("gps", gps[2]);}
                         query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
-                    }
+
                     query.setSkip(size);
                     query.setLimit(10);
                     query.order("date");
@@ -354,7 +356,7 @@ public class ActivitygpsFragment extends Fragment {
                         }
                     });
 
-
+                        }
                 }
 
             }

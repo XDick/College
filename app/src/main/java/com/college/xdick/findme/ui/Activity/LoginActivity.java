@@ -44,7 +44,7 @@ import cn.bmob.v3.listener.SaveListener;
  * Created by Administrator on 2018/4/2.
  */
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
     private EditText accountEdit, passwordEdit;
     private Button login, signup,qqLogin;
     private Tencent mTencent;

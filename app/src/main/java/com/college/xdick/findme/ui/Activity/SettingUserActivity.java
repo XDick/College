@@ -18,7 +18,7 @@ import cn.bmob.v3.BmobUser;
  * Created by Administrator on 2018/5/17.
  */
 
-public class SettingUserActivity extends AppCompatActivity{
+public class SettingUserActivity extends BaseActivity{
 
       MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     @Override

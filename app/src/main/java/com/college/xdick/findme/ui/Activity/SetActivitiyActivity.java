@@ -81,7 +81,7 @@ import static cn.bmob.newim.core.BmobIMClient.getContext;
  * Created by Administrator on 2018/4/11.
  */
 
-public class SetActivitiyActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener,DatePickerDialog.OnDateSetListener {
+public class SetActivitiyActivity extends BaseActivity implements TimePickerDialog.OnTimeSetListener,DatePickerDialog.OnDateSetListener {
     EditText titleE,  placeE, contentE,createE;
     ImageView cover;
     LinearLayout layout,chooselayout,labellayout;

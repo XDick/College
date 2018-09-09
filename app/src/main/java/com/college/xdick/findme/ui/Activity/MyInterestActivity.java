@@ -39,7 +39,7 @@ import cn.bmob.v3.listener.UpdateListener;
  * Created by Administrator on 2018/5/11.
  */
 
-public class MyInterestActivity extends AppCompatActivity{
+public class MyInterestActivity extends BaseActivity{
     private   LabelsView myTagLabel,myTagLabelmain,myTagLabeladd;
     private   Button add,delete,createButton;
     private   LinearLayout layout,chooselayout ;

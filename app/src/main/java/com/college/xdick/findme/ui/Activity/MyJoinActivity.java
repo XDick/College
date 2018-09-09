@@ -39,7 +39,7 @@ import cn.bmob.v3.listener.UpdateListener;
  * Created by Administrator on 2018/5/19.
  */
 
-public class MyJoinActivity extends AppCompatActivity {
+public class MyJoinActivity extends BaseActivity {
     private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     private List<MyActivity> activityList= new ArrayList<>();
     private ActivityAdapter2 adapter;

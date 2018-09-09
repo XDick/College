@@ -58,7 +58,7 @@ import cn.bmob.v3.listener.QueryListener;
  * Created by Administrator on 2018/4/4 0004.
  */
 
-public class ChatActivity extends AppCompatActivity implements MessageListHandler {
+public class ChatActivity extends BaseActivity  implements MessageListHandler {
 
     private RecyclerView msgRecyclerView;
     private EditText inputText;
@@ -240,7 +240,7 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
     private void sendIMMsg(){
 
         if (BmobIM.getInstance().getCurrentStatus()!= ConnectionStatus.CONNECTED){
-            Toast.makeText(this,"正在连接服务器请稍等...",Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this,"正在连接服务器请稍等...",Toast.LENGTH_SHORT).show();
             IMconnectBomob();
             return;
         }
@@ -412,7 +412,7 @@ public class ChatActivity extends AppCompatActivity implements MessageListHandle
 
                         } else {
                             //连接失败
-                            Toast.makeText(ChatActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
+                           // Toast.makeText(ChatActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

@@ -34,7 +34,7 @@ import cn.bmob.v3.listener.UpdateListener;
  * Created by Administrator on 2018/5/19.
  */
 
-public class MyLikeActivity extends AppCompatActivity {
+public class MyLikeActivity extends BaseActivity {
 
     private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     private List<MyActivity> activityList= new ArrayList<>();

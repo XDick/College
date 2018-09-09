@@ -17,6 +17,7 @@ import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
+import com.college.xdick.findme.ui.Activity.SearchActivity;
 import com.college.xdick.findme.ui.Activity.SearchUserActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
 
@@ -38,8 +39,13 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
     private int ITEM_TYPE_HEADER = 1;
     private int ITEM_TYPE_FOOTER = 2;
     private int ITEM_TYPE_EMPTY = 3;
+    private int load_more_status;
+    //上拉加载更多
+    public static final int  PULLUP_LOAD_MORE=0;
+    //正在加载中
+    public static final int  LOADING_MORE=1;
 
-
+    public static final int  NO_MORE=2;
 
 
     private List<MyUser> mActivityList;
@@ -53,6 +59,8 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
 
 
    private List<MyUser> allList;
+
+   private String searchMark;
 
 
     static class ViewHolder extends RecyclerView.ViewHolder{
@@ -88,6 +96,8 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
 
    }
 
+   public  void setSearchMark(String mark){searchMark=mark;}
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -105,14 +115,20 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
         } else if (viewType == ITEM_TYPE_FOOTER) {
 
             final ViewHolder holder= new ViewHolder(mFooterView);
-            mFooterView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(mContext, SearchUserActivity.class);
-                    intent.putExtra("USERLIST",(Serializable) allList);
-                    mContext.startActivity(intent);
-                }
-            });
+
+            if (mContext instanceof SearchActivity){
+                mFooterView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(mContext, SearchUserActivity.class);
+                        intent.putExtra("USERLIST",(Serializable) allList);
+                        intent.putExtra("EXTRA",searchMark);
+                        intent.putExtra("SIGNAL",SearchUserActivity.SEARCH);
+                        mContext.startActivity(intent);
+                    }
+                });
+            }
+
             return holder;
 
 
@@ -169,11 +185,29 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
         int type = getItemViewType(position);
 
         if (type == ITEM_TYPE_HEADER
-                || type == ITEM_TYPE_FOOTER
                 || type == ITEM_TYPE_EMPTY) {
             return;
         }
 
+
+        if (type == ITEM_TYPE_FOOTER) {
+            if (!(mContext instanceof SearchActivity)) {
+            TextView textView= mFooterView.findViewById(R.id.footer_text);
+            switch (load_more_status) {
+                case PULLUP_LOAD_MORE:
+                    textView.setText("上拉加载更多");
+                    break;
+                case LOADING_MORE:
+                    textView.setText("正在加载数据...");
+                    break;
+
+                case NO_MORE:
+                    textView.setText("没有更多了");
+                    break;
+
+            }}
+            return;
+        }
 
         int realPos = getRealItemPosition(position);
 
@@ -248,20 +282,10 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
         notifyDataSetChanged();
     }
 
-
+    public void changeMoreStatus(int status){
+        load_more_status=status;
+    }
 
 }
 
 
-  /*  @Override
-    public void onItemMove(int fromPosition, int toPosition) {
-        Collections.swap(mActivityList,fromPosition,toPosition);
-        notifyItemMoved(fromPosition,toPosition);
-    }
-
-    @Override
-    public void onItemDissmiss(int position) {
-        //移除数据
-        mActivityList.remove(position);
-        notifyItemRemoved(position);
-    }*/

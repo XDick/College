@@ -55,7 +55,7 @@ import cn.bmob.v3.listener.UpdateListener;
  * Created by Administrator on 2018/4/12.
  */
 
-public class ActivityActivity extends AppCompatActivity {
+public class ActivityActivity extends BaseActivity {
    private EditText editComment;
    private ImageView comment,like,sendComment;
    private LinearLayout startEdit,statusbar;
@@ -106,9 +106,15 @@ public class ActivityActivity extends AppCompatActivity {
                     Toast.makeText(ActivityActivity.this,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                     return;
                 }
+                startEdit.setVisibility(View.VISIBLE);
+                statusbar.setVisibility(View.GONE);
+                editComment.setFocusable(true);
+                editComment.setFocusableInTouchMode(true);
+                editComment.requestFocus();
+                editComment.findFocus();
+                imm.showSoftInput( editComment, 0);
 
-
-                    if (activity.getHostId().equals(myUser.getObjectId()))
+                  /*  if (activity.getHostId().equals(myUser.getObjectId()))
                     {
                         startEdit.setVisibility(View.VISIBLE);
                         statusbar.setVisibility(View.GONE);
@@ -140,7 +146,7 @@ public class ActivityActivity extends AppCompatActivity {
 
 
 
-                    }
+                    }*/
 
             }
         });
@@ -379,7 +385,7 @@ public class ActivityActivity extends AppCompatActivity {
                 }
                 else{
                     if (activity.getJoinUser()==null) {
-                        Toast.makeText(this,"加入活动才可以评论",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this,"加入活动才可以上传",Toast.LENGTH_SHORT).show();
                        return true;
                     }
                     if (myfragment.ifJoin||Arrays.asList(activity.getJoinUser()).contains(MyUser.getCurrentUser(MyUser.class).getObjectId()))
@@ -389,7 +395,7 @@ public class ActivityActivity extends AppCompatActivity {
                         return true;
                     }
                     else {
-                        Toast.makeText(this,"加入活动才可以评论",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this,"加入活动才可以上传",Toast.LENGTH_SHORT).show();
                     }
 
 
@@ -430,7 +436,7 @@ public class ActivityActivity extends AppCompatActivity {
            statusbar.setVisibility(View.VISIBLE);
            ifReply=false;
             imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
-            editComment.setHint("发表你的评论");
+            editComment.setHint("发表你的讨论");
         }
 
         else {
@@ -470,7 +476,7 @@ public class ActivityActivity extends AppCompatActivity {
     }
 
     public  void setText(int count){
-        commentcount .setText("评论:"+count);
+        commentcount .setText("讨论:"+count);
     }
 
     public void joinChange(int state){

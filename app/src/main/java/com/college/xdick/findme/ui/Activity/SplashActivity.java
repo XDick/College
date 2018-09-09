@@ -78,6 +78,7 @@ public class SplashActivity extends Activity {
             @Override
             public void done(final Long aLong, BmobException e) {
 
+                if (e == null) {
                     BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
                     List<BmobQuery<MyActivity>> queries = new ArrayList<>();
 //返回50条数据，如果不加上这条语句，默认返回10条数据
@@ -88,24 +89,23 @@ public class SplashActivity extends Activity {
                         }*/
 
 
-                           String tag[] = bmobUser.getTag();
-                           if (tag!=null){
-                               for (int i =0; i<tag.length;i++){
-                                   BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
-                                   q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
-                                   queries.add(q);
-                                   query.or(queries);
-                               }
+                        String tag[] = bmobUser.getTag();
+                        if (tag!=null){
+                            for (int i =0; i<tag.length;i++){
+                                BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
+                                q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
+                                queries.add(q);
+                                query.or(queries);
+                            }
 
-                           }
+                        }
 
 
 
 
                     }
-                if (e == null) {
                     query.addWhereGreaterThan("date", aLong * 1000L - 2.5*60 * 60 * 24 * 1000);
-                }
+
 
 
 
@@ -116,17 +116,10 @@ public class SplashActivity extends Activity {
                     query.findObjects(new FindListener<MyActivity>() {
                         @Override
                         public void done(List<MyActivity> object, BmobException e) {
-
-
-
-                                IMconnectBomob();
-
+                            IMconnectBomob();
                             if (e == null) {
-
                                 intent.putExtra("LISTDATA", (Serializable)object);
                                 intent.putExtra("TIME", aLong * 1000L);
-
-
                             } else {
                                 Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
@@ -138,7 +131,6 @@ public class SplashActivity extends Activity {
 
                                         if (status.getMsg().equals("connected")) {
                                             startActivity(intent);
-
                                             finish();
 
                                         }
@@ -150,13 +142,18 @@ public class SplashActivity extends Activity {
                                 });
                             }
                             else {
-                                startActivity(intent);
-                                finish();
+
+                             startActivity(intent);
+                             finish();
                             }
                         }
                     });
 
+                }
+                else {
 
+                    Toast.makeText(getBaseContext(),"无法连接服务器o(╥﹏╥)o"+'\n'+"请检查网络或重新打开应用", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
@@ -211,10 +208,9 @@ public class SplashActivity extends Activity {
                             }
 
                         } else {
-                          // startActivity(intent);
-                           //finish();
+
                             //连接失败
-                            Toast.makeText(getBaseContext(),"无法连接服务器", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(),"无法连接服务器o(╥﹏╥)o"+'\n'+"请检查网络或重新打开应用", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

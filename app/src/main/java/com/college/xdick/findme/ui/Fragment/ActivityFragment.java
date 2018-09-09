@@ -171,34 +171,33 @@ public class ActivityFragment extends Fragment {
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
             public void done(Long aLong, BmobException e) {
-                if (getContext()!=null) {
-                    ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
-                }
+                if (e==null){
+                    if (getContext()!=null) {
+                        ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
+                    }
 
-                BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
-                List<BmobQuery<MyActivity>> queries = new ArrayList<>();
+                    BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
+                    List<BmobQuery<MyActivity>> queries = new ArrayList<>();
 
-                if(bmobUser!=null&&bmobUser.getTag()!=null){
+                    if(bmobUser!=null&&bmobUser.getTag()!=null){
                     /*String gps[]=bmobUser.getGps();
                     if (gps!=null){
                         query.addWhereEqualTo("gps",gps[1]);}*/
 
-                    String tag[] = bmobUser.getTag();
-                    if (tag!=null){
-                        for (int i =0; i<tag.length;i++){
-                            BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
-                            q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
-                            queries.add(q);
-                            query.or(queries);
+                        String tag[] = bmobUser.getTag();
+                        if (tag!=null){
+                            for (int i =0; i<tag.length;i++){
+                                BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
+                                q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
+                                queries.add(q);
+                                query.or(queries);
+                            }
+
                         }
 
                     }
-
-                }
-
-                if (e==null){
                     query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
-                }
+
 
                 Log.d("","时间"+aLong);
                 //返回50条数据，如果不加上这条语句，默认返回10条数据
@@ -256,7 +255,11 @@ public class ActivityFragment extends Fragment {
                             Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
                         }
                     }
-                });
+
+
+                }
+                );}
+
 
             }
         });
@@ -328,23 +331,25 @@ public class ActivityFragment extends Fragment {
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
             public void done(Long aLong, BmobException e) {
-                if (getContext()!=null) {
-                    ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
-                }
 
-                BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
-                List<BmobQuery<MyActivity>> queries = new ArrayList<>();
 
-                if(bmobUser!=null&&bmobUser.getTag()!=null){
+                if (e==null){
+                    if (getContext()!=null) {
+                        ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
+                    }
+
+                    BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
+                    List<BmobQuery<MyActivity>> queries = new ArrayList<>();
+
+                    if(bmobUser!=null&&bmobUser.getTag()!=null){
                     /*String gps[]=bmobUser.getGps();
                     if (gps!=null){
                         query.addWhereEqualTo("gps",gps[1]);}*/
 
-                }
-
-                if (e==null){
+                    }
                     query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
-                }
+
+
 
                 Log.d("","时间"+aLong);
                 if(bmobUser!=null&&bmobUser.getTag()!=null) {
@@ -411,7 +416,7 @@ public class ActivityFragment extends Fragment {
                             Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
                         }
                     }
-                });
+                });  }
 
             }
         });

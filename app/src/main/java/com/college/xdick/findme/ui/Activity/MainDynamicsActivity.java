@@ -105,7 +105,7 @@ import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
  * Created by Administrator on 2018/5/16.
  */
 
-public class MainDynamicsActivity extends AppCompatActivity {
+public class MainDynamicsActivity extends BaseActivity {
 
     private TextView content1,time1,user1,commentcount,likecount;
     private Toolbar toolbar;

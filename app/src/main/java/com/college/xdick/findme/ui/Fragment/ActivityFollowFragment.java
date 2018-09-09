@@ -157,24 +157,25 @@ public class ActivityFollowFragment extends Fragment {
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
             public void done(Long aLong, BmobException e) {
-                if (getContext()!=null) {
-                    ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
-                }
-                if(bmobUser!=null){
 
-
-
-                   String[] follow = bmobUser.getFollowing();
-
-                    BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
-                    if (follow!=null){
-                        final List<String> list =new ArrayList<>(Arrays.asList(follow));
-                        list.add(bmobUser.getObjectId());
-
-                        query.addWhereContainedIn("hostId", list);}
                     if (e==null){
+                        if (getContext()!=null) {
+                            ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
+                        }
+                        if(bmobUser!=null){
+
+
+
+                            String[] follow = bmobUser.getFollowing();
+
+                            BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
+                            if (follow!=null){
+                                final List<String> list =new ArrayList<>(Arrays.asList(follow));
+                                list.add(bmobUser.getObjectId());
+
+                                query.addWhereContainedIn("hostId", list);}
                          query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
-                    }
+
                     query.order("-createdAt");
                     query.setSkip(size);
                     query.setLimit(10);
@@ -226,7 +227,7 @@ public class ActivityFollowFragment extends Fragment {
                             }
                         }
                     });
-
+                        }
 
                 }
 
@@ -283,25 +284,26 @@ public class ActivityFollowFragment extends Fragment {
             public void done(Long aLong, BmobException e) {
 
 
-                if (getContext()!=null) {
-                    ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
-                }
 
-                if(bmobUser!=null){
-
-
-
-                    String[] follow = bmobUser.getFollowing();
-
-                    BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
-                    if (follow!=null){
-                        final List<String> list =new ArrayList<>(Arrays.asList(follow));
-                        list.add(bmobUser.getObjectId());
-
-                        query.addWhereContainedIn("hostId", list);}
                     if (e==null){
+                        if (getContext()!=null) {
+                            ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
+                        }
+
+                        if(bmobUser!=null){
+
+
+
+                            String[] follow = bmobUser.getFollowing();
+
+                            BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
+                            if (follow!=null){
+                                final List<String> list =new ArrayList<>(Arrays.asList(follow));
+                                list.add(bmobUser.getObjectId());
+
+                                query.addWhereContainedIn("hostId", list);}
                         query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
-                    }
+
                     query.setSkip(size);
                     query.setLimit(10);
                     query.order("date");
@@ -351,7 +353,7 @@ public class ActivityFollowFragment extends Fragment {
                         }
                     });
 
-
+                        }
                 }
 
             }

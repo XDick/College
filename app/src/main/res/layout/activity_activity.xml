@@ -25,7 +25,7 @@ android:orientation="vertical"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:hint="发表你的评论"
+            android:hint="发表你的讨论"
             android:id="@+id/activity_edit_comment_edittext" />
 
         <ImageView

@@ -138,7 +138,7 @@ public class PrivateConversationFragment extends Fragment implements MessageList
     }
 
     private void IMconnectBomob() {
-        Toast.makeText(getActivity(),"正在连接服务器请稍等...",Toast.LENGTH_SHORT).show();
+
         //TODO 连接：3.1、登录成功、注册成功或处于登录状态重新打开应用后执行连接IM服务器的操作
         final MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
         if (bmobUser != null) {
@@ -153,7 +153,7 @@ public class PrivateConversationFragment extends Fragment implements MessageList
                             initAllConversation();
                         } else {
                             //连接失败
-                            Toast.makeText(getActivity(),e.getMessage(), Toast.LENGTH_SHORT).show();
+                          //  Toast.makeText(getActivity(),e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

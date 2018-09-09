@@ -58,10 +58,12 @@ import com.college.xdick.findme.ui.Activity.HostNotifyActivity;
 import com.college.xdick.findme.ui.Activity.LoginActivity;
 import com.college.xdick.findme.ui.Activity.MainActivity;
 import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
+import com.college.xdick.findme.ui.Activity.SearchUserActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
 import com.youth.banner.Transformer;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -119,6 +121,8 @@ public class StartactivityFragment extends Fragment{
    public static int ADD=2,REFRESH=1,REPLY=3;
     private int commentCount;
     private NestedScrollView scroller;
+    private LinearLayout avatarLayout;
+    private boolean ifHavePeopleIn=false;
 
 
     @Override
@@ -159,6 +163,7 @@ public class StartactivityFragment extends Fragment{
         });
         activityId = activity.getObjectId();
         scroller = rootView.findViewById(R.id.scroll);
+        avatarLayout= rootView.findViewById(R.id.avatar_layout);
 
 
 
@@ -349,9 +354,14 @@ public class StartactivityFragment extends Fragment{
                                               joinButton.setBackgroundResource(R.drawable.join_button_radius_true);
                                           }
                                       });
-                                      if (count<5){
+                                       if (!ifHavePeopleIn){
+                                           Glide.with(getContext()).load(bmobUser.getAvatar())
+                                                   .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar[count]);
+                                       }
+                                       else {
                                           Glide.with(getContext()).load(bmobUser.getAvatar())
                                                   .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar[++count]);
+
                                       }
 
                                       sendMessage(bmobUser.getUsername()+"加入了你的"+"#"+activity.getTitle()+"#活动"
@@ -384,6 +394,8 @@ public class StartactivityFragment extends Fragment{
                                           Glide.with(getContext()).load(R.drawable.blank_pic)
                                                   .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar[count--]);
                                       }
+                                      sendMessage(bmobUser.getUsername()+"退出了你的"+"#"+activity.getTitle()+"#活动"
+                                              ,new BmobIMUserInfo(hostID,activity.getHostName(),hostAvatar));
                                       getActivity().runOnUiThread(new Runnable() {
                                           @Override
                                           public void run() {
@@ -417,39 +429,38 @@ public  void initJoin(){
      if (activity.getJoinUser()==null){
          return;
      }
-        BmobQuery<MyUser> query = new BmobQuery<MyUser>();
+     BmobQuery<MyUser> query = new BmobQuery<MyUser>();
     query.addWhereContainedIn("objectId", Arrays.asList(activity.getJoinUser()));
-    query.setLimit(6);
+    query.setLimit(10);
     query.findObjects(new FindListener<MyUser>() {
         @Override
-        public void done(List<MyUser> list, BmobException e) {
+        public void done(final List<MyUser> list, BmobException e) {
             if(e==null){
+                ifHavePeopleIn=true;
+                avatarLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Intent intent = new Intent(getActivity(),SearchUserActivity.class);
+                        intent.putExtra("USERLIST",(Serializable)list);
+                        intent.putExtra("SIGNAL",SearchUserActivity.JOIN);
+                        intent.putExtra("EXTRA",activity.getJoinUser());
+                        startActivity(intent);
+
+                    }
+                });
+
 
                 for(final MyUser user :list){
-                    avatar[count].setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (MyUser.getCurrentUser(MyUser.class)==null){
-                                startActivity(new Intent(getContext(),LoginActivity.class));
-                                getActivity().finish();
-                                Toast.makeText(getActivity(),"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-
-                            Intent intent = new Intent(getActivity(), UserCenterActivity.class);
-                            intent.putExtra("USER",user);
-                            startActivity(intent);
-
-                        }
-                    });
                     Glide.with(getContext()).load(user.getAvatar())
                             .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar[count]);
 
-                    if(count==list.size()-1){
+                    if(count==list.size()-1||count==5){
                         break;
                     }
                     count++;
                 }
+
             }
             else
             {

@@ -27,6 +27,7 @@ import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.MessageFragmentStatePagerAdapter;
 import com.college.xdick.findme.adapter.UserCenterFragmentStatePagerAdapter;
+import com.college.xdick.findme.bean.FollowChart;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Fragment.MessageFragment;
 
@@ -49,6 +50,7 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
@@ -61,7 +63,7 @@ import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
  * Created by Administrator on 2018/5/31.
  */
 
-public class UserCenterActivity extends AppCompatActivity {
+public class UserCenterActivity extends BaseActivity {
     private ImageView background,avatar;
     private TextView username,follow_text,fanscount ,followingcount;
     private MyUser myUser =BmobUser.getCurrentUser(MyUser.class);
@@ -111,45 +113,47 @@ public class UserCenterActivity extends AppCompatActivity {
 
 
 
-        try{
+      /*  try{
             followingcount.setText("关注: "+nowUser.getFollowing().length);
         }
         catch (Exception e){
             e.printStackTrace();
         }
-
+*/
 
         followingcount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(UserCenterActivity.this,UserCenterFollowingActivity.class);
-                intent.putExtra("USER",nowUser);
+                Intent intent = new Intent(UserCenterActivity.this,SearchUserActivity.class);
+                intent.putExtra("USERLIST",new ArrayList<MyUser>());
+                intent.putExtra("EXTRA",nowUser.getFollowing());
+                intent.putExtra("SIGNAL",SearchUserActivity.FOLLOWING);
                 startActivity(intent);
             }
         });
 
 
-        BmobQuery<MyUser> query = new BmobQuery<>();
-        query.addWhereContainsAll("following",Arrays.asList(nowUser.getObjectId()));
-        query.setLimit(500);
-        query.findObjects(new FindListener<MyUser>() {
-            @Override
-            public void done(final List<MyUser> list, BmobException e) {
-                if (e==null){
+     /*   BmobQuery<FollowChart> query = new BmobQuery<>();
+      query.getObject(myUser.getFollowChartId(), new QueryListener<FollowChart>() {
+          @Override
+          public void done(FollowChart followChart, BmobException e) {
+              if (e==null){
+                  fanscount.setText("粉丝: "+followChart.getFansCount());
+              }
+          }
+      });*/
 
-                    fanscount.setText("粉丝: "+list.size());
-                    fanscount.setOnClickListener(new View.OnClickListener() {
+     fanscount.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent intent = new Intent(UserCenterActivity.this,UserCenterFollowedActivity.class);
-                            intent.putExtra("USERLIST",(Serializable)list);
+                            Intent intent = new Intent(UserCenterActivity.this,SearchUserActivity.class);
+                            intent.putExtra("EXTRA",nowUser.getObjectId());
+                            intent.putExtra("SIGNAL",SearchUserActivity.FOLLOWED);
+                            intent.putExtra("USERLIST",new ArrayList<MyUser>());
                             startActivity(intent);
                         }
                     });
 
-                }
-            }
-        });
 
         if (nowUser.getUsername().equals(myUser.getUsername())){
             statusbar.setVisibility(View.GONE);
@@ -176,6 +180,11 @@ public class UserCenterActivity extends AppCompatActivity {
                             public void done(BmobException e) {
                                 if (e == null) {
 
+
+                                 /*   FollowChart followChart =new FollowChart();
+                                    followChart.setObjectId(nowUser.getFollowChartId());
+                                    followChart.increment("fansCount",-1);
+                                    followChart.update();*/
                                                 followList.removeAll(Arrays.asList(nowUser.getObjectId()));
 
                                                 runOnUiThread(new Runnable() {
@@ -202,6 +211,13 @@ public class UserCenterActivity extends AppCompatActivity {
                             @Override
                             public void done(BmobException e) {
                                 if (e==null){
+
+
+                                   /* FollowChart followChart =new FollowChart();
+                                    followChart.setObjectId(nowUser.getFollowChartId());
+                                    followChart.increment("fansCount",1);
+                                    followChart.update();*/
+
                                                 followList.add(nowUser.getObjectId());
                                                 sendMessage(myUser.getUsername()+"关注了你",new BmobIMUserInfo(nowUser.getObjectId(),nowUser.getUsername(),nowUser.getAvatar()));
 
@@ -318,7 +334,7 @@ public class UserCenterActivity extends AppCompatActivity {
 
                             } else {
                                 //连接失败
-                                Toast.makeText(UserCenterActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(UserCenterActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

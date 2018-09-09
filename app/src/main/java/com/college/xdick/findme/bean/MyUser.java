@@ -29,13 +29,15 @@ public class MyUser extends BmobUser implements Serializable {
 
     private String[] following;
 
-    private String[] fans;
 
     private boolean isGod;
 
     private Integer setAcCount=0;
 
     private Integer dynamicsCount=0;
+
+
+    private String followChartId;
 
 
 
@@ -105,13 +107,6 @@ public class MyUser extends BmobUser implements Serializable {
         this.following = following;
     }
 
-    public String[] getFans() {
-        return fans;
-    }
-
-    public void setFans(String[] fans) {
-        this.fans = fans;
-    }
 
     public boolean isGod() {
         return isGod;
@@ -135,6 +130,14 @@ public class MyUser extends BmobUser implements Serializable {
 
     public void setDynamicsCount(int dynamicsCount) {
         this.dynamicsCount = dynamicsCount;
+    }
+
+    public String getFollowChartId() {
+        return followChartId;
+    }
+
+    public void setFollowChartId(String followChartId) {
+        this.followChartId = followChartId;
     }
 }
 

@@ -36,7 +36,7 @@ import cn.bmob.v3.listener.FindListener;
  * Created by Administrator on 2018/5/11.
  */
 
-public class AddTagActivity extends AppCompatActivity {
+public class AddTagActivity extends BaseActivity {
     private MyUser user = BmobUser.getCurrentUser(MyUser.class);
    private List<MainTagBean> mainTagList= new ArrayList<>();
     private MainTagAdapter adapter;

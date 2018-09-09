@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class GalleryActivity extends AppCompatActivity {
+public class GalleryActivity extends BaseActivity {
 
     private MorePicAdapter adapter;
     private Map<String,Dynamics> map;

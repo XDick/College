@@ -1,8 +1,11 @@
 package com.college.xdick.findme.ui.Activity;
 
 
+import android.app.AlertDialog;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.support.v4.app.Fragment;
@@ -46,6 +49,8 @@ import org.litepal.crud.DataSupport;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMUserInfo;
@@ -67,6 +72,9 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
     public LocationClient mLocationClient;
     private int unReadNum;
     private long bmobTime=0;
+    private ProgressDialog dialog=null;
+    private AlertDialog.Builder builder=null ;
+    private  AlertDialog dialog2=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,17 +100,7 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
             IMconnectBomob();
         }
 
-        BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
-            @Override
-            public void onChange(ConnectionStatus status) {
-
-                if (status.getMsg().equals("disconnect")) {
-                    IMconnectBomob();
-                }
-                //Toast.makeText(getApplicationContext(),status.getMsg(),Toast.LENGTH_SHORT).show();
-
-            }
-        });
+         setIMListener();
 
 
         IMMLeaks.fixFocusedViewLeak(getApplication());
@@ -228,7 +226,18 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
     @Override
     protected void onResume() {
         BmobIM.getInstance().addMessageListHandler(this);
+        setIMListener();
         setBadgeItem();
+        if (BmobIM.getInstance().getCurrentStatus().equals(ConnectionStatus.DISCONNECT)){
+            IMconnectBomob();
+        }
+        else if (BmobIM.getInstance().getCurrentStatus().equals(ConnectionStatus.CONNECTED))
+        {  if (dialog!=null){
+            dialog.dismiss();}
+        if (dialog2!=null){
+            dialog2.dismiss();}
+        }
+
         super.onResume();
     }
 
@@ -386,7 +395,18 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
 
                         } else {
                             //连接失败
-                            Toast.makeText(getBaseContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
+
+
+                            if (dialog!=null){
+                                dialog.dismiss();
+                            }
+
+                            if (dialog2==null){
+                                initDialog2();
+                            }
+                            dialog2.show();
+
+                            //Toast.makeText(getBaseContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -396,6 +416,101 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
 
 
 
+    private void initDialog1() {
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("正在连接服务器...");
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+
+
+    }
+
+    private void initDialog2() {
+        builder = new AlertDialog.Builder(this);
+        builder.setTitle("连接断开");
+        builder.setMessage("你可以点击重试重新连接");
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog2.dismiss();
+
+            }
+        });
+        builder.setPositiveButton("重试", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                IMconnectBomob();
+                dialog2.dismiss();
+            }
+        });
+
+
+        dialog2 = builder.create();
+        dialog2.setCancelable(false);
+        dialog2.setCanceledOnTouchOutside(false);
+    }
+
+    private void setIMListener(){
+        BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+            @Override
+            public void onChange(ConnectionStatus status) {
+                if (BmobUser.getCurrentUser()!=null){
+
+
+                    if (status.getMsg().equals("connected")) {
+
+                        if (dialog!=null){
+                            dialog.dismiss();}
+                        if (dialog2!=null){
+                            dialog2.dismiss();}
+
+
+                    }
+                    else if (status.getMsg().equals("connecting")) {
+
+
+
+                        if (dialog==null){
+                            initDialog1();
+                        }
+                        dialog.show();
+                        if (dialog2==null){
+                            initDialog2();
+                        }
+                        if (dialog2!=null) {
+                            dialog2.dismiss();
+                        }
+
+
+                    }
+
+
+
+                    else {
+
+                        IMconnectBomob();
+
+
+
+                        if (dialog!=null){
+                            dialog.dismiss();
+                        }
+
+                        if (dialog2==null){
+                            initDialog2();
+                        }
+                        dialog2.show();
+
+
+                    }
+                }
+
+               // Toast.makeText(getBaseContext(),status.getMsg(),Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+    }
 
 }
 

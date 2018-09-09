@@ -36,7 +36,7 @@ import cn.bmob.v3.listener.UpdateListener;
  * Created by Administrator on 2018/5/9.
  */
 
-public class InterestActivity extends AppCompatActivity {
+public class InterestActivity extends BaseActivity {
    MyUser user = BmobUser.getCurrentUser(MyUser.class);
    List< String> selectTagList = new ArrayList<>();
     @Override

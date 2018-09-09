@@ -56,7 +56,13 @@ public class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityAd
     private int ITEM_TYPE_FOOTER = 2;
     private int ITEM_TYPE_EMPTY = 3;
 
+    private int load_more_status;
+    //上拉加载更多
+    public static final int  PULLUP_LOAD_MORE=0;
+    //正在加载中
+    public static final int  LOADING_MORE=1;
 
+    public static final int  NO_MORE=2;
 
 
     private List<MyActivity> mActivityList;
@@ -68,7 +74,7 @@ public class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityAd
 
    private List<MyActivity> allList;
 
-
+    private String searchMark;
 
 
 
@@ -90,17 +96,6 @@ public class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityAd
 
         }
 
-     /*   public void setVisibility(boolean isVisible){
-            RecyclerView.LayoutParams param = (RecyclerView.LayoutParams)itemView.getLayoutParams();
-            if (isVisible){
-                param.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-                param.width = LinearLayout.LayoutParams.MATCH_PARENT;
-            }else{
-                param.height = 0;
-                param.width = 0;
-            }
-            itemView.setLayoutParams(param);
-        }*/
     }
 
 
@@ -115,7 +110,7 @@ public class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityAd
         allList=list;
 
    }
-
+    public  void setSearchMark(String mark){searchMark=mark;}
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -135,15 +130,21 @@ public class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityAd
 
 
             final ViewHolder holder= new ViewHolder(mFooterView);
-            mFooterView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(mContext, SearchActivityActivity.class);
-                    intent.putExtra("ACTIVITYLIST",(Serializable) allList);
-                    mContext.startActivity(intent);
-                }
-            });
-            return holder;
+
+
+            if (mContext instanceof SearchActivity) {
+                mFooterView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(mContext, SearchActivityActivity.class);
+                        intent.putExtra("ACTIVITYLIST", (Serializable) allList);
+                        intent.putExtra("EXTRA", searchMark);
+                        intent.putExtra("SIGNAL", SearchUserActivity.SEARCH);
+                        mContext.startActivity(intent);
+                    }
+                });}
+                return holder;
+
         } else {
 
             View view = LayoutInflater.from(parent.getContext())
@@ -158,6 +159,7 @@ public class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityAd
                     MyActivity activity = mActivityList.get(position);
                     Intent intent = new Intent(mContext, ActivityActivity.class);
                     intent.putExtra("ACTIVITY",activity);
+
                     mContext.startActivity(intent);
 
 
@@ -197,10 +199,32 @@ public class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityAd
         int type = getItemViewType(position);
 
         if (type == ITEM_TYPE_HEADER
-                || type == ITEM_TYPE_FOOTER
                 || type == ITEM_TYPE_EMPTY) {
             return;
         }
+
+
+        if (type == ITEM_TYPE_FOOTER) {
+
+            if (!(mContext instanceof SearchActivity)) {
+            TextView textView= mFooterView.findViewById(R.id.footer_text);
+            switch (load_more_status) {
+                case PULLUP_LOAD_MORE:
+                    textView.setText("上拉加载更多");
+                    break;
+                case LOADING_MORE:
+                    textView.setText("正在加载数据...");
+                    break;
+
+                case NO_MORE:
+                    textView.setText("没有更多了");
+                    break;
+
+            }
+            }
+            return;
+        }
+
 
 
         int realPos = getRealItemPosition(position);
@@ -281,20 +305,9 @@ public class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityAd
         notifyDataSetChanged();
     }
 
-
+    public void changeMoreStatus(int status){
+        load_more_status=status;
+    }
 
 }
 
-
-  /*  @Override
-    public void onItemMove(int fromPosition, int toPosition) {
-        Collections.swap(mActivityList,fromPosition,toPosition);
-        notifyItemMoved(fromPosition,toPosition);
-    }
-
-    @Override
-    public void onItemDissmiss(int position) {
-        //移除数据
-        mActivityList.remove(position);
-        notifyItemRemoved(position);
-    }*/

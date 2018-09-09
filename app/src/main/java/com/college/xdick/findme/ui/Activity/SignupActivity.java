@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.college.xdick.findme.R;
+import com.college.xdick.findme.bean.FollowChart;
 import com.college.xdick.findme.bean.MyUser;
 
 import com.college.xdick.findme.util.SelectSchoolUtil;
@@ -33,7 +34,7 @@ import cn.bmob.v3.listener.UpdateListener;
  * Created by Administrator on 2018/4/2.
  */
 
-public class SignupActivity  extends AppCompatActivity {
+public class SignupActivity  extends BaseActivity {
    private EditText accountEdit,passwordEdit,phoneEdit,identityEdit;
    private Button signup,selectSchoolButton,sendIdentifyButton,confirmIdentityButton;
    private boolean ifConfirm=false;
@@ -144,11 +145,25 @@ public class SignupActivity  extends AppCompatActivity {
                    if (ifConfirm && phoneEdit.getText().toString().equals(number)) {
                         bu.setMobilePhoneNumberVerified(true);
                         bu.setEmailVerified(false);
-
+                        bu.setFollowChartId("");
                         bu.signUp(new SaveListener<MyUser>() {
                             @Override
-                            public void done(MyUser s, BmobException e) {
+                            public void done(final MyUser s, BmobException e) {
                                 if (e == null) {
+/*
+                                    FollowChart followChart= new FollowChart();
+                                    followChart.setFansCount(0);
+                                    followChart.setHostId(s.getObjectId());
+                                    followChart.setUserName(s.getUsername());
+                                    followChart.save(new SaveListener<String>() {
+                                        @Override
+                                        public void done(String s2, BmobException e) {
+                                            if (e==null){
+                                                s.setFollowChartId(s2);
+                                                s.update();
+                                            }
+                                        }
+                                    });*/
 
 
                                     Toast.makeText(SignupActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
