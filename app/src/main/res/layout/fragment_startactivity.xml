@@ -115,6 +115,7 @@
             android:id="@+id/join_num_layout"
             android:layout_marginRight="15dp"
             android:layout_marginLeft="15dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
           >
 
@@ -194,7 +195,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
-                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="35dp"
@@ -255,25 +255,71 @@
                    android:orientation="vertical"
                    android:layout_margin="20dp"
                    >
-                   <TextView
+                   <LinearLayout
                        android:layout_width="match_parent"
                        android:layout_height="wrap_content"
+                       android:paddingBottom="10dp"
+                       android:orientation="horizontal">
+                   <TextView
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
                        android:text="活动描述:"
+                       android:layout_gravity="center"
                        android:textSize="15sp"
                        android:textStyle="bold"
                        android:textColor="#5669fa"
-                       android:paddingBottom="10dp"/>
-
+                     />
                    <TextView
-                       android:id="@+id/activity_tag_text"
+                       android:id="@+id/activity_tag1_text"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content"
                        android:textIsSelectable="true"
-                       android:layout_marginBottom="5dp"
                        android:textSize="12sp"
-                       android:textColor="#999999"
-                       android:lineSpacingExtra="5dp"/>
+                       android:layout_gravity="center"
+                       android:layout_marginStart="7dp"
+                       android:textColor="#6a7af5"
+                       />
+                   </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:id="@+id/activity_tag2_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textIsSelectable="true"
+
+                    android:background="@drawable/label_bg2"
+                    android:textSize="12sp"
+                    android:padding="5dp"
+
+                    android:layout_marginEnd="10dp"
+                    android:textColor="#e91111" />
+                <TextView
+                    android:id="@+id/activity_tag3_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textIsSelectable="true"
+                    android:background="@drawable/label_bg2"
+                    android:padding="5dp"
+
+                    android:textSize="12sp"
+                    android:textColor="#e91111"
+                    />
+            </LinearLayout>
+                   <TextView
+                       android:id="@+id/activity_findme_text"
+                       android:layout_marginBottom="10dp"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:textSize="15sp"
+                       android:textColor="#810303"
+                       android:textStyle="bold"
+                       android:visibility="gone"
+                       android:text="注：『泛觅活动』为泛觅官方发起，当参与人数达到10人时，泛觅会帮参与者拉起一个微信群，注意私信里加群的通知。"/>
                     <TextView
                         android:id="@+id/activity_content_text"
                         android:layout_width="wrap_content"

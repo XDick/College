@@ -91,6 +91,39 @@ public class SplashActivity extends Activity {
 
                         String tag[] = bmobUser.getTag();
                         if (tag!=null){
+
+
+                            if (tag.length==0){
+
+
+                                intent.putExtra("TIME", aLong * 1000L);
+                                if (bmobUser!=null){
+                                    BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+                                        @Override
+                                        public void onChange(ConnectionStatus status) {
+
+                                            if (status.getMsg().equals("connected")) {
+                                                startActivity(intent);
+                                                finish();
+
+                                            }
+                                            else if (status.getMsg().equals("disconnect")){
+                                                IMconnectBomob();
+
+                                            }
+                                        }
+                                    });
+                                }
+                                else {
+
+                                    startActivity(intent);
+                                    finish();
+                                }
+                                IMconnectBomob();
+                                return;
+
+
+                            }
                             for (int i =0; i<tag.length;i++){
                                 BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
                                 q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
@@ -99,12 +132,39 @@ public class SplashActivity extends Activity {
                             }
 
                         }
+                        else {
+                            intent.putExtra("TIME", aLong * 1000L);
+                            if (bmobUser!=null){
+                                BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+                                    @Override
+                                    public void onChange(ConnectionStatus status) {
+
+                                        if (status.getMsg().equals("connected")) {
+                                            startActivity(intent);
+                                            finish();
+
+                                        }
+                                        else if (status.getMsg().equals("disconnect")){
+                                            IMconnectBomob();
+
+                                        }
+                                    }
+                                });
+                            }
+                            else {
+
+                                startActivity(intent);
+                                finish();
+                            }
+                            IMconnectBomob();
+                            return;
+                        }
 
 
 
 
                     }
-                    query.addWhereGreaterThan("date", aLong * 1000L - 2.5*60 * 60 * 24 * 1000);
+                    query.addWhereGreaterThan("date", aLong * 1000L - 60 * 60 * 24 * 1000);
 
 
 
@@ -116,7 +176,7 @@ public class SplashActivity extends Activity {
                     query.findObjects(new FindListener<MyActivity>() {
                         @Override
                         public void done(List<MyActivity> object, BmobException e) {
-                            IMconnectBomob();
+
                             if (e == null) {
                                 intent.putExtra("LISTDATA", (Serializable)object);
                                 intent.putExtra("TIME", aLong * 1000L);
@@ -146,7 +206,10 @@ public class SplashActivity extends Activity {
                              startActivity(intent);
                              finish();
                             }
+                            IMconnectBomob();
                         }
+
+
                     });
 
                 }

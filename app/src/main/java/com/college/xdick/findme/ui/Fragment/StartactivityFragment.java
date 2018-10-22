@@ -1,15 +1,9 @@
 package com.college.xdick.findme.ui.Fragment;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,17 +12,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,12 +25,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
-import com.college.xdick.findme.MyClass.DownLoadImageService;
 import com.college.xdick.findme.MyClass.GalleryLayoutManager;
-import com.college.xdick.findme.MyClass.ImageDownLoadCallBack;
-import com.college.xdick.findme.MyClass.PicturePageAdapter;
 import com.college.xdick.findme.MyClass.ScaleTransformer;
-import com.college.xdick.findme.MyClass.ViewPagerFixed;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.ActivityAdapter;
 import com.college.xdick.findme.adapter.CommentAdapter;
@@ -56,17 +38,14 @@ import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.HostNotifyActivity;
 import com.college.xdick.findme.ui.Activity.LoginActivity;
-import com.college.xdick.findme.ui.Activity.MainActivity;
-import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
+import com.college.xdick.findme.ui.Activity.SearchActivity;
 import com.college.xdick.findme.ui.Activity.SearchUserActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
-import com.youth.banner.Transformer;
+import com.college.xdick.findme.ui.Base.BaseFragment;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,28 +56,22 @@ import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.newim.core.BmobIMClient;
 import cn.bmob.newim.listener.MessageSendListener;
-import cn.bmob.v3.BmobBatch;
-import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
-import cn.bmob.v3.datatype.BatchResult;
-import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
-import cn.bmob.v3.listener.QueryListListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
-import static cn.bmob.v3.Bmob.getApplicationContext;
 import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/4/12.
  */
 
-public class StartactivityFragment extends Fragment{
+public class StartactivityFragment extends BaseFragment {
 
 
     private String activityId,hostAvatar,hostID;
@@ -110,9 +83,9 @@ public class StartactivityFragment extends Fragment{
     private CommentAdapter adapter;
     public List<Comment> commentList = new ArrayList<>();
     private View rootView;
-    private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
+    private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     public boolean ifJoin;
-   public   MyActivity activity;
+    public   static MyActivity activity;
    private GalleryAdapter galleryAdapter;
    private Map<String,Dynamics>picMap = new HashMap<>();
    private List<String> uriList = new ArrayList<>();
@@ -190,7 +163,7 @@ public class StartactivityFragment extends Fragment{
         BmobQuery<MyUser> query1= new BmobQuery<>();
         query1.getObject(activity.getHostId(), new QueryListener<MyUser>() {
             @Override
-            public void done(MyUser myUser, BmobException e) {
+            public void done(final MyUser myUser, BmobException e) {
                 if (e==null){
                     ImageView hostAvatarImg= rootView.findViewById(R.id.host_avatar);
                     String hostAvatarUri=myUser.getAvatar();
@@ -200,6 +173,14 @@ public class StartactivityFragment extends Fragment{
                     hostAvatarImg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+
+
+                            if (MyUser.getCurrentUser(MyUser.class)==null){
+                                startActivity(new Intent(getContext(),LoginActivity.class));
+                                getActivity().finish();
+                               return;
+
+                            }
                             BmobQuery<MyUser>  query1 = new BmobQuery<>();
                             query1.getObject(activity.getHostId(), new QueryListener<MyUser>() {
                                 @Override
@@ -223,7 +204,11 @@ public class StartactivityFragment extends Fragment{
         TextView activityHostText =  rootView.findViewById(R.id.activity_host_text);
         TextView activityTimeText =  rootView.findViewById(R.id.activity_time_text);
         TextView activityPlaceText =  rootView.findViewById(R.id.activity_place_text);
-        TextView activityTagText =  rootView.findViewById(R.id.activity_tag_text);
+        TextView activityTagText1 =  rootView.findViewById(R.id.activity_tag1_text);
+        TextView findme_text = rootView.findViewById(R.id.activity_findme_text);
+        final TextView activityTagText2 =  rootView.findViewById(R.id.activity_tag2_text);
+        final TextView activityTagText3 =  rootView.findViewById(R.id.activity_tag3_text);
+
         commentcount = rootView.findViewById(R.id.activity_comment_count);
         joincount = rootView.findViewById(R.id.ac_main_joincount);
         joinButton = rootView.findViewById(R.id.join_ac_button);
@@ -245,23 +230,39 @@ public class StartactivityFragment extends Fragment{
         activityTimeText.setText(""+activityTime);
         activityPlaceText.setText(""+activityPlace);
         activityHostText.setText(""+activityHost);
-        String tag=Arrays.toString(activity.getTag());
-        tag = tag.replace("[","");
-        tag = tag.replace("]","");
-        tag = tag.replace(","," ");
-        activityTagText.setText(""+tag);
+        activityTagText1.setText(activityTag[0]);
+        if (activityTag[0].equals("泛觅活动")){
+            findme_text.setVisibility(View.VISIBLE);
+        }
+        activityTagText2.setText(activityTag[1]);
+        activityTagText3.setText(activityTag[2]);
+        activityTagText2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                intent.putExtra("SEARCH",activityTagText2.getText().toString());
+                startActivity(intent);
+            }
+        });
+        activityTagText3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                intent.putExtra("SEARCH",activityTagText3.getText().toString());
+                startActivity(intent);
+            }
+        });
 
 
 
-
-     if (activityTag[0].equals("二手交易")){
+   /*  if (activityTag[0].equals("二手交易")){
             joinButton.setVisibility(View.GONE);
             LinearLayout linearLayout = rootView.findViewById(R.id.join_num_layout);
             linearLayout.setVisibility(View.INVISIBLE);
             for (int i=0;i<6;i++){
                 avatar[i].setVisibility(View.GONE);
             }
-        }
+        }*/
         try {
          joinnum=activity.getJoinUser().length;
         }catch (Exception e){
@@ -271,6 +272,12 @@ public class StartactivityFragment extends Fragment{
         activityHostText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (MyUser.getCurrentUser(MyUser.class)==null){
+                    startActivity(new Intent(getContext(),LoginActivity.class));
+                    getActivity().finish();
+                    return;
+
+                }
                BmobQuery<MyUser>  query1 = new BmobQuery<>();
                query1.getObject(activity.getHostId(), new QueryListener<MyUser>() {
                    @Override
@@ -305,12 +312,15 @@ public class StartactivityFragment extends Fragment{
         });
 
 
-          if(bmobUser!=null&&activity.getHostName().equals(bmobUser.getUsername())){
+          if(myUser !=null&&activity.getHostId().equals(myUser.getObjectId())){
               joinButton.setText("发送通知");
               joinButton.setBackgroundResource(R.drawable.join_button_radius_notify);
               joinButton.setOnClickListener(new View.OnClickListener() {
                   @Override
                   public void onClick(View v) {
+                      if (activity.getJoinUser()==null||Arrays.asList(activity.getJoinUser()).isEmpty()){
+                          return;
+                      }
                          Intent intent = new Intent(getActivity(), HostNotifyActivity.class);
                          intent.putExtra("ACTIVITY",activity);
                          startActivity(intent);
@@ -327,7 +337,7 @@ public class StartactivityFragment extends Fragment{
                       if (MyUser.getCurrentUser(MyUser.class)==null){
                           startActivity(new Intent(getContext(),LoginActivity.class));
                           getActivity().finish();
-                          Toast.makeText(getActivity(),"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                         // Toast.makeText(getActivity(),"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
 
                       }
 
@@ -341,7 +351,7 @@ public class StartactivityFragment extends Fragment{
                           MyActivity myActivity = new MyActivity();
                           myActivity.setObjectId(activityId);
                           myActivity.setDate(activity.getDate());
-                          myActivity.addUnique("joinUser",bmobUser.getObjectId());
+                          myActivity.addUnique("joinUser", myUser.getObjectId());
                           myActivity.update(new UpdateListener() {
                               @Override
                               public void done(BmobException e) {
@@ -355,16 +365,16 @@ public class StartactivityFragment extends Fragment{
                                           }
                                       });
                                        if (!ifHavePeopleIn){
-                                           Glide.with(getContext()).load(bmobUser.getAvatar())
+                                           Glide.with(getContext()).load(myUser.getAvatar())
                                                    .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar[count]);
                                        }
                                        else {
-                                          Glide.with(getContext()).load(bmobUser.getAvatar())
+                                          Glide.with(getContext()).load(myUser.getAvatar())
                                                   .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar[++count]);
 
                                       }
 
-                                      sendMessage(bmobUser.getUsername()+"加入了你的"+"#"+activity.getTitle()+"#活动"
+                                      sendMessage(myUser.getUsername()+"加入了你的"+"#"+activity.getTitle()+"#活动"
                                               ,new BmobIMUserInfo(hostID,activity.getHostName(),hostAvatar));
                                       ifJoin=true;
                                       Toast.makeText(getContext(), "成功加入", Toast.LENGTH_SHORT).show();
@@ -385,7 +395,7 @@ public class StartactivityFragment extends Fragment{
                           MyActivity myActivity = new MyActivity();
                           myActivity.setObjectId(activityId);
                           myActivity.setDate(activity.getDate());
-                          myActivity.removeAll("joinUser",Arrays.asList(bmobUser.getObjectId()));
+                          myActivity.removeAll("joinUser",Arrays.asList(myUser.getObjectId()));
                           myActivity.update(new UpdateListener() {
                               @Override
                               public void done(BmobException e) {
@@ -394,7 +404,7 @@ public class StartactivityFragment extends Fragment{
                                           Glide.with(getContext()).load(R.drawable.blank_pic)
                                                   .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar[count--]);
                                       }
-                                      sendMessage(bmobUser.getUsername()+"退出了你的"+"#"+activity.getTitle()+"#活动"
+                                      sendMessage(myUser.getUsername()+"退出了你的"+"#"+activity.getTitle()+"#活动"
                                               ,new BmobIMUserInfo(hostID,activity.getHostName(),hostAvatar));
                                       getActivity().runOnUiThread(new Runnable() {
                                           @Override
@@ -426,7 +436,9 @@ public class StartactivityFragment extends Fragment{
 
 
 public  void initJoin(){
-     if (activity.getJoinUser()==null){
+     if (activity.getJoinUser()==null||Arrays.asList(activity.getJoinUser()).isEmpty()){
+         avatarLayout.setVisibility(View.GONE);
+
          return;
      }
      BmobQuery<MyUser> query = new BmobQuery<MyUser>();
@@ -440,7 +452,12 @@ public  void initJoin(){
                 avatarLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (MyUser.getCurrentUser(MyUser.class)==null){
+                            startActivity(new Intent(getContext(),LoginActivity.class));
+                            getActivity().finish();
+                            return;
 
+                        }
                         Intent intent = new Intent(getActivity(),SearchUserActivity.class);
                         intent.putExtra("USERLIST",(Serializable)list);
                         intent.putExtra("SIGNAL",SearchUserActivity.JOIN);
@@ -618,11 +635,11 @@ public  void initJoin(){
 
 
     private void ifJoin() {
-       if (bmobUser==null){
+       if (myUser ==null){
            joinButton.setText("未登录");
            return;
        }
-        if (!Arrays.toString(activity.getJoinUser()).contains(bmobUser.getObjectId())) {
+        if (!Arrays.toString(activity.getJoinUser()).contains(myUser.getObjectId())) {
             ifJoin = false;
             joinButton.setText("加 入!");
             joinButton.setBackgroundResource(R.drawable.join_button_radius_false);
@@ -642,7 +659,7 @@ public  void initJoin(){
          GalleryLayoutManager layoutManager = new GalleryLayoutManager(GalleryLayoutManager.HORIZONTAL);
          layoutManager.attach(recyclerView,1);
          layoutManager.setItemTransformer(new ScaleTransformer());
-         galleryAdapter = new GalleryAdapter(picMap,uriList);
+         galleryAdapter = new GalleryAdapter(picMap,uriList,activity.getObjectId());
 
          recyclerView.setAdapter(galleryAdapter);
       BmobQuery<Dynamics> query = new BmobQuery<>();
@@ -650,10 +667,10 @@ public  void initJoin(){
       BmobQuery<Dynamics> q1 = new BmobQuery<>();
       q1.addWhereEqualTo("ifAdd2Gallery",true);
       query.and(Arrays.asList(q1));
-      query.setLimit(500);
+
       query.addWhereEqualTo("activityId",activity.getObjectId());
       query.order("-likeCount");
-
+      query.setLimit(2);
       query.findObjects(new FindListener<Dynamics>() {
           @Override
           public void done(List<Dynamics> list, BmobException e) {
@@ -695,7 +712,7 @@ public  void initJoin(){
 
     public void sendMessage(String content ,BmobIMUserInfo info) {
 
-        if(!bmobUser.getObjectId().equals(info.getUserId())){
+        if(!myUser.getObjectId().equals(info.getUserId())){
 
         BmobIMConversation conversationEntrance = BmobIM.getInstance().startPrivateConversation(info, true, null);
         BmobIMConversation messageManager = BmobIMConversation.obtain(BmobIMClient.getInstance(), conversationEntrance);
@@ -703,9 +720,9 @@ public  void initJoin(){
         msg.setContent(content);//给对方的一个留言信息
         Map<String, Object> map = new HashMap<>();
         map.put("currentuser", info.getUserId());
-        map.put("userid", bmobUser.getObjectId());
-        map.put("username",bmobUser.getUsername());
-        map.put("useravatar",bmobUser.getAvatar());
+        map.put("userid", myUser.getObjectId());
+        map.put("username", myUser.getUsername());
+        map.put("useravatar", myUser.getAvatar());
         map.put("activityid",activity.getObjectId());
         map.put("activityname",activity.getTitle());
         map.put("type","activity");

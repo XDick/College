@@ -80,7 +80,7 @@ public class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityAd
 
     static class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView title,time,host,join;
+        TextView title,time,host,join,gps;
         ImageView cover;
         CardView cardView;
 
@@ -93,6 +93,7 @@ public class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityAd
             time= view.findViewById(R.id.time_ac);
             host = view.findViewById(R.id.host_ac);
             join = view.findViewById(R.id.join_ac);
+            gps= view.findViewById(R.id.gps_ac);
 
         }
 
@@ -235,6 +236,8 @@ public class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityAd
          holder.title.setText(activity.getTitle());
 
          holder.time.setText(activity.getTime());
+         String gps[]=activity.getGps();
+         holder.gps.setText(gps[2]);
 
          Glide.with(mContext).load(activity.getCover())
                  .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover);

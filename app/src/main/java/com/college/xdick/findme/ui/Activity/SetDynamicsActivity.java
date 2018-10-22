@@ -5,24 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.res.TypedArrayUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.Toolbar;
-import android.util.ArrayMap;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -40,23 +33,18 @@ import com.college.xdick.findme.MyClass.MyGlideEngine;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.GridViewAddImagesAdapter;
 import com.college.xdick.findme.adapter.SelectActivityAdapter;
-import com.college.xdick.findme.bean.City;
 import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
-import com.college.xdick.findme.bean.Province;
-import com.college.xdick.findme.bean.School;
+import com.college.xdick.findme.ui.Base.BaseActivity;
+import com.college.xdick.findme.util.ClassFileHelper;
 import com.college.xdick.findme.util.FileUtil;
-import com.linchaolong.android.imagepicker.ImagePicker;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
 
-import org.w3c.dom.Text;
-
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -77,7 +65,6 @@ import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadBatchListener;
-import cn.bmob.v3.listener.UploadFileListener;
 
 
 /**
@@ -253,9 +240,25 @@ public class SetDynamicsActivity extends BaseActivity {
                     finish();
                 } else {
                     Toast.makeText(SetDynamicsActivity.this, "正在发送...", Toast.LENGTH_SHORT).show();
-
+                    int num=0;
                     for (Uri u : mSelected) {
-                        picPath.add(FileUtil.uriToFile(u, this));
+                        String path=FileUtil.uriToFile(u, this);
+
+                        File file=new File(path);
+                        final String fileType = path
+                                .substring(path.lastIndexOf("."));
+
+                        final String renamePath="data/user/0/com.college.xdick.findme/cache/"
+                                +"dynamics_image_"+"_"
+                                +BmobUser.getCurrentUser().getObjectId()+"_"+num
+                                +fileType;
+                        final File newFile = new File(renamePath);
+                        try{
+                            ClassFileHelper.copyFileTo(file,newFile);}
+                        catch (IOException e){
+                            e.printStackTrace(); }
+                        picPath.add(renamePath);
+                          ++num;
                     }
                            finish();
                         BmobFile.uploadBatch(picPath.toArray(new String[picPath.size()]), new UploadBatchListener() {
@@ -263,6 +266,12 @@ public class SetDynamicsActivity extends BaseActivity {
                             public void onSuccess(List<BmobFile> list, List<String> list1) {
 
                                 if (list1.size() == picPath.size()) {
+
+                                    for (String path :picPath){
+
+                                        ClassFileHelper.deleteFile(new File(path));
+                                    }
+
                                     final String content = contentEdit.getText().toString();
                                     final Dynamics dynamics = new Dynamics();
                                     dynamics.setContent(content);

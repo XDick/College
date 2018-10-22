@@ -310,7 +310,7 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
 
 
          Glide.with(mContext).load(activity.getUserAvatar())
-                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new CropCircleTransformation())).into(holder.cover);
+                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE).error(R.drawable.head)).apply(bitmapTransform(new CropCircleTransformation())).into(holder.cover);
 
       holder.cover.setOnClickListener(new View.OnClickListener() {
           @Override

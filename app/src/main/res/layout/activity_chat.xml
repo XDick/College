@@ -82,11 +82,22 @@
                         android:id="@+id/emoji"/>
         <Button
             android:id="@+id/send"
+            android:visibility="gone"
             android:layout_height="35dp"
             android:layout_width="35dp"
             android:layout_margin="10dp"
             android:layout_gravity="center"
             android:background="@drawable/send"/>
+                    <Button
+                        android:id="@+id/add"
+                        android:layout_height="35dp"
+                        android:layout_width="35dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/add_circle_grey"/>
                 </LinearLayout>
 
             </LinearLayout>

@@ -47,7 +47,8 @@
         tools:replace="label"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:largeHeap="true">
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
@@ -90,7 +91,10 @@
 
     <activity android:name=".ui.Activity.UserCenterActivity"/>
     <activity android:name="com.college.xdick.findme.ui.Activity.MainActivity"
-        android:launchMode="singleTask"/>
+        android:launchMode="singleTask"
+        android:configChanges="orientation|screenSize|keyboardHidden"
+
+        />
         <activity android:name="com.college.xdick.findme.ui.Activity.LoginActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.SignupActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.SetDynamicsActivity"/>
@@ -152,6 +156,8 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
 
+        <activity android:name=".ui.Activity.ConfirmPhoneNumberActivity"/>
+
 
 
         <service android:name="com.baidu.location.f"
@@ -205,7 +211,7 @@
             </intent-filter>
         </receiver>
         <provider
-            android:authorities="cn.bmob.update.fileprovider"
+            android:authorities="com.college.xdick.findme"
             android:name="android.support.v4.content.FileProvider"
             tools:replace="android:authorities"
             android:grantUriPermissions="true"

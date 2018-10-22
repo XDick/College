@@ -1,15 +1,12 @@
 package com.college.xdick.findme.ui.Activity;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -25,13 +22,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
 import com.college.xdick.findme.R;
-import com.college.xdick.findme.adapter.MessageFragmentStatePagerAdapter;
 import com.college.xdick.findme.adapter.UserCenterFragmentStatePagerAdapter;
-import com.college.xdick.findme.bean.FollowChart;
 import com.college.xdick.findme.bean.MyUser;
-import com.college.xdick.findme.ui.Fragment.MessageFragment;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,11 +40,8 @@ import cn.bmob.newim.core.BmobIMClient;
 import cn.bmob.newim.core.ConnectionStatus;
 import cn.bmob.newim.listener.ConnectListener;
 import cn.bmob.newim.listener.MessageSendListener;
-import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.FindListener;
-import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
@@ -65,7 +56,7 @@ import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 public class UserCenterActivity extends BaseActivity {
     private ImageView background,avatar;
-    private TextView username,follow_text,fanscount ,followingcount;
+    private TextView username,follow_text,fanscount ,followingcount,userschool;
     private MyUser myUser =BmobUser.getCurrentUser(MyUser.class);
     private ViewPager mViewPager1;
     private TabLayout mTabLayout;
@@ -110,6 +101,11 @@ public class UserCenterActivity extends BaseActivity {
         centerlayout = findViewById(R.id.center_layout);
         fanscount = findViewById(R.id.center_fans);
         followingcount = findViewById(R.id.center_following);
+        userschool= findViewById(R.id.center_userschool);
+        if (nowUser.getSchool()!=null){
+            userschool.setText(nowUser.getSchool());
+        }
+
 
 
 
@@ -174,8 +170,11 @@ public class UserCenterActivity extends BaseActivity {
                 public void onClick(View v) {
 
                     if (followList.contains(nowUser.getObjectId())) {
-                        myUser.removeAll("following", Arrays.asList(nowUser.getObjectId()));
-                        myUser.update(new UpdateListener() {
+                        MyUser myUser= BmobUser.getCurrentUser(MyUser.class);
+                        MyUser myUser1= new MyUser();
+                        myUser1.setObjectId(myUser.getObjectId());
+                        myUser1.removeAll("following", Arrays.asList(nowUser.getObjectId()));
+                        myUser1.update(new UpdateListener() {
                             @Override
                             public void done(BmobException e) {
                                 if (e == null) {
@@ -206,8 +205,11 @@ public class UserCenterActivity extends BaseActivity {
                         });
 
                     }else {
-                        myUser.addUnique("following",nowUser.getObjectId());
-                        myUser.update(new UpdateListener() {
+                       final MyUser myUser= BmobUser.getCurrentUser(MyUser.class);
+                        MyUser myUser1= new MyUser();
+                        myUser1.setObjectId(myUser.getObjectId());
+                       myUser1.addUnique("following",nowUser.getObjectId());
+                        myUser1.update(new UpdateListener() {
                             @Override
                             public void done(BmobException e) {
                                 if (e==null){

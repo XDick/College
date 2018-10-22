@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.college.xdick.findme.MyClass.BackHandlerHelper;
@@ -29,6 +30,7 @@ import com.college.xdick.findme.bean.FindNews;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.SearchActivity;
+import com.college.xdick.findme.ui.Base.BaseFragment;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 import com.youth.banner.Transformer;
@@ -47,21 +49,18 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListener;
 import km.lmy.searchview.SearchView;
-import pl.tajchert.waitingdots.DotsTextView;
+
 
 /**
  * Created by Administrator on 2018/4/10.
  */
 
-public class SearchFragment extends Fragment implements FragmentBackHandler {
+public class SearchFragment extends BaseFragment implements FragmentBackHandler {
     @Nullable
    private static List<FindNews> newsList = new ArrayList<>();
     private FindNewsAdapter adapter;
     private SwipeRefreshLayout swipeRefresh;
     private View rootView;
-    static int flag_search=0;
-    private DotsTextView dots;
-    private LinearLayout loadlayout;
     private RecyclerView recyclerView;
     private Banner banner;
     private SearchView searchView;
@@ -76,14 +75,17 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
        rootView =inflater.inflate(R.layout.fragment_search,container,false);
         initBaseView();
-        if(flag_search==0){
-            loadlayout.setVisibility(View.VISIBLE);
-            dots.start();
-            initNews();
+
+
+        swipeRefresh.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefresh.setRefreshing(true);
+                initNews();
+            }
+        });
+
             initBanner();
-
-
-        }
         initRecyclerView();
         setHasOptionsMenu(true);
 
@@ -92,9 +94,6 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
 
 
     private void initBaseView() {
-        Toolbar toolbar = rootView.findViewById(R.id.toolbar_search);
-        toolbar.setTitle("");
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         swipeRefresh =rootView.findViewById(R.id.swipe_refresh_search);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -103,9 +102,14 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
                 refresh();
             }
         });
-        dots =  rootView.findViewById(R.id.dots);
-        loadlayout=  rootView.findViewById(R.id.loading_layout);
 
+        Button searchButton = rootView.findViewById(R.id.search_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchView.open();
+            }
+        });
 
         setSearch();
 
@@ -113,33 +117,7 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
     }
 
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
-        inflater.inflate(R.menu.toolbar_search_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override                //ToolBar上面的按钮事件
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-
-             case  R.id.home:
-             {
-                 getActivity().finish();
-             }
-
-            case R.id.menu_search:
-
-                searchView.open();
-
-
-            default:
-                break;
-        }
-
-        return true;
-    }
 
 
     private void initRecyclerView(){
@@ -183,18 +161,16 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
 
 
     private void refresh(){
+        swipeRefresh.setRefreshing(true);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
+
                     newsList.clear();
                     initNews();
                     initBanner();
-                    Thread.sleep(2000);
-                }
-                catch (InterruptedException e){
-                    e.printStackTrace();
-                }
+
+
                 if (getActivity() == null)
                     return;
                 getActivity().runOnUiThread(new Runnable() {
@@ -202,7 +178,7 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
                     public void run() {
 
                          adapter.notifyDataSetChanged();
-                        swipeRefresh.setRefreshing(false);
+
                     }
                 });
             }
@@ -218,7 +194,7 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
             public void done(Long aLong, BmobException e) {
                 if (e==null){
                     BmobQuery<MyActivity> query = new BmobQuery();
-                    query.addWhereGreaterThan("date", aLong*1000L-60*60*24*2.5*1000);//60*60*24*1000
+                    query.addWhereGreaterThan("date", aLong*1000L-60*60*24*1.5*1000);//60*60*24*1000
 
                     query.order("-joinCount");
                     query.setLimit(5);
@@ -229,13 +205,18 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
                                 activityList.addAll(list);
                                 for (MyActivity activity:list){
                                     imageList.add(activity.getCover());
+
                                     String[] gps=activity.getGps();
-                                    titleList.add("("+gps[1]+")"+activity.getTitle());
+                                    if (gps==null){
+                                        titleList.add(activity.getTitle());
+                                    }else {
+                                        titleList.add("("+gps[1]+")"+activity.getTitle());
+                                    }
+
                                 }
-                               if (flag_search==0){
+
                                    initRecyclerView();
-                                   flag_search=1;
-                               }
+
 
                             }
 
@@ -293,11 +274,12 @@ public class SearchFragment extends Fragment implements FragmentBackHandler {
                     if (getActivity()==null){
                         return;
                     }
+
                   getActivity().runOnUiThread(new Runnable() {
                       @Override
                       public void run() {
                           adapter.notifyDataSetChanged();
-                          loadlayout.setVisibility(View.GONE);
+                          swipeRefresh.setRefreshing(false);
 
                       }
                   });

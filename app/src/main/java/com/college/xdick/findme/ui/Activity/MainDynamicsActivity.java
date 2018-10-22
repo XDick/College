@@ -1,6 +1,5 @@
 package com.college.xdick.findme.ui.Activity;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,8 +8,8 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,12 +26,9 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,17 +41,16 @@ import com.college.xdick.findme.MyClass.DownLoadImageService;
 import com.college.xdick.findme.MyClass.ImageDownLoadCallBack;
 import com.college.xdick.findme.MyClass.PicturePageAdapter;
 import com.college.xdick.findme.MyClass.ViewPagerFixed;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.ActivityAdapter;
 import com.college.xdick.findme.adapter.CommentAdapter;
 import com.college.xdick.findme.adapter.DynamicsCommentAdapter;
-import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.DynamicsComment;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
-import com.college.xdick.findme.ui.Fragment.DynamicsFragment;
-import com.college.xdick.findme.ui.Fragment.UserCenterDynamicsFragment;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 import com.jaeger.ninegridimageview.NineGridImageView;
 import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
 import com.zyyoona7.popup.EasyPopup;
@@ -67,7 +62,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +72,6 @@ import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.newim.core.BmobIMClient;
-import cn.bmob.newim.listener.ConversationListener;
 import cn.bmob.newim.listener.MessageSendListener;
 import cn.bmob.v3.BmobBatch;
 import cn.bmob.v3.BmobObject;
@@ -94,10 +87,9 @@ import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
-import pl.tajchert.waitingdots.DotsTextView;
+
 
 import static android.view.View.GONE;
-import static cn.bmob.v3.Bmob.getApplicationContext;
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
@@ -120,15 +112,14 @@ public class MainDynamicsActivity extends BaseActivity {
     private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     private String dynamicsId;
     private InputMethodManager imm ;
-    private DotsTextView dots;
-    private LinearLayout loadlayout;
     private NineGridImageViewAdapter mAdapter;
     private NineGridImageView gridImageView;
     private Dialog mDialog;
     private ViewPagerFixed pager;
-    private MyUser  bmobUser = BmobUser.getCurrentUser(MyUser.class);
+    private MyUser myUser1 = BmobUser.getCurrentUser(MyUser.class);
     private Dynamics dynamics;
     private  ImageView[] avatarView =new ImageView[6];
+    private ContentLoadingProgressBar loadingProgressBar;
 
     private  int size =0;
     public static boolean ifEmpty=false;
@@ -236,7 +227,7 @@ public class MainDynamicsActivity extends BaseActivity {
                         @Override
                         public void done(BmobException e) {
                             if (e == null) {
-                                sendMessage(bmobUser.getUsername() + "点赞了你的动态",
+                                sendMessage(myUser1.getUsername() + "点赞了你的动态",
                                         new BmobIMUserInfo(dynamics.getUserId(), dynamics.getUser(), null),
                                         dynamics.getObjectId(), dynamics.getContent());
 
@@ -328,7 +319,7 @@ public class MainDynamicsActivity extends BaseActivity {
         mAdapter = new NineGridImageViewAdapter<String>() {
             @Override
             protected void onDisplayImage(Context context, ImageView imageView, String photo) {
-                Glide.with(MainDynamicsActivity.this).load(photo)
+                Glide.with(MainDynamicsActivity.this).load(new mGlideUrl(photo))
                         .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(imageView);
             }
 
@@ -353,10 +344,8 @@ public class MainDynamicsActivity extends BaseActivity {
         }
 
 
-        dots = findViewById(R.id.dots);
-        loadlayout= findViewById(R.id.loading_layout);
-        loadlayout.setVisibility(View.VISIBLE);
-        dots.start();
+       loadingProgressBar = findViewById(R.id.loading_dynamics);
+        loadingProgressBar.setVisibility(View.VISIBLE);
         imm = (InputMethodManager) getSystemService (Context.INPUT_METHOD_SERVICE);
 
         content1 = findViewById(R.id.content_main_dynamics);
@@ -421,7 +410,7 @@ public class MainDynamicsActivity extends BaseActivity {
                         public void done(String s, BmobException e) {
                             if(e==null){
                                 Toast.makeText(MainDynamicsActivity.this,"回复成功",Toast.LENGTH_SHORT).show();
-                                sendMessage(bmobUser.getUsername()+"回复了你:"+content,
+                                sendMessage(myUser1.getUsername()+"回复了你:"+content,
                                         new BmobIMUserInfo(replyComment.getReplyuserId(),
                                                 replyComment.getUserName(),null),
                                         dynamics.getObjectId(),dynamics.getContent());
@@ -472,7 +461,7 @@ public class MainDynamicsActivity extends BaseActivity {
 
                                 Toast.makeText(MainDynamicsActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
 
-                                sendMessage(bmobUser.getUsername()+"评论了你的动态:"+content,new BmobIMUserInfo(dynamics.getUserId(),dynamics.getUser(),null),
+                                sendMessage(myUser1.getUsername()+"评论了你的动态:"+content,new BmobIMUserInfo(dynamics.getUserId(),dynamics.getUser(),null),
                                         dynamics.getObjectId(),dynamics.getContent());
 
                                 commentList.clear();
@@ -567,7 +556,7 @@ public class MainDynamicsActivity extends BaseActivity {
 
                         adapter.notifyDataSetChanged();
                         commentcount.setText("("+commentCount+")");
-                        loadlayout.setVisibility(View.GONE);
+                       loadingProgressBar.setVisibility(GONE);
 
                     }
                     else if (state == ADD){
@@ -628,7 +617,7 @@ public class MainDynamicsActivity extends BaseActivity {
 
     public void sendMessage(String content ,BmobIMUserInfo info,String objectId,String objectTitle) {
 
-        if(!bmobUser.getObjectId().equals(info.getUserId())){
+        if(!myUser1.getObjectId().equals(info.getUserId())){
 
             BmobIMConversation conversationEntrance = BmobIM.getInstance().startPrivateConversation(info, true, null);
             BmobIMConversation messageManager = BmobIMConversation.obtain(BmobIMClient.getInstance(), conversationEntrance);
@@ -636,9 +625,9 @@ public class MainDynamicsActivity extends BaseActivity {
             msg.setContent(content);//给对方的一个留言信息
             Map<String, Object> map = new HashMap<>();
             map.put("currentuser", info.getUserId());
-            map.put("userid", bmobUser.getObjectId());
-            map.put("username",bmobUser.getUsername());
-            map.put("useravatar",bmobUser.getAvatar());
+            map.put("userid", myUser1.getObjectId());
+            map.put("username", myUser1.getUsername());
+            map.put("useravatar", myUser1.getAvatar());
             map.put("activityid",objectId);
             map.put("activityname",objectTitle);
             map.put("type","dynamics");
@@ -661,7 +650,7 @@ public class MainDynamicsActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu){
 
 
-        if (dynamics.getUser().equals(bmobUser.getUsername())){
+        if (dynamics.getUser().equals(myUser1.getUsername())){
             getMenuInflater().inflate(R.menu.toolbar_delete_dynamics,menu);
         }
 
@@ -679,9 +668,10 @@ public class MainDynamicsActivity extends BaseActivity {
             }
 
             case R.id.menu_delete_dynamics:
-            {
-                bmobUser.removeAll("dynamics", Arrays.asList(dynamics.getObjectId()));
-                bmobUser.update(new UpdateListener() {
+            {     MyUser myUser1 = new MyUser();
+                myUser1.setObjectId(myUser1.getObjectId());
+                myUser1.removeAll("dynamics", Arrays.asList(dynamics.getObjectId()));
+                myUser1.update(new UpdateListener() {
                     @Override
                     public void done(BmobException e) {
                         if (e==null){

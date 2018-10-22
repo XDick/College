@@ -1,29 +1,23 @@
 package com.college.xdick.findme.ui.Activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.ActivityAdapter;
 import com.college.xdick.findme.adapter.SearchActivityAdapter;
 import com.college.xdick.findme.adapter.SearchUserAdapter;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,9 +25,6 @@ import java.util.List;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
-import jp.wasabeef.glide.transformations.CropCircleTransformation;
-
-import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 /**
  * Created by Administrator on 2018/6/3.
@@ -137,6 +128,9 @@ public class SearchUserActivity extends BaseActivity {
     }
 
     private void initData(int signal){
+
+
+
         if (signal==JOIN){
             initJoinData();
         }
@@ -153,7 +147,9 @@ public class SearchUserActivity extends BaseActivity {
 
 
     private  void initJoinData(){
-
+        if (getIntent().getStringArrayExtra("EXTRA")==null){
+            return;
+        }
         BmobQuery<MyUser> query = new BmobQuery<MyUser>();
         query.addWhereContainedIn("objectId", Arrays.asList(getIntent().getStringArrayExtra("EXTRA")));
         query.setLimit(10);
@@ -198,7 +194,9 @@ public class SearchUserActivity extends BaseActivity {
 
 
    private void initSearchData(){
-
+       if (getIntent().getStringExtra("EXTRA")==null){
+           return;
+       }
        BmobQuery<MyUser> q1 = new BmobQuery<>();
        q1.addWhereEqualTo("username",getIntent().getStringExtra("EXTRA"));
 
@@ -254,6 +252,9 @@ public class SearchUserActivity extends BaseActivity {
 
 
     private void initFollowingData(){
+        if (getIntent().getStringArrayExtra("EXTRA")==null){
+            return;
+        }
         BmobQuery<MyUser> query = new BmobQuery<>();
         String[] following= getIntent().getStringArrayExtra("EXTRA");
         query.addWhereContainedIn("objectId", Arrays.asList(following));
@@ -313,6 +314,9 @@ public class SearchUserActivity extends BaseActivity {
     }
 
    private void initFollowedDate(){
+       if (getIntent().getStringExtra("EXTRA")==null){
+           return;
+       }
        BmobQuery<MyUser> query = new BmobQuery<>();
        query.addWhereContainsAll("following",Arrays.asList(getIntent().getStringExtra("EXTRA")));
        query.setLimit(10);

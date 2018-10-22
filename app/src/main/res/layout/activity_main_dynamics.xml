@@ -282,31 +282,16 @@
 
         </LinearLayout>
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_gravity="center"
+
+                <android.support.v4.widget.ContentLoadingProgressBar
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/Widget.AppCompat.ProgressBar"
                     android:visibility="gone"
-                    android:id="@+id/loading_layout">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#484848"
-                        android:textSize="20sp"
-                        android:text="Loading"/>
-
-                    <pl.tajchert.waitingdots.DotsTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/dots"
-
-                        android:textSize="45sp"
-                        android:textColor="#484848"
-                        dots:autoplay="false"
-                        dots:period="1000"/>
-                </LinearLayout>
+                    android:max="100"
+                    android:progress="0"
+                    android:layout_gravity="center"
+                    android:id="@+id/loading_dynamics"
+                    android:layout_height="wrap_content" />
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

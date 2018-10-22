@@ -6,43 +6,31 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.FutureTarget;
-import com.bumptech.glide.request.target.Target;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
 import com.college.xdick.findme.MyClass.DownLoadImageService;
 import com.college.xdick.findme.MyClass.ImageDownLoadCallBack;
 import com.college.xdick.findme.MyClass.PicturePageAdapter;
 import com.college.xdick.findme.MyClass.ViewPagerFixed;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
-import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.DynamicsComment;
 import com.college.xdick.findme.bean.MyActivity;
@@ -53,9 +41,7 @@ import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
 import com.college.xdick.findme.ui.Fragment.DynamicsFragment;
 import com.college.xdick.findme.ui.Fragment.UserCenterDynamicsFragment;
-import com.college.xdick.findme.util.DownloadUtil;
 
-import com.college.xdick.findme.util.FileUtil;
 import com.jaeger.ninegridimageview.NineGridImageView;
 import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
 
@@ -73,16 +59,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMConversation;
 import cn.bmob.newim.bean.BmobIMMessage;
 import cn.bmob.newim.bean.BmobIMUserInfo;
 import cn.bmob.newim.core.BmobIMClient;
-import cn.bmob.newim.listener.ConversationListener;
 import cn.bmob.newim.listener.MessageSendListener;
-import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobBatch;
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
@@ -130,7 +113,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
        private List<Dynamics> mDynamicsList;
        private  NineGridImageViewAdapter<String> mAdapter;
        private Context mContext;
-        private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
+        private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
          private Dialog mDialog;
 
            private ViewPagerFixed pager;
@@ -172,7 +155,6 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                time2= view.findViewById(R.id.time_ac);
 
                host = view.findViewById(R.id.host_ac);
-               join = view.findViewById(R.id.join_ac);
            }
 
         public void setVisibility(boolean isVisible){
@@ -240,6 +222,10 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
             holder.avatar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    if (fragmentNum==2){
+                        return;
+                    }
                     int position = holder.getAdapterPosition();
                     final Dynamics dynamics = mDynamicsList.get(position);
 
@@ -366,7 +352,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
             @Override
             protected void onDisplayImage(Context context, ImageView imageView, String photo) {
-                Glide.with(mContext).load(photo) .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(imageView);
+                Glide.with(mContext).load(new mGlideUrl(photo)) .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(imageView);
             }
 
             @Override
@@ -442,19 +428,25 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                    report.setOnClickListener(new View.OnClickListener() {
                        @Override
                        public void onClick(View v) {
+                           Toast.makeText(mContext,"举报成功，感谢反馈",Toast.LENGTH_SHORT).show();
                            easyPopup.dismiss();
+                           sendMessage(myUser.getUsername()+"举报此动态违规"
+                                   ,new BmobIMUserInfo("90b5bdad85","叉地克",""),
+                                   dynamics.getObjectId(), dynamics.getContent());
                        }
                    });
 
-           if (dynamics.getUser().equals(bmobUser.getUsername())){
+           if (dynamics.getUser().equals(myUser.getUsername())|| myUser.isGod()){
 
                delete.setVisibility(View.VISIBLE);
                delete.setOnClickListener(new View.OnClickListener() {
                    @Override
                    public void onClick(View v) {
                        easyPopup.dismiss();
-                       bmobUser.increment("dynamicsCount",-1);
-                       bmobUser.update(new UpdateListener() {
+                       MyUser myUser1= new MyUser();
+                       myUser1.setObjectId(myUser.getObjectId());
+                       myUser1.increment("dynamicsCount",-1);
+                       myUser1.update(new UpdateListener() {
                            @Override
                            public void done(BmobException e) {
                                if (e==null){
@@ -470,14 +462,18 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                                                   {
                                                       fragment1.setSize(0);
                                                       fragment1.initData(DynamicsFragment.REFRESH);
+                                                      break;
                                                   }
                                                   case 2:
                                                       fragment2.setSize(0);
                                                       fragment2.initData(UserCenterDynamicsFragment.REFRESH);
+                                                      break;
+
+                                                      default:break;
 
 
                                               }
-                                              Toast.makeText(mContext,"成功删除",Toast.LENGTH_SHORT).show();
+                                               Toast.makeText(mContext,"成功删除",Toast.LENGTH_SHORT).show();
 
                                                BmobQuery<DynamicsComment> query = new BmobQuery<>();
                                                query.addWhereEqualTo("dynamicsID", dynamics.getObjectId());
@@ -505,12 +501,13 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                                                    @Override
                                                    public void done(String[] failUrls, BmobException e) {
                                                        if (e == null) {
-
+                                                          // Toast.makeText(mContext,"全部删除成功",Toast.LENGTH_SHORT).show();
                                                        } else {
+                                                          // Toast.makeText(mContext,e.getMessage(),Toast.LENGTH_SHORT).show();
                                                            if (failUrls != null) {
-
+                                                               //Toast.makeText(mContext,"删除失败个数："+failUrls.length,Toast.LENGTH_SHORT).show();
                                                            } else {
-
+                                                               //Toast.makeText(mContext,"全部删除失败：",Toast.LENGTH_SHORT).show();
                                                            }
                                                        }
                                                    }
@@ -640,7 +637,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                                     @Override
                                     public void done(BmobException e) {
                                         if (e == null) {
-                                            sendMessage(bmobUser.getUsername() + "点赞了你的动态",
+                                            sendMessage(myUser.getUsername() + "点赞了你的动态",
                                                     new BmobIMUserInfo(dynamics.getUserId(), dynamics.getUser(), null),
                                                     dynamics.getObjectId(), dynamics.getContent());
 
@@ -853,7 +850,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
     public void sendMessage(String content ,BmobIMUserInfo info,String objectId,String objectTitle) {
 
-        if(!bmobUser.getObjectId().equals(info.getUserId())){
+        if(!myUser.getObjectId().equals(info.getUserId())){
 
             BmobIMConversation conversationEntrance = BmobIM.getInstance().startPrivateConversation(info, true, null);
             BmobIMConversation messageManager = BmobIMConversation.obtain(BmobIMClient.getInstance(), conversationEntrance);
@@ -861,9 +858,9 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
             msg.setContent(content);//给对方的一个留言信息
             Map<String, Object> map = new HashMap<>();
             map.put("currentuser", info.getUserId());
-            map.put("userid", bmobUser.getObjectId());
-            map.put("username",bmobUser.getUsername());
-            map.put("useravatar",bmobUser.getAvatar());
+            map.put("userid", myUser.getObjectId());
+            map.put("username", myUser.getUsername());
+            map.put("useravatar", myUser.getAvatar());
             map.put("activityid",objectId);
             map.put("activityname",objectTitle);
             map.put("type","dynamics");

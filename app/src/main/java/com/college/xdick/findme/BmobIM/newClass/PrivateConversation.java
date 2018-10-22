@@ -64,7 +64,10 @@ public class PrivateConversation extends Conversation{
     public String getLastMessageContent() {
         if(lastMsg!=null){
             String content =lastMsg.getContent();
-            if(lastMsg.getMsgType().equals(BmobIMMessageType.TEXT.getType()) || lastMsg.getMsgType().equals("agree")){
+             if(lastMsg.getExtra().contains("activityid")){
+                return "[活动通知]";
+            }
+            else if(lastMsg.getMsgType().equals(BmobIMMessageType.TEXT.getType()) ){
                 return content;
             }else if(lastMsg.getMsgType().equals(BmobIMMessageType.IMAGE.getType())){
                 return "[图片]";
@@ -75,9 +78,7 @@ public class PrivateConversation extends Conversation{
             }else if(lastMsg.getMsgType().equals(BmobIMMessageType.VIDEO.getType())){
                 return "[视频]";
             }
-            else if(lastMsg.getMsgType().equals("join")){
-                return "[我加入了你的活动]";
-            }else{//开发者自定义的消息类型，需要自行处理
+           else{//开发者自定义的消息类型，需要自行处理
                 return "[未知]";
             }
         }else{//防止消息错乱

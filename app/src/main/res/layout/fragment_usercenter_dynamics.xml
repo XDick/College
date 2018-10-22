@@ -5,32 +5,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:dots="http://schemas.android.com/tools">
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center|top"
-        android:layout_marginTop="20dp"
-        android:visibility="gone"
-        android:id="@+id/loading_layout">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#484848"
-            android:textSize="20sp"
-            android:text="Loading"/>
-
-        <pl.tajchert.waitingdots.DotsTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/dots"
-
-            android:textSize="45sp"
-            android:textColor="#484848"
-            dots:autoplay="false"
-            dots:period="1000"/>
-    </LinearLayout>
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 
         <android.support.v7.widget.RecyclerView
@@ -40,7 +20,7 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 
-
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 
 </FrameLayout>

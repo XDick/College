@@ -27,8 +27,7 @@ import com.college.xdick.findme.ui.Activity.SetDynamicsActivity;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.adapter.DynamicsAdapter;
-
-
+import com.college.xdick.findme.ui.Base.BaseFragment;
 
 
 import java.util.ArrayList;
@@ -41,25 +40,22 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
-import cn.bmob.v3.listener.QueryListener;
+
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
-import pl.tajchert.waitingdots.DotsTextView;
+
 
 /**
  * Created by Administrator on 2018/4/2.
  */
 
-public  class DynamicsFragment extends Fragment {
+public  class DynamicsFragment extends BaseFragment {
     View rootview;
     private RecyclerView recyclerView;
-    private DotsTextView dots;
-    private LinearLayout loadlayout;
-    private   Toolbar toolbar;
+
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
     private static List<Dynamics> dynamicsList= new ArrayList<>();
     private SwipeRefreshLayout swipeRefresh;
     private DynamicsAdapter adapter;
-    private static boolean flag=true;
     private static int size =0;
     private static boolean ifEmpty=false;
     static public int REFRESH=1;
@@ -75,14 +71,20 @@ public  class DynamicsFragment extends Fragment {
         initBaseView();
 
         initRecyclerView();
-        if (flag){
-            loadlayout.setVisibility(View.VISIBLE);
-            dots.start();
+
        if(bmobUser!=null){
-           initData(REFRESH);
+           swipeRefresh.post(new Runnable() {
+               @Override
+               public void run() {
+                   swipeRefresh.setRefreshing(true);
+                   size=0;
+                   initData(REFRESH);
+               }
+           });
+
        }
 
-        flag=false;}
+
         setHasOptionsMenu(true);
 
 
@@ -100,9 +102,9 @@ public  class DynamicsFragment extends Fragment {
 
 
     private void initBaseView() {
-        toolbar = rootview.findViewById(R.id.toolbar_main);
+      /*  toolbar = rootview.findViewById(R.id.toolbar_main);
         toolbar.setTitle("");
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);*/
         swipeRefresh = rootview.findViewById(R.id.swipe_refresh_main);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -111,8 +113,7 @@ public  class DynamicsFragment extends Fragment {
                 refresh();
             }
         });
-        dots = rootview.findViewById(R.id.dots);
-        loadlayout= rootview.findViewById(R.id.loading_layout);
+
          floatingActionButton = rootview.findViewById(R.id.floatactionbutton);
          floatingActionButton.setOnClickListener(new View.OnClickListener() {
              @Override
@@ -194,7 +195,7 @@ public  class DynamicsFragment extends Fragment {
   public void initData(final int state){
                   BmobQuery<Dynamics> query = new BmobQuery<Dynamics>();
 
-                  String following[] = bmobUser.getFollowing();
+                  String following[] = BmobUser.getCurrentUser(MyUser.class).getFollowing();
       if (following!=null){
           final List<String> list =new ArrayList<>(Arrays.asList(following));
           list.add(bmobUser.getObjectId());
@@ -236,6 +237,7 @@ public  class DynamicsFragment extends Fragment {
                           if(object.size()<20){
                               ifEmpty=true;
                               dynamicsList.addAll(object);
+                              adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                               adapter.notifyDataSetChanged();
                           }
                           else {
@@ -244,7 +246,7 @@ public  class DynamicsFragment extends Fragment {
                               adapter.notifyDataSetChanged();}
                           size=20;
 
-                          loadlayout.setVisibility(View.GONE);
+                          swipeRefresh.setRefreshing(false);
 
                       }
 
@@ -261,7 +263,7 @@ public  class DynamicsFragment extends Fragment {
       }
       else {
           ifEmpty = true;
-          loadlayout.setVisibility(View.GONE);
+          swipeRefresh.setRefreshing(false);
 
       }
 
@@ -278,29 +280,23 @@ public  class DynamicsFragment extends Fragment {
 
         dynamicsList.clear();
         size=0;
-
+        swipeRefresh.setRefreshing(true);
 
 
 
       new Thread(new Runnable() {
           @Override
           public void run() {
-              try{
+
                  
                   initData(REFRESH);
 
-                  Thread.sleep(1000);
-              }
-              catch (InterruptedException e){
-                  e.printStackTrace();
-              }
               if (getActivity() == null)
                   return;
               getActivity().runOnUiThread(new Runnable() {
                   @Override
                   public void run() {
 
-                      swipeRefresh.setRefreshing(false);
                   }
               });
           }

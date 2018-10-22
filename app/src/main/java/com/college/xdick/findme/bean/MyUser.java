@@ -12,9 +12,9 @@ public class MyUser extends BmobUser implements Serializable {
 
 
 
-    private String avatar ="http://bmob-cdn-18038.b0.upaiyun.com/2018/05/18/425ce45f40a6b2208074aa1dbce9f76c.png";
+    private String avatar ;
 
-    private String school="";
+    private String school;
 
     private String[] gps;
 
@@ -30,14 +30,18 @@ public class MyUser extends BmobUser implements Serializable {
     private String[] following;
 
 
-    private boolean isGod;
+    private Boolean isGod;
 
-    private Integer setAcCount=0;
+    private Boolean isBanned;
 
-    private Integer dynamicsCount=0;
+    private Integer setAcCount;
+
+    private Integer dynamicsCount;
 
 
     private String followChartId;
+
+    private String bannedReason;
 
 
 
@@ -136,8 +140,24 @@ public class MyUser extends BmobUser implements Serializable {
         return followChartId;
     }
 
+    public Boolean getBanned() {
+        return isBanned;
+    }
+
+    public void setBanned(Boolean banned) {
+        isBanned = banned;
+    }
+
     public void setFollowChartId(String followChartId) {
         this.followChartId = followChartId;
+    }
+
+    public String getBannedReason() {
+        return bannedReason;
+    }
+
+    public void setBannedReason(String bannedReason) {
+        this.bannedReason = bannedReason;
     }
 }
 

@@ -29,6 +29,7 @@ import com.college.xdick.findme.bean.MyUser;
 
 import com.college.xdick.findme.ui.Activity.LoginActivity;
 import com.college.xdick.findme.ui.Activity.MainActivity;
+import com.college.xdick.findme.ui.Base.BaseFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,21 +49,19 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
  * Created by Administrator on 2018/4/11.
  */
 
-public class ActivityFragment extends Fragment {
+public class ActivityFragment extends BaseFragment {
 
    public final int ADD =1;
    public final int REFRESH=2;
    public final int SORT =3;
-   private static int size =10;
+   private static int size =0;
 
-    View rootview;
-    private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
-    static private List<MyActivity> activityList= new ArrayList<>();
+    private View rootview;
+    private List<MyActivity> activityList= new ArrayList<>();
     private SwipeRefreshLayout swipeRefresh;
     private ActivityAdapter adapter;
-    static boolean ifsort = false;
-    static int flag =0;
-    static boolean ifEmpty= false;
+    private boolean ifsort = false;
+    private boolean ifEmpty= false;
 
 
 
@@ -70,12 +69,40 @@ public class ActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootview =inflater.inflate(R.layout.fragment_activity,container,false);
-        if(flag==0){
-            FirstInitFromActivity();
-        }
-
         initBaseView();
         initRecyclerView();
+
+        MainActivity activity = (MainActivity) getActivity();
+        List<MyActivity>list=(List<MyActivity>)activity.getIntent().getSerializableExtra("LISTDATA");;
+
+        if (list!=null) {
+            activityList.addAll(list);
+            if (list.size()<10){
+                ifEmpty=true;
+            }
+
+            else {
+                ifEmpty=false;
+
+            }
+            adapter.notifyDataSetChanged();
+            size=10;
+        }
+        else {
+            swipeRefresh.post(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefresh.setRefreshing(true);
+                    size=0;
+                    initData(REFRESH);
+                }
+            });
+
+        }
+
+
+
+
 
 
 
@@ -121,6 +148,11 @@ public class ActivityFragment extends Fragment {
          adapter.addFooterView(footer);
         View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_activity, recyclerView, false);
         adapter.setEmptyView(empty);
+
+        if (ifEmpty){
+            adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+            adapter.notifyDataSetChanged();
+        }
 
 
        // int resId = R.anim.recycler_animation;
@@ -179,13 +211,21 @@ public class ActivityFragment extends Fragment {
                     BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
                     List<BmobQuery<MyActivity>> queries = new ArrayList<>();
 
-                    if(bmobUser!=null&&bmobUser.getTag()!=null){
+                    if( BmobUser.getCurrentUser(MyUser.class)!=null&& BmobUser.getCurrentUser(MyUser.class).getTag()!=null){
                     /*String gps[]=bmobUser.getGps();
                     if (gps!=null){
                         query.addWhereEqualTo("gps",gps[1]);}*/
 
-                        String tag[] = bmobUser.getTag();
+                        String tag[] =  BmobUser.getCurrentUser(MyUser.class).getTag();
                         if (tag!=null){
+
+                            if (tag.length==0){
+                                ifEmpty=true;
+                                adapter.notifyDataSetChanged();
+                                swipeRefresh.setRefreshing(false);
+                                return;
+
+                            }
                             for (int i =0; i<tag.length;i++){
                                 BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
                                 q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
@@ -194,9 +234,15 @@ public class ActivityFragment extends Fragment {
                             }
 
                         }
+                        else {
+                            ifEmpty=true;
+                            adapter.notifyDataSetChanged();
+                            swipeRefresh.setRefreshing(false);
+                            return;
+                        }
 
                     }
-                    query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
+                    query.addWhereGreaterThan("date", aLong*1000L-60*60*24*1000);
 
 
                 Log.d("","时间"+aLong);
@@ -214,8 +260,9 @@ public class ActivityFragment extends Fragment {
 
 
                               ifsort=false;
-                            activityList.addAll(object);
+
                               if (state==ADD){
+                                  activityList.addAll(object);
                                   if (listsize==activityList.size()){
                                       ifEmpty=true;
                                       adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
@@ -240,6 +287,7 @@ public class ActivityFragment extends Fragment {
                                   if(object.size()<10){
                                       ifEmpty=true;
                                       activityList.addAll(object);
+                                      adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                                       adapter.notifyDataSetChanged();
                                   }
                                   else {
@@ -247,11 +295,11 @@ public class ActivityFragment extends Fragment {
                                       activityList.addAll(object);
                                       adapter.notifyDataSetChanged();}
                                   size =  10;
-
+                                  swipeRefresh.setRefreshing(false);
                               }
 
                         }else{
-
+                            swipeRefresh.setRefreshing(false);
                             Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -269,34 +317,25 @@ public class ActivityFragment extends Fragment {
 
 
 
-    private void refresh(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+    public void refresh(){
+        swipeRefresh.setRefreshing(true);
+
 
                 size =0;
-                try{
+
                     if (ifsort){
                         sortData(REFRESH);
                     }else {
                         initData(REFRESH);}
-                    Thread.sleep(1000);
-                }
-                catch (InterruptedException e){
-                    e.printStackTrace();
-                }
 
                 if (getActivity() == null)
+                {
                     return;
+                }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        swipeRefresh.setRefreshing(false);
-                    }
-                });
-            }
-        }).start();
+
+
+
     }
 
 
@@ -304,27 +343,6 @@ public class ActivityFragment extends Fragment {
 
 
 
-    private  void FirstInitFromActivity(){
-            MainActivity activity = (MainActivity) getActivity();
-            List<MyActivity>list=(List<MyActivity>)activity.getIntent().getSerializableExtra("LISTDATA");;
-
-            if (list!=null) {
-                if (list.size()<10){
-                    ifEmpty=true;
-                }
-
-                else {
-                    ifEmpty=false;
-
-                }
-                activityList =list;
-               
-            }
-
-
-            flag=1;
-
-    }
 
     public void sortData(final int state) {
 
@@ -341,19 +359,33 @@ public class ActivityFragment extends Fragment {
                     BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
                     List<BmobQuery<MyActivity>> queries = new ArrayList<>();
 
-                    if(bmobUser!=null&&bmobUser.getTag()!=null){
+                    if( BmobUser.getCurrentUser(MyUser.class)!=null&& BmobUser.getCurrentUser(MyUser.class).getTag()!=null){
                     /*String gps[]=bmobUser.getGps();
                     if (gps!=null){
                         query.addWhereEqualTo("gps",gps[1]);}*/
 
                     }
-                    query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
+
+                    else {
+                        ifEmpty=true;
+                        adapter.notifyDataSetChanged();
+                        swipeRefresh.setRefreshing(false);
+                        return;
+                    }
+                    query.addWhereGreaterThan("date", aLong*1000L-60*60*24*1000);
 
 
 
                 Log.d("","时间"+aLong);
-                if(bmobUser!=null&&bmobUser.getTag()!=null) {
-                    String tag[] = bmobUser.getTag();
+                if( BmobUser.getCurrentUser(MyUser.class)!=null&& BmobUser.getCurrentUser(MyUser.class).getTag()!=null) {
+                    String tag[] =  BmobUser.getCurrentUser(MyUser.class).getTag();
+                    if (tag.length==0){
+                        ifEmpty=true;
+                        adapter.notifyDataSetChanged();
+                            swipeRefresh.setRefreshing(false);
+                            return;
+
+                    }
                     for (int i = 0; i < tag.length; i++) {
                         BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
                         q.addWhereContainsAll("tag", Arrays.asList(tag[i]));
@@ -373,8 +405,9 @@ public class ActivityFragment extends Fragment {
 
 
                             ifsort=true;
-                            activityList.addAll(object);
+
                             if (state==SORT){
+                                activityList.addAll(object);
                                 if (listsize==activityList.size()){
                                     ifEmpty=true;
                                     adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
@@ -399,6 +432,7 @@ public class ActivityFragment extends Fragment {
                                if(activityList.size()<10){
                                    ifEmpty=true;
                                    activityList.addAll(object);
+                                   adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                                    adapter.notifyDataSetChanged();
                                }
                                else {
@@ -406,13 +440,13 @@ public class ActivityFragment extends Fragment {
                                 activityList.addAll(object);
                                 adapter.notifyDataSetChanged();}
                                 size =  10;
-
+                                swipeRefresh.setRefreshing(false);
 
                             }
 
 
                         }else{
-
+                            swipeRefresh.setRefreshing(false);
                             Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -422,7 +456,7 @@ public class ActivityFragment extends Fragment {
         });
     }
 
-    public void setSize(int size1){
-        size=size1;
+    public void setSORT(boolean ifsort){
+        this.ifsort = ifsort;
     }
 }

@@ -5,9 +5,11 @@ buildscript {
     repositories {
         google()
         jcenter()
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.4'
+
 
 
         
@@ -23,6 +25,7 @@ allprojects {
         jcenter()
         maven { url "https://raw.github.com/bmob/bmob-android-sdk/master"}
         maven { url 'https://jitpack.io' }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 
 
     }

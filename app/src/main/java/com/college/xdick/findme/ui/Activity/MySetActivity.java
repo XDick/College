@@ -3,15 +3,12 @@ package com.college.xdick.findme.ui.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.college.xdick.findme.R;
@@ -19,11 +16,9 @@ import com.college.xdick.findme.adapter.ActivityAdapter;
 import com.college.xdick.findme.adapter.ActivityAdapter2;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
@@ -146,9 +141,10 @@ public class MySetActivity extends BaseActivity {
 
 
                if (ifEmpty&&activityList.size()!=myUser.getSetAcCount()){
-
-                   myUser.setSetAcCount(activityList.size());
-                   myUser.update(myUser.getObjectId(),new UpdateListener() {
+                 MyUser myUser1= new MyUser();
+                 myUser1.setObjectId(myUser.getObjectId());
+                   myUser1.setSetAcCount(activityList.size());
+                   myUser1.update(new UpdateListener() {
                        @Override
                        public void done(BmobException e) {
                            if (e==null){

@@ -4,7 +4,6 @@ package com.college.xdick.findme.ui.Activity;
 import android.os.Bundle;
 
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,15 +15,13 @@ import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.AddTagBean;
 import com.college.xdick.findme.bean.MainTagBean;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 import com.donkingliang.labels.LabelsView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import cn.bmob.newim.BmobIM;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
@@ -55,115 +52,127 @@ public class InterestActivity extends BaseActivity {
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                user.addAllUnique("tag", selectTagList);
-                user.update(new UpdateListener() {
+
+                if (selectTagList.isEmpty()){
+                    Toast.makeText(InterestActivity.this,"请至少选择一个标签o(╥﹏╥)o",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                MyUser myUser1 = new MyUser();
+                myUser1.setObjectId(user.getObjectId());
+                myUser1.addAllUnique("tag", selectTagList);
+                myUser1.update(new UpdateListener() {
                     @Override
                     public void done(BmobException e) {
                        finish();
-                        Toast.makeText(InterestActivity.this,"成功",Toast.LENGTH_SHORT).show();
+
                     }
                 });
             }
         });
 
 
-
-                    if (user.isGod()) {
-                        final EditText editText = findViewById(R.id.tag_edit);
-                        Button addmain = findViewById(R.id.addmain);
-                        final Button addadd = findViewById(R.id.addadd);
-                        Button delmain = findViewById(R.id.deletemain);
-                        Button deladd = findViewById(R.id.deleteadd);
-
-
-                        editText.setVisibility(View.VISIBLE);
-                        addadd.setVisibility(View.VISIBLE);
-                        addmain.setVisibility(View.VISIBLE);
-                        deladd.setVisibility(View.VISIBLE);
-                        delmain.setVisibility(View.VISIBLE);
+                  try {
+                      if (user.isGod()) {
+                          final EditText editText = findViewById(R.id.tag_edit);
+                          Button addmain = findViewById(R.id.addmain);
+                          final Button addadd = findViewById(R.id.addadd);
+                          Button delmain = findViewById(R.id.deletemain);
+                          Button deladd = findViewById(R.id.deleteadd);
 
 
-                        addmain.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String tag = editText.getText().toString();
-                                MainTagBean maintag = new MainTagBean(tag);
-                                maintag.save(new SaveListener<String>() {
-                                    @Override
-                                    public void done(String s, BmobException e) {
-                                        Toast.makeText(InterestActivity.this, "成功", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        });
-
-                        addadd.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String tag = editText.getText().toString();
-                                AddTagBean addtag = new AddTagBean(tag);
-                                addtag.save(new SaveListener<String>() {
-                                    @Override
-                                    public void done(String s, BmobException e) {
-                                        Toast.makeText(InterestActivity.this, "成功", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        });
-
-                        delmain.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String tag = editText.getText().toString();
-                                BmobQuery query = new BmobQuery<MainTagBean>();
-                                query.addWhereEqualTo("mainTag", tag);
-                                query.findObjects(new FindListener<MainTagBean>() {
-                                    @Override
-                                    public void done(List<MainTagBean> object, BmobException e) {
-
-                                        for (MainTagBean mainTagBean : object) {
-
-                                            mainTagBean.delete(new UpdateListener() {
-                                                @Override
-                                                public void done(BmobException e) {
-                                                    Toast.makeText(InterestActivity.this, "成功", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                        }
-
-                                    }
-                                });
-
-                            }
-                        });
+                          editText.setVisibility(View.VISIBLE);
+                          addadd.setVisibility(View.VISIBLE);
+                          addmain.setVisibility(View.VISIBLE);
+                          deladd.setVisibility(View.VISIBLE);
+                          delmain.setVisibility(View.VISIBLE);
 
 
-                        deladd.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String tag = editText.getText().toString();
-                                BmobQuery query = new BmobQuery<AddTagBean>();
-                                query.addWhereEqualTo("addTag", tag);
-                                query.findObjects(new FindListener<AddTagBean>() {
-                                    @Override
-                                    public void done(List<AddTagBean> object, BmobException e) {
+                          addmain.setOnClickListener(new View.OnClickListener() {
+                              @Override
+                              public void onClick(View v) {
+                                  String tag = editText.getText().toString();
+                                  MainTagBean maintag = new MainTagBean(tag);
+                                  maintag.save(new SaveListener<String>() {
+                                      @Override
+                                      public void done(String s, BmobException e) {
+                                          Toast.makeText(InterestActivity.this, "成功", Toast.LENGTH_SHORT).show();
+                                      }
+                                  });
+                              }
+                          });
 
-                                        for (AddTagBean mainTagBean : object) {
+                          addadd.setOnClickListener(new View.OnClickListener() {
+                              @Override
+                              public void onClick(View v) {
+                                  String tag = editText.getText().toString();
+                                  AddTagBean addtag = new AddTagBean(tag);
+                                  addtag.save(new SaveListener<String>() {
+                                      @Override
+                                      public void done(String s, BmobException e) {
+                                          Toast.makeText(InterestActivity.this, "成功", Toast.LENGTH_SHORT).show();
+                                      }
+                                  });
+                              }
+                          });
 
-                                            mainTagBean.delete(new UpdateListener() {
-                                                @Override
-                                                public void done(BmobException e) {
-                                                    Toast.makeText(InterestActivity.this, "成功", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                        }
+                          delmain.setOnClickListener(new View.OnClickListener() {
+                              @Override
+                              public void onClick(View v) {
+                                  String tag = editText.getText().toString();
+                                  BmobQuery query = new BmobQuery<MainTagBean>();
+                                  query.addWhereEqualTo("mainTag", tag);
+                                  query.findObjects(new FindListener<MainTagBean>() {
+                                      @Override
+                                      public void done(List<MainTagBean> object, BmobException e) {
 
-                                    }
-                                });
+                                          for (MainTagBean mainTagBean : object) {
 
-                            }
-                        });
-                    }
+                                              mainTagBean.delete(new UpdateListener() {
+                                                  @Override
+                                                  public void done(BmobException e) {
+                                                      Toast.makeText(InterestActivity.this, "成功", Toast.LENGTH_SHORT).show();
+                                                  }
+                                              });
+                                          }
+
+                                      }
+                                  });
+
+                              }
+                          });
+
+
+                          deladd.setOnClickListener(new View.OnClickListener() {
+                              @Override
+                              public void onClick(View v) {
+                                  String tag = editText.getText().toString();
+                                  BmobQuery query = new BmobQuery<AddTagBean>();
+                                  query.addWhereEqualTo("addTag", tag);
+                                  query.findObjects(new FindListener<AddTagBean>() {
+                                      @Override
+                                      public void done(List<AddTagBean> object, BmobException e) {
+
+                                          for (AddTagBean mainTagBean : object) {
+
+                                              mainTagBean.delete(new UpdateListener() {
+                                                  @Override
+                                                  public void done(BmobException e) {
+                                                      Toast.makeText(InterestActivity.this, "成功", Toast.LENGTH_SHORT).show();
+                                                  }
+                                              });
+                                          }
+
+                                      }
+                                  });
+
+                              }
+                          });
+                      }
+                  }
+                  catch (Exception e){
+                      e.printStackTrace();
+                  }
+
 
 //LabelsView可以设置任何类型的数据，而不仅仅是String。
 
@@ -203,7 +212,7 @@ public class InterestActivity extends BaseActivity {
                     BmobQuery<AddTagBean> query2 = new BmobQuery<AddTagBean>();
 
 //返回50条数据，如果不加上这条语句，默认返回10条数据
-                    query2.setLimit(999);
+                    query2.setLimit(50);
 //执行查询方法
                     query2.findObjects(new FindListener<AddTagBean>() {
                         @Override

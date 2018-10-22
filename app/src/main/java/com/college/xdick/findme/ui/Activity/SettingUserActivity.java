@@ -2,14 +2,12 @@ package com.college.xdick.findme.ui.Activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyUser;
-import com.college.xdick.findme.bean.School;
-import com.college.xdick.findme.bean.SelectSchool;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 import com.college.xdick.findme.util.SelectSchoolUtil;
 
 import cn.bmob.v3.BmobUser;
@@ -18,7 +16,7 @@ import cn.bmob.v3.BmobUser;
  * Created by Administrator on 2018/5/17.
  */
 
-public class SettingUserActivity extends BaseActivity{
+public class SettingUserActivity extends BaseActivity {
 
       MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     @Override

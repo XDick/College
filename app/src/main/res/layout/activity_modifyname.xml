@@ -1,53 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_gravity="center"
-    android:background="@color/colorPrimary"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="200dp">
 
 
-        <ImageView
-            android:layout_marginTop="50dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|bottom"
-            android:background="@drawable/findme"
 
-            />
 
-    </LinearLayout>
+
+
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:orientation="vertical"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="@color/colorPrimary">
+
+
+
 <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
     android:orientation="vertical"
-  >
+    android:layout_width="match_parent"
+    android:layout_height="200dp">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
-        <EditText
-            android:hint="输入你的用户名"
-            android:id="@+id/modifyname_editview"
-            android:layout_width="match_parent"
-            android:textColor="#fff"
-            android:layout_height="wrap_content" />
-    </android.support.design.widget.TextInputLayout>
 
-    <Button
-        android:id="@+id/confirmname_button"
-        android:layout_width="match_parent"
-        android:textColor="#fff"
-        android:layout_height="wrap_content"
-        android:background="@color/red"
+    <ImageView
         android:layout_marginTop="50dp"
-        android:text="确定"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:background="@drawable/findme"
+
+        />
+
 </LinearLayout>
 
-</FrameLayout>
+
+
+<LinearLayout
+
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="60dp">
+    <FrameLayout
+        android:layout_width="90dp"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+
+            android:layout_height="wrap_content"
+            android:text="用户名"
+
+            android:textColor="#FFF"/>
+    </FrameLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="用户名"
+        >
+
+        <EditText
+            android:id="@+id/account_signup"
+            android:layout_width="200dp"
+            android:textSize="14dp"
+            android:textColor="#ffcdcd"
+            android:maxLines="1"
+            android:layout_height="wrap_content" />
+    </android.support.design.widget.TextInputLayout>
+</LinearLayout>
+
+
+
+
+<LinearLayout
+
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="60dp">
+    <FrameLayout
+        android:layout_width="90dp"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="手机号"
+            android:textColor="#ffffff"/>
+    </FrameLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:hint="手机号"
+        android:id="@+id/textInputLayout_phone_signup">
+
+        <EditText
+            android:id="@+id/phone_signup"
+            android:layout_width="150dp"
+            android:textSize="14dp"
+            android:maxLines="1"
+            android:textColor="#ffcdcd"
+            android:layout_height="match_parent"
+            />
+    </android.support.design.widget.TextInputLayout>
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="45dp"
+        android:background="@drawable/login_button"
+        android:textColor="#FFF"
+        android:id="@+id/sendidentity_button"
+        android:text="验证码"/>
+</LinearLayout>
+
+<LinearLayout
+
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="60dp">
+    <FrameLayout
+        android:layout_width="90dp"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="验证码"
+            android:textColor="#ffffff"/>
+    </FrameLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="验证码"
+        android:id="@+id/textInputLayout_identify_signup">
+        <EditText
+            android:id="@+id/identify_signup"
+            android:layout_width="150dp"
+            android:textSize="14dp"
+            android:textColor="#ffcdcd"
+            android:maxLines="1"
+            android:layout_height="match_parent"
+            />
+    </android.support.design.widget.TextInputLayout>
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="45dp"
+        android:background="@drawable/login_button"
+        android:textColor="#ffffff"
+        android:id="@+id/identify_confirm_button"
+        android:text="确认"/>
+
+</LinearLayout>
+
+
+
+
+<Button
+    android:id="@+id/signup_button"
+    android:layout_width="200dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/login_button"
+    android:text="确定"
+    android:textColor="#FFF"/>
+
+</LinearLayout>

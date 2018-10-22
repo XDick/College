@@ -12,8 +12,8 @@ android {
         applicationId "com.college.xdick.findme"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 20
-        versionName "2.0"
+        versionCode 26
+        versionName "2.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
 
@@ -68,8 +68,7 @@ dependencies {
     //glide的图片效果
     implementation 'com.linchaolong.android:imagepicker:1.5'
     //图片选择和裁剪
-    implementation 'com.github.tajchert:WaitingDots:0.4.0'
-    //loading
+
     implementation 'com.github.mcxtzhang:SwipeDelMenuLayout:V1.3.0'
     //滑动菜单
     implementation 'org.litepal.android:core:1.5.0'
@@ -86,9 +85,20 @@ dependencies {
     implementation 'com.github.chrisbanes:PhotoView:2.1.4'
     //photeView
     implementation files('libs/open_sdk_r6008_lite.jar')
-
+   //qq登录SDK
 
 
     //新浪表情
     implementation 'com.tb.emoji:yykEmoji:1.0.0'
+
+
+    //地区选择器
+    implementation 'liji.library.dev:citypickerview:3.1.13'
+
+
+    //验证码输入框
+    implementation 'com.jyn.verificationcodeview:verificationcodeview:1.0.0'
+    //butterknife
+
+
 }

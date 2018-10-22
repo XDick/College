@@ -8,7 +8,6 @@ import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +29,8 @@ import com.college.xdick.findme.ui.Activity.MyLikeActivity;
 import com.college.xdick.findme.ui.Activity.MySetActivity;
 import com.college.xdick.findme.ui.Activity.SettingUserActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
+import com.college.xdick.findme.ui.Base.BaseFragment;
+import com.college.xdick.findme.util.ClassFileHelper;
 import com.college.xdick.findme.util.SelectSchoolUtil;
 import com.linchaolong.android.imagepicker.ImagePicker;
 import com.linchaolong.android.imagepicker.cropper.CropImage;
@@ -45,26 +46,31 @@ import cn.bmob.newim.BmobIM;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.BmobUpdateListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadFileListener;
+import cn.bmob.v3.update.BmobUpdateAgent;
+import cn.bmob.v3.update.UpdateResponse;
+import cn.bmob.v3.update.UpdateStatus;
 import jp.wasabeef.glide.transformations.BlurTransformation;
-import jp.wasabeef.glide.transformations.ColorFilterTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+
 
 /**
  * Created by Administrator on 2018/4/2.
  */
 
-public class UserFragment extends Fragment {
+public class UserFragment extends BaseFragment {
     private View rootview;
     private String picturePath;
-    private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
+    private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     private TextView user,setcountText,dynamicscountText;
     private ImageView avatar,setting,background;
     private ImagePicker imagePicker;
-    private LinearLayout maytag,userset,userjoin,userlike,userexit,usersetting,userdynamics;
+    private LinearLayout maytag,userset,userjoin,userlike,
+            userexit,usersetting,userdynamics,userUpdate;
     private WaveView3 waveView3;
     private LinearLayout about;
 
@@ -97,8 +103,8 @@ public class UserFragment extends Fragment {
         TextView schoolText = rootview.findViewById(R.id.userschool);
         background = rootview.findViewById(R.id.user_background);
         try {
-            schoolText.setText("学校:"+bmobUser.getSchool());
-            SelectSchoolUtil.initPopView(getActivity(),null,schoolText,bmobUser);
+            schoolText.setText("学校:"+ myUser.getSchool());
+            SelectSchoolUtil.initPopView(getActivity(),null,schoolText, myUser);
             schoolText.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -120,7 +126,7 @@ public class UserFragment extends Fragment {
             @Override
             public void onClick(View v) {
                Intent intent = new Intent(getActivity(), UserCenterActivity.class);
-               intent.putExtra("USER",bmobUser);
+               intent.putExtra("USER", myUser);
                 startActivity(intent);
             }
         });
@@ -134,13 +140,31 @@ public class UserFragment extends Fragment {
         userexit = easyPopup.findViewById(R.id.exit_setting);
         usersetting = easyPopup.findViewById(R.id.account_setting);
         about = easyPopup.findViewById(R.id.user_set_about);
+        userUpdate = easyPopup.findViewById(R.id.update_setting);
+         userUpdate.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 BmobUpdateAgent.setUpdateListener(new BmobUpdateListener() {
 
+                     @Override
+                     public void onUpdateReturned(int updateStatus, UpdateResponse updateInfo) {
+                         // TODO Auto-generated method stub
+
+                       if(updateStatus == UpdateStatus.No) {
+                           Toast.makeText(getActivity(), "已经是最新版本", Toast.LENGTH_SHORT).show();
+                       }
+                     }
+                 });
+                 BmobUpdateAgent.forceUpdate(getActivity());
+                 easyPopup.dismiss();
+             }
+         });
         about.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("关于");
-                builder.setMessage("本应用由XDick-谢德锟开发，有Bug和意见欢迎加QQ群815191255 反馈");
+                builder.setMessage("本应用由XDick-谢德锟开发，有Bug和意见欢迎加QQ群938641787 反馈");
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -200,8 +224,8 @@ public class UserFragment extends Fragment {
                                         @Override
                                         public void onClick(View v) {
                                             BmobUser.logOut();   //清除缓存用户对象
-                                            bmobUser = BmobUser.getCurrentUser(MyUser.class); // 现在的currentUser是null了
-                                            Toast.makeText(getActivity(), "已退出登录", Toast.LENGTH_SHORT).show();
+                                            myUser = BmobUser.getCurrentUser(MyUser.class); // 现在的currentUser是null了
+                                          //  Toast.makeText(getActivity(), "已退出登录", Toast.LENGTH_SHORT).show();
                                             BmobIM.getInstance().disConnect();
                                             BmobCheckIfLogin();
                                             easyPopup.dismiss();
@@ -230,9 +254,10 @@ public class UserFragment extends Fragment {
                 avatar.setLayoutParams(lp);
             }
         });
-        background.setColorFilter(Color.parseColor("#cf0606"), PorterDuff.Mode.DARKEN);
-        Glide.with(this).load(bmobUser.getAvatar())
-                        .apply(bitmapTransform(new BlurTransformation(9, 7)))
+        background.setColorFilter(Color.parseColor("#d72f31"), PorterDuff.Mode.DARKEN);
+        Glide.with(this).load(myUser.getAvatar())
+                        .apply(bitmapTransform(new BlurTransformation(9, 7))
+                        .error(R.drawable.head))
                         .into(background);
 
 
@@ -244,17 +269,18 @@ public class UserFragment extends Fragment {
 
 
 
-            setcountText.setText(bmobUser.getSetAcCount()+"");
+            setcountText.setText(myUser.getSetAcCount()+"");
 
 
 
-            dynamicscountText.setText(bmobUser.getDynamicsCount()+"");
+            dynamicscountText.setText(myUser.getDynamicsCount()+"");
 
 
 
 
-                user.setText(bmobUser.getUsername());
-                Glide.with(getActivity()).load(bmobUser.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
+                user.setText(myUser.getUsername());
+                Glide.with(getActivity()).load(myUser.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())
+                        .error(R.drawable.head)).into(avatar);
 
 
 
@@ -272,7 +298,7 @@ public class UserFragment extends Fragment {
     private void BmobCheckIfLogin(){
 
 
-        if(bmobUser != null){
+        if(myUser != null){
             showUserInfo();
             avatar.setOnClickListener(new View.OnClickListener() {
                                             @Override
@@ -289,42 +315,69 @@ public class UserFragment extends Fragment {
                                                     public void onCropImage(Uri imageUri) {
 
                                                         picturePath=imageUri.toString().replace("file:///","");
-                                                        if(picturePath!=null){
+                                                        File file=new File(picturePath);
+                                                        final String fileType = picturePath
+                                                                .substring(picturePath.lastIndexOf("."));
 
-                                                            final BmobFile bmobFile = new BmobFile(new File(picturePath));
+                                                        if(picturePath!=null){
+                                                           final String renamePath=picturePath.
+                                                                    substring(0,picturePath.lastIndexOf("/")+1)
+                                                            +"avatar_"+myUser.getObjectId()
+                                                                    +fileType;
+                                                            //Toast.makeText(getContext(),renamePath,Toast.LENGTH_LONG).show();
+
+
+                                                            file.renameTo(new File(renamePath));
+                                                            //Toast.makeText(getContext(),fileFinish+"",Toast.LENGTH_LONG).show();
+
+                                                            final BmobFile bmobFile = new  BmobFile(new File(renamePath));
+
                                                             bmobFile.uploadblock(new UploadFileListener() {
                                                                                      @Override
                                                                                      public void done(BmobException e) {
-                                                                                         if (!bmobUser.getAvatar().equals("http://bmob-cdn-18038.b0.upaiyun.com/2018/05/18/425ce45f40a6b2208074aa1dbce9f76c.png"))
-                                                                                         {
-                                                                                             BmobFile file = new BmobFile();
-                                                                                             file.setUrl(bmobUser.getAvatar());//此url是上传文件成功之后通过bmobFile.getUrl()方法获取的。
-                                                                                             file.delete(new UpdateListener() {
+                                                                                         if (e==null){
+                                                                                             if (!myUser.getAvatar().equals("http://bmob-cdn-18038.b0.upaiyun.com/2018/05/18/425ce45f40a6b2208074aa1dbce9f76c.png"))
+                                                                                             {
+                                                                                                 BmobFile file = new BmobFile();
+                                                                                                 file.setUrl(myUser.getAvatar());//此url是上传文件成功之后通过bmobFile.getUrl()方法获取的。
+                                                                                                 file.delete(new UpdateListener() {
 
+                                                                                                     @Override
+                                                                                                     public void done(BmobException e) {
+                                                                                                         if(e==null){
+
+                                                                                                         }else{
+                                                                                                         }
+                                                                                                     }
+                                                                                                 });
+
+                                                                                             }
+                                                                                             final MyUser myUser1= new MyUser();
+                                                                                             myUser1.setObjectId(myUser.getObjectId());
+                                                                                             myUser1.setAvatar(bmobFile.getFileUrl());
+                                                                                             myUser1.update(myUser.getObjectId(),new UpdateListener() {
                                                                                                  @Override
                                                                                                  public void done(BmobException e) {
                                                                                                      if(e==null){
 
+                                                                                                         ClassFileHelper.deleteFile(new File(renamePath));
+                                                                                                         Toast.makeText(getContext(),"修改头像成功",Toast.LENGTH_SHORT).show();
+                                                                                                                 Glide.with(getContext()).load(myUser1.getAvatar()).apply(bitmapTransform(new CropCircleTransformation()).error(R.drawable.head)).into(avatar);
+                                                                                                         Glide.with(getContext()).load(myUser1.getAvatar())
+                                                                                                                 .apply(bitmapTransform(new BlurTransformation(9, 7))
+                                                                                                                 .error(R.drawable.head))
+                                                                                                                 .into(background);
+                                                                                                                 picturePath =null;
                                                                                                      }else{
+                                                                                                         Toast.makeText(getContext(),"修改头像失败"+e.getMessage(),Toast.LENGTH_SHORT).show();
                                                                                                      }
                                                                                                  }
                                                                                              });
-
+                                                                                         }
+                                                                                         else {
+                                                                                             Toast.makeText(getContext(),"上传文件失败"+e.getMessage(),Toast.LENGTH_SHORT).show();
                                                                                          }
 
-                                                                                         bmobUser.setAvatar(bmobFile.getFileUrl());
-                                                                                         bmobUser.update(bmobUser.getObjectId(),new UpdateListener() {
-                                                                                             @Override
-                                                                                             public void done(BmobException e) {
-                                                                                                 if(e==null){
-                                                                                                     Toast.makeText(getContext(),"修改头像成功",Toast.LENGTH_SHORT).show();
-                                                                                                     Glide.with(getContext()).load(bmobUser.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
-                                                                                                     picturePath =null;
-                                                                                                 }else{
-
-                                                                                                 }
-                                                                                             }
-                                                                                         });
                                                                                      }
 
 
@@ -412,14 +465,14 @@ public class UserFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-          bmobUser=BmobUser.getCurrentUser(MyUser.class);
+          myUser =BmobUser.getCurrentUser(MyUser.class);
 
 
-            setcountText.setText(bmobUser.getSetAcCount()+"");
+            setcountText.setText(myUser.getSetAcCount()+"");
 
 
 
-           dynamicscountText.setText(bmobUser.getDynamicsCount()+"");
+           dynamicscountText.setText(myUser.getDynamicsCount()+"");
 
 
 

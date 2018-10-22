@@ -256,7 +256,7 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
                 final MyActivity activity = mActivityList.get(position);
-                final MyUser user = BmobUser.getCurrentUser(MyUser.class);
+                final MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
                 switch (currentActivity){
 
                     case 0: {
@@ -264,7 +264,7 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
                         MyActivity myActivity = new MyActivity();
                         myActivity.setObjectId(activity.getObjectId());
                         myActivity.setDate(activity.getDate());
-                        myActivity.removeAll("joinUser", Arrays.asList(user.getObjectId()));
+                        myActivity.removeAll("joinUser", Arrays.asList(myUser.getObjectId()));
                         myActivity.increment("joinCount",-1);
                         myActivity.update(new UpdateListener() {
                             @Override
@@ -283,9 +283,10 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
 
                     }
                     case 1:
-                    {
-                        user.removeAll("like", Arrays.asList(activity.getObjectId()));
-                        user.update(new UpdateListener() {
+                    {   MyUser myUser1= new MyUser();
+                        myUser1.setObjectId(myUser.getObjectId());
+                        myUser1.removeAll("like", Arrays.asList(activity.getObjectId()));
+                        myUser1.update(new UpdateListener() {
                             @Override
                             public void done(BmobException e) {
                                 if (e == null) {
@@ -304,9 +305,10 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
 
                     case 2:
 
-                    {
-                        user.increment("setAcCount",-1);
-                        user.update(new UpdateListener() {
+                    {   MyUser myUser1= new MyUser();
+                        myUser1.setObjectId(myUser.getObjectId());
+                        myUser1.increment("setAcCount",-1);
+                        myUser1.update(new UpdateListener() {
                             @Override
                             public void done(BmobException e) {
                                 if (e == null) {

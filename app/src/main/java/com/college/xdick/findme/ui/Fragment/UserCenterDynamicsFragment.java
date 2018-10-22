@@ -22,6 +22,7 @@ import com.college.xdick.findme.adapter.DynamicsAdapter;
 import com.college.xdick.findme.bean.ActivityMessageBean;
 import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Base.BaseFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,25 +35,25 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
-import pl.tajchert.waitingdots.DotsTextView;
+
 
 /**
  * Created by Administrator on 2018/5/31.
  */
 
-public class UserCenterDynamicsFragment extends Fragment {
+public class UserCenterDynamicsFragment extends BaseFragment {
 
     private View rootView;
     private List<Dynamics> dynamicsList= new ArrayList<>();
     private DynamicsAdapter adapter;
-    private DotsTextView dots;
-    private LinearLayout loadlayout;
+
     private MyUser nowUser ;
     private  boolean ifEmpty=false;
     private  int size =0;
     static public int ADD=0;
     static public int REFRESH=1;
     private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
+    private SwipeRefreshLayout swipeRefresh;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -60,9 +61,15 @@ public class UserCenterDynamicsFragment extends Fragment {
 
         nowUser=(MyUser)getActivity(). getIntent().getSerializableExtra("USER");
         initView();
-        loadlayout.setVisibility(View.VISIBLE);
-        dots.start();
-        initData(REFRESH);
+
+        swipeRefresh.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefresh.setRefreshing(true);
+                size = 0;
+                initData(REFRESH);
+            }
+        });
 
         return rootView;
     }
@@ -70,7 +77,14 @@ public class UserCenterDynamicsFragment extends Fragment {
 
     private void initView(){
 
-
+        swipeRefresh = rootView.findViewById(R.id.swipe_refresh);
+        swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
         RecyclerView recyclerView = rootView.findViewById(R.id.recyclerview);
        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
@@ -109,8 +123,6 @@ public class UserCenterDynamicsFragment extends Fragment {
             }
         });
 
-        dots = rootView.findViewById(R.id.dots);
-        loadlayout= rootView.findViewById(R.id.loading_layout);
     }
 
 
@@ -118,7 +130,7 @@ public class UserCenterDynamicsFragment extends Fragment {
 
 
         BmobQuery<Dynamics> query = new BmobQuery<Dynamics>();
-        query.addWhereEqualTo("user",nowUser.getUsername());
+        query.addWhereEqualTo("userId",nowUser.getObjectId());
         query.order("-createdAt");
         query.setLimit(20);
         query.setSkip(size);
@@ -150,6 +162,7 @@ public class UserCenterDynamicsFragment extends Fragment {
                                     if (object.size() < 20) {
                                         ifEmpty = true;
                                         dynamicsList.addAll(object);
+                                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                                         adapter.notifyDataSetChanged();
 
                                     } else {
@@ -158,16 +171,17 @@ public class UserCenterDynamicsFragment extends Fragment {
                                         adapter.notifyDataSetChanged();
                                     }
                                     size = 20;
-
-                                    loadlayout.setVisibility(View.GONE);
-
+                                    swipeRefresh.setRefreshing(false);
                                 } else {
                                     Toast.makeText(getContext(), "", Toast.LENGTH_SHORT).show();
                                 }
 
                                 if (ifEmpty&&dynamicsList.size()!=myUser.getDynamicsCount()&&nowUser.getObjectId().equals(myUser.getObjectId())){
-                                    myUser.setDynamicsCount(dynamicsList.size());
-                                    myUser.update(BmobUser.getCurrentUser(MyUser.class).getObjectId(),new UpdateListener() {
+                                    MyUser myUser1= new MyUser();
+                                    myUser1.setObjectId(myUser.getObjectId());
+
+                                    myUser1.setDynamicsCount(dynamicsList.size());
+                                    myUser1.update(BmobUser.getCurrentUser(MyUser.class).getObjectId(),new UpdateListener() {
                                         @Override
                                         public void done(BmobException e) {
                                             if (e==null){
@@ -185,7 +199,18 @@ public class UserCenterDynamicsFragment extends Fragment {
         this.size=size;
     }
 
-
+    private void refresh(){
+        size =0;
+        swipeRefresh.setRefreshing(true);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                initData(REFRESH);
+                if (getActivity() == null){
+                    return;}
+            }
+        }).start();
+    }
 
 
 

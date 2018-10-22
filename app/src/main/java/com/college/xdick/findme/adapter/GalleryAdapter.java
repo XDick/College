@@ -77,6 +77,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
     private Map<String,Dynamics> mPicMap;
     private List<String> uriList;
+    private String activityId;
     private Context mContext;
     private View mHeaderView;
     private View mFooterView;
@@ -119,9 +120,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
 
 
-    public GalleryAdapter(Map<String,Dynamics> map,List<String> pic){
+    public GalleryAdapter(Map<String,Dynamics> map,List<String> pic,String activityId){
         mPicMap=map;
         uriList=pic;
+        this.activityId=activityId;
     }
 
 
@@ -215,6 +217,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                         map.setMap(mPicMap);
                         intent.putExtra("MAP",map);
                         intent.putStringArrayListExtra("PIC",(ArrayList<String>) uriList);
+                        intent.putExtra("ACTIVITYID",activityId);
                         mContext.startActivity(intent);
 
                     }
@@ -353,7 +356,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                    if (MyUser.getCurrentUser(MyUser.class)==null){
                        mContext.startActivity(new Intent(mContext,LoginActivity.class));
                        ((Activity)mContext).finish();
-                       Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                      // Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                        return;
                    }
                    BmobQuery<MyUser> query = new BmobQuery<MyUser>();
@@ -412,7 +415,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                             if (MyUser.getCurrentUser(MyUser.class)==null){
                                 mContext.startActivity(new Intent(mContext,LoginActivity.class));
                                 ((Activity)mContext).finish();
-                                Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                                 return;
                             }
                             BmobQuery<MyUser> query = new BmobQuery<MyUser>();

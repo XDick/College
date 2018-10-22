@@ -1,23 +1,15 @@
 package com.college.xdick.findme.ui.Activity;
 
 
-import android.Manifest;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -40,17 +32,16 @@ import com.college.xdick.findme.bean.MainTagBean;
 import com.college.xdick.findme.bean.MyActivity;
 
 import com.college.xdick.findme.bean.MyUser;
-import com.college.xdick.findme.util.FileUtil;
+import com.college.xdick.findme.ui.Base.BaseActivity;
+import com.college.xdick.findme.util.ClassFileHelper;
 import com.donkingliang.labels.LabelsView;
 import com.linchaolong.android.imagepicker.ImagePicker;
 import com.linchaolong.android.imagepicker.cropper.CropImage;
 import com.linchaolong.android.imagepicker.cropper.CropImageView;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
-import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.io.File;
-import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,13 +51,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
-import cn.bmob.v3.b.V;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
@@ -97,7 +86,7 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
     long time;
     MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     ImagePicker imagePicker ;
-    String picturePath;
+    static String picturePath;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -293,8 +282,13 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
             }
         });
 
-        String[] sort={"个人活动","团体组织","安利活动","二手交易"};
+        String[] sort={"个人活动","团体组织"};
         labelsView_sort.setLabels(Arrays.asList(sort));
+        if(myUser.isGod()){
+            String[] sort2={"泛觅活动","个人活动","团体组织"};
+            labelsView_sort.setLabels(Arrays.asList(sort2));
+        }
+
 
         BmobQuery<MainTagBean> query = new BmobQuery<MainTagBean>();
 
@@ -330,13 +324,14 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
 
 //返回50条数据，如果不加上这条语句，默认返回10条数据
         query2.setLimit(50);
+        query2.order("-updatedAt");
 //执行查询方法
         query2.findObjects(new FindListener<AddTagBean>() {
             @Override
             public void done(List<AddTagBean> object, BmobException e) {
                 if (e == null) {
-                    Collections.sort(object);
-                    Collections.reverse(object); // 倒序排列
+                  //  Collections.sort(object);
+                   // Collections.reverse(object); // 倒序排列
                     labelsView2.setLabels(object, new LabelsView.LabelTextProvider<AddTagBean>() {
                         @Override
                         public CharSequence getLabelText(TextView label, int position, AddTagBean data) {
@@ -453,13 +448,31 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
                  else {
                      Toast.makeText(SetActivitiyActivity.this, "发起中...", Toast.LENGTH_SHORT).show();
                     if(picturePath!=null) {
-                    final BmobFile bmobFile = new BmobFile(new File(picturePath));
+
+                        File file=new File(picturePath);
+                        final String fileType = picturePath
+                                .substring(picturePath.lastIndexOf("."));
+
+                            final String renamePath=picturePath.
+                                    substring(0,picturePath.lastIndexOf("/")+1)
+                                    +"activity_image_"+myUser.getObjectId()
+                                    +fileType;
+                            //Toast.makeText(getContext(),renamePath,Toast.LENGTH_LONG).show();
+
+
+                            file.renameTo(new File(renamePath));
+
+
+
+
+                    final BmobFile bmobFile = new BmobFile(new File(renamePath));
                         finish();
                     bmobFile.uploadblock(new UploadFileListener() {
 
                         @Override
                         public void done(BmobException e) {
                             if (e == null) {
+                                ClassFileHelper.deleteFile(new File(renamePath));
                                 //Toast.makeText(getContext(), "上传文件成功:" + bmobFile.getFileUrl(), Toast.LENGTH_LONG).show();
                                 final MyUser user = BmobUser.getCurrentUser(MyUser.class);
                                 final String coverURL = bmobFile.getFileUrl();
@@ -608,12 +621,15 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
 
     @Override
     public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
-         DateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分");
+       // DateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分");
+        time=time+hourOfDay*60*60*1000+minute*60*1000+second*1000;
          String min=""+minute;
         if (minute<10){min="0"+minute;}
 
         String time = hourOfDay+":"+min;
         myTime=myTime+" "+time;
+
+
         timeE.setText(myTime);
     }
 

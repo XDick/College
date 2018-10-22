@@ -122,6 +122,7 @@ public class ConversationAdapter extends RecyclerView.Adapter< ConversationAdapt
                 PrivateConversation conversation = ConversationList.get(position);
                 conversation.deleteConversation();
                 fragment.initAllConversation();
+                fragment.initRecyclerView();
             }
         });
         return holder;
@@ -133,7 +134,9 @@ public class ConversationAdapter extends RecyclerView.Adapter< ConversationAdapt
          long count =BmobIM.getInstance().getUnReadCount(conversation.getcId());
         String title=conversation.getcName();
 
-        Glide.with(mContext).load(conversation.getAvatar()).apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
+        Glide.with(mContext).load(conversation.getAvatar()).
+                apply(bitmapTransform(new CropCircleTransformation()).
+                        error(R.drawable.head).circleCrop()).into(holder.avatar);
 
         long t=Long.valueOf(conversation.getLastMessageTime());
 

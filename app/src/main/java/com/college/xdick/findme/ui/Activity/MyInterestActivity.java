@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,12 +14,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.AddTagBean;
 import com.college.xdick.findme.bean.MainTagBean;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 import com.donkingliang.labels.LabelsView;
 
 import java.util.ArrayList;
@@ -32,14 +31,13 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
-import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Created by Administrator on 2018/5/11.
  */
 
-public class MyInterestActivity extends BaseActivity{
+public class MyInterestActivity extends BaseActivity {
     private   LabelsView myTagLabel,myTagLabelmain,myTagLabeladd;
     private   Button add,delete,createButton;
     private   LinearLayout layout,chooselayout ;
@@ -130,9 +128,10 @@ public class MyInterestActivity extends BaseActivity{
                     Toast.makeText(MyInterestActivity.this,"请选择标签",Toast.LENGTH_SHORT).show();
                 }
                 else{
-
-                user.removeAll("tag", selectTagList);
-                user.update(new UpdateListener() {
+                    MyUser myUser1 = new MyUser();
+                    myUser1.setObjectId(user.getObjectId());
+                    myUser1.removeAll("tag", selectTagList);
+                    myUser1.update(new UpdateListener() {
                     @Override
                     public void done(BmobException e) {
                         selectTagList.clear();
@@ -196,10 +195,11 @@ public class MyInterestActivity extends BaseActivity{
                    }
                }
                else {
-
+               final MyUser myUser1=new MyUser();
+               myUser1.setObjectId(user.getObjectId());
                     if (createdTag.equals("")){
-                        user.addAll("tag", selectAddTagList);
-                        user.update(new UpdateListener() {
+                        myUser1.addAll("tag", selectAddTagList);
+                        myUser1.update(new UpdateListener() {
                             @Override
                             public void done(BmobException e) {
                                 selectAddTagList.clear();
@@ -220,6 +220,7 @@ public class MyInterestActivity extends BaseActivity{
                         });
                     }
                     else {
+
                         BmobQuery<AddTagBean> query = new BmobQuery<AddTagBean>();
                         query.addWhereEqualTo("addTag", createText.getText().toString());
                         query.findObjects(new FindListener<AddTagBean>() {
@@ -227,8 +228,8 @@ public class MyInterestActivity extends BaseActivity{
                             public void done(List<AddTagBean> list, BmobException e) {
                                 if (e==null){
                                     selectAddTagList.add(list.get(0).getAddTag());
-                                    user.addAll("tag", selectAddTagList);
-                                    user.update(new UpdateListener() {
+                                    myUser1.addAll("tag", selectAddTagList);
+                                    myUser1.update(new UpdateListener() {
                                         @Override
                                         public void done(BmobException e) {
                                             selectAddTagList.clear();
@@ -332,7 +333,8 @@ public class MyInterestActivity extends BaseActivity{
         BmobQuery<AddTagBean> query2 = new BmobQuery<AddTagBean>();
 
 //返回50条数据，如果不加上这条语句，默认返回10条数据
-        query2.setLimit(999);
+        query2.setLimit(50);
+        query2.order("-updatedAt");
 //执行查询方法
         query2.findObjects(new FindListener<AddTagBean>() {
             @Override
@@ -348,8 +350,8 @@ public class MyInterestActivity extends BaseActivity{
                         addTagList.add(tag);
                     }
 
-                    Collections.sort(addTagList);
-                    Collections.reverse(addTagList); // 倒序排列
+                    //Collections.sort(addTagList);
+                   // Collections.reverse(addTagList); // 倒序排列
 
                     myTagLabeladd.setLabels(addTagList, new LabelsView.LabelTextProvider<AddTagBean>() {
                         @Override

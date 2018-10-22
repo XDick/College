@@ -37,16 +37,27 @@ import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Fragment.MainActivityFragment;
 import com.college.xdick.findme.ui.Fragment.MainMessageFragment;
 import com.college.xdick.findme.ui.Fragment.DynamicsFragment;
+import com.college.xdick.findme.ui.Fragment.MessageFragment;
 import com.college.xdick.findme.ui.Fragment.SearchFragment;
 import com.college.xdick.findme.ui.Fragment.UserFragment;
 import com.college.xdick.findme.R;
+import com.college.xdick.findme.util.AppManager;
+import com.lljjcoder.Interface.OnCityItemClickListener;
+import com.lljjcoder.bean.CityBean;
+import com.lljjcoder.bean.DistrictBean;
+import com.lljjcoder.bean.ProvinceBean;
+import com.lljjcoder.citywheel.CityConfig;
+import com.lljjcoder.style.citylist.Toast.ToastUtils;
+import com.lljjcoder.style.citypickerview.CityPickerView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
@@ -61,6 +72,7 @@ import cn.bmob.newim.listener.ConnectStatusChangeListener;
 import cn.bmob.newim.listener.MessageListHandler;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FetchUserInfoListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.update.BmobUpdateAgent;
 
@@ -70,30 +82,49 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
     private BottomNavigationBar mBottomNavigationBar;
     private TextBadgeItem mBadgeItem;
     public LocationClient mLocationClient;
-    private int unReadNum;
+    private int unReadNum=0;
     private long bmobTime=0;
     private ProgressDialog dialog=null;
     private AlertDialog.Builder builder=null ;
     private  AlertDialog dialog2=null;
+    private Fragment mContent;
+    private List<Fragment> mFragment;
+
+    private AlertDialog bannedDialog=null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         CancelNotify();
+        initFragment();
         bmobTime=getIntent().getLongExtra("TIME",0);
 
         mLocationClient = new LocationClient(getApplicationContext());
         mLocationClient.registerLocationListener(new MyLocationListener());
         SDKInitializer.initialize(getApplicationContext());
         initView();
-        replaceFragment(new MainActivityFragment());
+        switchFragment(mContent,getFragment(0));
         if (BmobUser.getCurrentUser(MyUser.class) != null) {
+            fetchUserInfo();
             requestLocation();
+
+            if (BmobUser.getCurrentUser(MyUser.class).getMobilePhoneNumber()==null) {
+                startActivity(new Intent(this, ModifyNameActivity.class));
+                Toast.makeText(this, "完善一下信息吧(#^.^#)", Toast.LENGTH_SHORT).show();
+                 return;
+            }
+
             if (BmobUser.getCurrentUser(MyUser.class).getTag() == null) {
                 startActivity(new Intent(this, InterestActivity.class));
                 Toast.makeText(this, "请选择喜欢的标签", Toast.LENGTH_SHORT).show();
             }
+
+
         }
 
         if (BmobIM.getInstance().getCurrentStatus().equals(ConnectionStatus.DISCONNECT)){
@@ -120,6 +151,10 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
 
         mBottomNavigationBar = findViewById(R.id.bottom_navigation_bar);
         setBottomNav();   //设置底部导航栏
+
+
+
+
 
     }
 
@@ -151,46 +186,45 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
         mBottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {//这里也可以使用SimpleOnTabSelectedListener
             @Override
             public void onTabSelected(int position) {//未选中 -> 选中
-                switch (position) {
-                    case 0:
-                        replaceFragment(new MainActivityFragment());
-                        break;
-                    case 1:
 
-                        replaceFragment(new SearchFragment());
-                        break;
+                switch (position) {
+
                     case 2:
                         if (MyUser.getCurrentUser(MyUser.class) == null) {
                             startActivity(new Intent(MainActivity.this, LoginActivity.class));
                             finish();
-                            Toast.makeText(MainActivity.this, "请先登录（*＾-＾*）", Toast.LENGTH_SHORT).show();
-                            break;
+
+                           // Toast.makeText(MainActivity.this, "请先登录（*＾-＾*）", Toast.LENGTH_SHORT).show();
+
+                            return;
+
                         }
-                        replaceFragment(new DynamicsFragment());
+
 
                         break;
                     case 3:
                         if (MyUser.getCurrentUser(MyUser.class) == null) {
                             startActivity(new Intent(MainActivity.this, LoginActivity.class));
                             finish();
-                            Toast.makeText(MainActivity.this, "请先登录（*＾-＾*）", Toast.LENGTH_SHORT).show();
-                            break;
+                            //Toast.makeText(MainActivity.this, "请先登录（*＾-＾*）", Toast.LENGTH_SHORT).show();
+                            return;
                         }
-                        replaceFragment(new MainMessageFragment());
                         break;
                     case 4:
                         if (MyUser.getCurrentUser(MyUser.class) == null) {
                             startActivity(new Intent(MainActivity.this, LoginActivity.class));
                             finish();
-                            Toast.makeText(MainActivity.this, "请先登录（*＾-＾*）", Toast.LENGTH_SHORT).show();
-                            break;
+                           // Toast.makeText(MainActivity.this, "请先登录（*＾-＾*）", Toast.LENGTH_SHORT).show();
+                            return;
                         }
-                        replaceFragment(new UserFragment());
-
                         break;
                     default:
                         break;
                 }
+
+
+                Fragment to = getFragment(position);
+                switchFragment(mContent,to);
 
             }
 
@@ -205,16 +239,51 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
             }
         });
     }
+    private void switchFragment(Fragment from, Fragment to) {
+          if (from!=to){
+              mContent=to;
+              FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+              if (!to.isAdded())
+              {
+                   if (from!=null){
+                       ft.hide(from);
+                   }
 
+                   if (to!=null){
+                       ft.add(R.id.fragment,to).commit();
+                   }
+              }
+              else {
+                  if (from!=null){
+                      ft.hide(from);
+                  }
 
-    private void replaceFragment(Fragment fragment) {
+                  if (to!=null){
+                      ft.show(to).commit();
+                  }
+              }
+          }
+    }
+
+  /*private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.fragment, fragment);
         transaction.commit();
-    }
+    }*/
 
+  private void initFragment(){
 
+      mFragment = new ArrayList<>();
+      mFragment.add(new MainActivityFragment());
+      mFragment.add(new SearchFragment());
+      mFragment.add(new DynamicsFragment());
+      mFragment.add(new MainMessageFragment());
+      mFragment.add(new UserFragment());
+  }
+  private Fragment getFragment(int position){
+      return mFragment.get(position);
+  }
     @Override
     protected void onStart() {
         setBadgeItem();
@@ -250,12 +319,13 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
     @Override
     public void onMessageReceive(List<MessageEvent> list) {
 
-        if (list.isEmpty()) {
+       // if (list.isEmpty()) {
             setBadgeItem();
-        } else {
+    /*    } else {
             setBadgeItem(list);
-        }
+        }*/
     }
+
 
 
     public void setBadgeItem() {
@@ -279,6 +349,7 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
     public void setBadgeItem(List<MessageEvent> list) {
 
         int sum = list.size();
+
         unReadNum = unReadNum + sum;
         if (unReadNum == 0) {
             mBadgeItem.hide();
@@ -316,13 +387,12 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
             return;
         }
         if (myUser!=null&&!Arrays.asList(gpsEvent.getMessage()).contains(null)){
-
-            myUser.setGps(gpsEvent.getMessage());
-            myUser.update(myUser.getObjectId(), new UpdateListener() {
+            MyUser myUser1 = new MyUser();
+            myUser1.setGps(gpsEvent.getMessage());
+            myUser1.update(myUser.getObjectId(), new UpdateListener() {
                 @Override
                 public void done(BmobException e) {
                     if (e == null) {
-                        mLocationClient.stop();
                         Log.d("TAG", "更新地址" + Arrays.toString(gpsEvent.getMessage()));
                     } else {
 
@@ -331,6 +401,7 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
                 }
             });
         }
+        mLocationClient.stop();
 
     }
 
@@ -372,8 +443,10 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
     }
 
 
-
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        //super.onSaveInstanceState(outState);
+    }
 
     private void IMconnectBomob() {
 
@@ -512,6 +585,56 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
 
     }
 
+
+    private void fetchUserInfo() {
+        BmobUser.fetchUserJsonInfo(new FetchUserInfoListener<String>() {
+            @Override
+            public void done(String s, BmobException e) {
+                if (e == null) {
+                    try {
+                        JSONObject json = new JSONObject(s);
+                        if (json.getString("isBanned").equals("true")){
+
+                            showBannedDialog(  json.getString("bannedReason")  );
+                           }
+                    }
+                    catch (Exception e2){
+                        e2.printStackTrace();
+                    }
+
+                } else {
+                    //log(e);
+                }
+            }
+        });
+    }
+
+
+    private void showBannedDialog(String reason){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder
+                (this);
+
+        builder.setTitle("你已经被封禁");
+
+        builder.setMessage(reason);
+        builder.setNegativeButton("确认", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                bannedDialog.dismiss();
+                BmobUser.logOut();
+                startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                finish();
+            }
+        });
+
+
+
+        bannedDialog = builder.create();
+        bannedDialog.setCancelable(false);
+        bannedDialog.setCanceledOnTouchOutside(false);
+        bannedDialog.show();
+    }
 }
 
 

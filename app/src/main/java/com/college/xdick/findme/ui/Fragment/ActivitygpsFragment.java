@@ -1,8 +1,6 @@
 package com.college.xdick.findme.ui.Fragment;
 
 
-import android.app.Activity;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,13 +16,11 @@ import android.widget.Toast;
 
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.ActivityAdapter;
-import com.college.xdick.findme.adapter.DynamicsAdapter;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.MainActivity;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import cn.bmob.v3.Bmob;
@@ -34,28 +30,27 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListener;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
-import pl.tajchert.waitingdots.DotsTextView;
+
 
 /**
  * Created by Administrator on 2018/4/11.
  */
 
 public class ActivitygpsFragment extends Fragment {
-    static int flag_gps =0;
+
     public final int ADD =1;
     public final int REFRESH=2;
     public final int SORT =3;
     private static int size =0;
 
     View rootview;
-    private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
-    static private List<MyActivity> activityList= new ArrayList<>();
+    private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
+    private List<MyActivity> activityList= new ArrayList<>();
     private SwipeRefreshLayout swipeRefresh;
     private ActivityAdapter adapter;
-    private DotsTextView dots;
-    private LinearLayout loadlayout;
-    static boolean ifsort = false;
-    static boolean ifEmpty= false;
+
+    private boolean ifsort = false;
+    private boolean ifEmpty= false;
 
 
 
@@ -67,15 +62,19 @@ public class ActivitygpsFragment extends Fragment {
 
         initBaseView();
         initRecyclerView();
-        if(flag_gps==0){
-            loadlayout.setVisibility(View.VISIBLE);
-            dots.start();
-            initData(REFRESH);
-            flag_gps=1;
+
+
+        if (myUser!=null){
+            swipeRefresh.post(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefresh.setRefreshing(true);
+                    size=0;
+                    initData(REFRESH);
+                }
+            });
         }
-        if (bmobUser==null){
-            loadlayout.setVisibility(View.GONE);
-        }
+
 
         return rootview;
     }
@@ -91,8 +90,7 @@ public class ActivitygpsFragment extends Fragment {
 
     private void initBaseView(){
 
-        dots = rootview.findViewById(R.id.dots);
-        loadlayout= rootview.findViewById(R.id.loading_layout);
+
         swipeRefresh =rootview.findViewById(R.id.swipe_refresh_ac_gps);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -118,7 +116,10 @@ public class ActivitygpsFragment extends Fragment {
         View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_activity, recyclerView, false);
         adapter.setEmptyView(empty);
          adapter.addFooterView(footer);
-
+        if (ifEmpty){
+            adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+            adapter.notifyDataSetChanged();
+        }
 
 
         ScaleInAnimationAdapter alphaAdapter = new ScaleInAnimationAdapter(adapter);
@@ -171,16 +172,23 @@ public class ActivitygpsFragment extends Fragment {
                             ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
                         }
 
-                        if(bmobUser!=null){
+                        if(BmobUser.getCurrentUser(MyUser.class) !=null){
 
 
 
-                            String[] gps = bmobUser.getGps();
+                            String[] gps = BmobUser.getCurrentUser(MyUser.class).getGps();
 
                             BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
                             if (gps!=null){
                                 query.addWhereEqualTo("gps", gps[2]);}
-                        query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
+
+                            else {
+                                ifEmpty=true;
+                                adapter.notifyDataSetChanged();
+                                swipeRefresh.setRefreshing(false);
+                                return;
+                            }
+                        query.addWhereGreaterThan("date", aLong*1000L-60*60*24*1000);
 
                     query.order("-createdAt");
                     query.setSkip(size);
@@ -191,8 +199,9 @@ public class ActivitygpsFragment extends Fragment {
                         public void done(List<MyActivity> object, BmobException e) {
                             if(e==null){
                                 ifsort=false;
-                                activityList.addAll(object);
+
                                 if (state==ADD){
+                                    activityList.addAll(object);
                                     if (listsize==activityList.size()){
                                         ifEmpty=true;
                                         adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
@@ -218,6 +227,7 @@ public class ActivitygpsFragment extends Fragment {
                                     if(object.size()<10){
                                         ifEmpty=true;
                                         activityList.addAll(object);
+                                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                                         adapter.notifyDataSetChanged();
                                     }
                                     else {
@@ -225,10 +235,11 @@ public class ActivitygpsFragment extends Fragment {
                                         activityList.addAll(object);
                                         adapter.notifyDataSetChanged();}
                                     size =  10;
-
+                                    swipeRefresh.setRefreshing(false);
                                 }
-                                loadlayout.setVisibility(View.INVISIBLE);
+
                             }else{
+                                swipeRefresh.setRefreshing(false);
                                 Toast.makeText(getContext(),"网络不佳",Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -247,36 +258,24 @@ public class ActivitygpsFragment extends Fragment {
 
 
 
-    private void refresh(){
+    public void refresh(){
         size =0;
+        swipeRefresh.setRefreshing(true);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try{
+
                     if (ifsort){
                         sortData(REFRESH);
                     }else {
                         initData(REFRESH);}
-                    Thread.sleep(2000);
-                }
-                catch (InterruptedException e){
-                    e.printStackTrace();
-                }
 
-                if (getActivity() == null)
+
+                if (getActivity() == null){
                     return;
-
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+                }
 
 
-                        swipeRefresh.setRefreshing(false);
-                    }
-                });
-            }
-        }).start();
+
+
     }
 
 
@@ -296,16 +295,25 @@ public class ActivitygpsFragment extends Fragment {
                             ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
                         }
 
-                        if(bmobUser!=null){
+                        if(BmobUser.getCurrentUser(MyUser.class)!=null){
 
 
 
-                            String[] gps = bmobUser.getGps();
+                            String[] gps = BmobUser.getCurrentUser(MyUser.class).getGps();
 
                             BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
                             if (gps!=null){
+
+
                                 query.addWhereEqualTo("gps", gps[2]);}
-                        query.addWhereGreaterThan("date", aLong*1000L-2.5*60*60*24*1000);
+
+                                else {
+                                ifEmpty=true;
+                                adapter.notifyDataSetChanged();
+                                swipeRefresh.setRefreshing(false);
+                                return;
+                            }
+                        query.addWhereGreaterThan("date", aLong*1000L-60*60*24*1000);
 
                     query.setSkip(size);
                     query.setLimit(10);
@@ -316,8 +324,9 @@ public class ActivitygpsFragment extends Fragment {
                         public void done(List<MyActivity> object, BmobException e) {
                             if(e==null){
                                 ifsort=true;
-                                activityList.addAll(object);
+
                                 if (state==SORT){
+                                    activityList.addAll(object);
                                     if (listsize==activityList.size()){
                                         ifEmpty=true;
                                         adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
@@ -341,6 +350,7 @@ public class ActivitygpsFragment extends Fragment {
                                     if(object.size()<10){
                                         ifEmpty=true;
                                         activityList.addAll(object);
+                                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
                                         adapter.notifyDataSetChanged();
                                     }
                                     else {
@@ -348,9 +358,11 @@ public class ActivitygpsFragment extends Fragment {
                                         activityList.addAll(object);
                                         adapter.notifyDataSetChanged();}
                                     size =  10;
+                                    swipeRefresh.setRefreshing(false);
                                 }
 
                             }else{
+                                swipeRefresh.setRefreshing(false);
                                 Toast.makeText(getContext(),"网络不佳",Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -369,8 +381,8 @@ public class ActivitygpsFragment extends Fragment {
     }
 
 
-    public void setSize(int size1){
-        size=size1;
+    public void setSORT(boolean ifsort){
+        this.ifsort = ifsort;
     }
 
 }

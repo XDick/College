@@ -78,7 +78,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
     static class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView place,title,host,time,join,gps,tag,date,comment;
+        TextView place,title,host,time,join,gps,tag1,tag2,tag3,date,comment;
         ImageView cover,avatar,finish;
         CardView cardView;
 
@@ -93,7 +93,9 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
             join=view.findViewById(R.id.join_ac);
             cover = view.findViewById(R.id.cover_ac);
             gps=view.findViewById(R.id.gps_ac);
-            tag = view.findViewById(R.id.tag_ac);
+            tag1 = view.findViewById(R.id.tag1_ac);
+            tag2 = view.findViewById(R.id.tag2_ac);
+            tag3 = view.findViewById(R.id.tag3_ac);
             date = view. findViewById(R.id.date_ac);
             avatar = view.findViewById(R.id.host_avatar);
             comment = view.findViewById(R.id.comment_ac);
@@ -208,13 +210,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
 
         String gps[]=activity.getGps();
-        String tag =Arrays.toString(activity.getTag());
-        if(tag.equals(null)){
-            tag=" ";
-        }
-        tag = tag.replace("[","");
-        tag = tag.replace("]","");
-        tag = tag.replace(","," ");
+        String tag[] =activity.getTag();
+
         String rawTime=activity.getTime();
 
 
@@ -256,8 +253,17 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
         holder.comment.setText(activity.getCommentCount()+"评论");
 
-
-        holder.tag.setText(tag);
+        if (tag[0].equals("泛觅活动")){
+            holder.tag1.setBackgroundResource(R.drawable.label_bg2);
+            holder.tag1.setTextColor(Color.parseColor( "#e91111"));
+        }
+        else {
+            holder.tag1.setBackgroundResource(R.drawable.label_text_color2);
+            holder.tag1.setTextColor(Color.parseColor( "#121212"));
+        }
+        holder.tag1.setText(tag[0]);
+        holder.tag2.setText(tag[1]);
+        holder.tag3.setText(tag[2]);
 
         //holder.cover.setColorFilter(Color.parseColor(color), PorterDuff.Mode.MULTIPLY);
 
@@ -268,19 +274,30 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new BlurTransformation(9, 3))).into(holder.cover);
 
            holder.join.setText( joincount +"人参与");
-           String[] tag2 =activity.getTag();
-           if (tag2[0].equals("二手交易")||tag2[0].equals("招聘"))
-           {
-               holder.join.setVisibility(View.GONE);
-           }
 
 
-        if (activity.getDate()+60*60*24*1000*1.5<  ((MainActivity)mContext).getBmobTime()){
+
+
+        if (activity.getDate()+0.9*60*60*24*1000<((MainActivity)mContext).getBmobTime()){
                holder.finish.setBackground(mContext.getDrawable(R.drawable.finish));
         }
+
         else {
             holder.finish.setBackground(mContext.getDrawable(R.drawable.blank_pic));
         }
+
+          if (activity.getDate()<((MainActivity)mContext).getBmobTime()&&((MainActivity)mContext).getBmobTime()<activity.getDate()+60*60*24*1000)
+        {
+            holder.time.setTextColor(Color.parseColor("#e91111"));
+            holder.date.setTextColor(Color.parseColor("#e91111"));
+
+        }
+        else {
+              holder.time.setTextColor(Color.parseColor("#000000"));
+              holder.date.setTextColor(Color.parseColor("#000000"));
+          }
+
+
 
 
 

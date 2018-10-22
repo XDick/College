@@ -18,6 +18,7 @@ import com.college.xdick.findme.adapter.ConversationAdapter;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.MainActivity;
+import com.college.xdick.findme.ui.Base.BaseFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ import static cn.bmob.v3.Bmob.getApplicationContext;
  * Created by Administrator on 2018/4/2.
  */
 
-public class PrivateConversationFragment extends Fragment implements MessageListHandler {
+public class PrivateConversationFragment extends BaseFragment implements MessageListHandler {
     View rootview;
     private List<PrivateConversation> conversationList = new ArrayList<>();
     private ConversationAdapter adapter;
@@ -48,6 +49,13 @@ public class PrivateConversationFragment extends Fragment implements MessageList
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootview =inflater.inflate(R.layout.fragment_conversation,container,false);
         initView();
+        swipeRefresh.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefresh.setRefreshing(true);
+                initAllConversation();
+            }
+        });
 
 
 
@@ -69,7 +77,7 @@ public class PrivateConversationFragment extends Fragment implements MessageList
             }
         });
     }
-    private void initRecyclerView(){
+    public void initRecyclerView(){
 
         RecyclerView recyclerView = rootview.findViewById(R.id.recyclerview_conversation);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -92,7 +100,9 @@ public class PrivateConversationFragment extends Fragment implements MessageList
                    conversationList.add(new PrivateConversation(c));
 
                }
+
                adapter.notifyDataSetChanged();
+               swipeRefresh.setRefreshing(false);
            }
            else
            {
@@ -118,17 +128,26 @@ public class PrivateConversationFragment extends Fragment implements MessageList
 
     }
 
+    public void deleteAllConversation(){
+        BmobIM.getInstance().clearAllConversation();
+        initAllConversation();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         BmobIM.getInstance().addMessageListHandler(this);
-         initAllConversation();
+
+
+        initAllConversation();
          initRecyclerView();
     }
 
 
     public void onMessageReceive(List<MessageEvent> list) {
+
         initAllConversation();
+        initRecyclerView();
     }
 
     @Override

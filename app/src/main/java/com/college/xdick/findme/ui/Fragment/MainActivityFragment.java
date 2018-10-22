@@ -1,6 +1,7 @@
 package com.college.xdick.findme.ui.Fragment;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -33,6 +34,14 @@ import com.college.xdick.findme.ui.Activity.LoginActivity;
 import com.college.xdick.findme.ui.Activity.MainActivity;
 import com.college.xdick.findme.ui.Activity.SetActivitiyActivity;
 
+import com.college.xdick.findme.ui.Base.BaseFragment;
+import com.lljjcoder.Interface.OnCityItemClickListener;
+import com.lljjcoder.bean.CityBean;
+import com.lljjcoder.bean.DistrictBean;
+import com.lljjcoder.bean.ProvinceBean;
+import com.lljjcoder.citywheel.CityConfig;
+import com.lljjcoder.style.citylist.Toast.ToastUtils;
+import com.lljjcoder.style.citypickerview.CityPickerView;
 import com.zyyoona7.popup.EasyPopup;
 import com.zyyoona7.popup.XGravity;
 import com.zyyoona7.popup.YGravity;
@@ -57,11 +66,11 @@ import cn.bmob.v3.listener.UpdateListener;
  * Created by Administrator on 2018/5/6.
  */
 
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends BaseFragment {
     private View rootView;
     private ViewPager mViewPager1;
     private TabLayout mTabLayout;
-    private LinearLayout newsort, datesort;
+    private CityPickerView  mPicker;
     private TextView gpsTextView;
     private String[] tabTitle = {"关注","推荐", "同城", "同校"};//每个页面顶部标签的名字
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
@@ -73,16 +82,79 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_main_activity, container, false);
         initViews();
+        mPicker.init(getActivity());
         setHasOptionsMenu(true);
         Log.d("", mViewPager1.getCurrentItem() + "当前");
         EventBus.getDefault().register(this);
         return rootView;
 
     }
+    private void initPicker(){
+        mPicker= new CityPickerView();
+        CityConfig cityConfig = new CityConfig.Builder()
+                .confirTextColor("#cf0606")
+                .setCityWheelType(CityConfig.WheelType.PRO_CITY)
+                .build();
 
+        if (BmobUser.getCurrentUser(MyUser.class)!=null){
+            String[] gps =BmobUser.getCurrentUser(MyUser.class).getGps();
+            if (gps!=null){
+                cityConfig = new CityConfig.Builder()
+                        .confirTextColor("#cf0606")
+                        .setCityWheelType(CityConfig.WheelType.PRO_CITY)
+                        .province(gps[1])
+                        .city(gps[2])
+                        .build();
+            }
+        }
+
+
+        mPicker.setConfig(cityConfig);
+
+//监听选择点击事件及返回结果
+        mPicker.setOnCityItemClickListener(new OnCityItemClickListener() {
+            @Override
+            public void onSelected(ProvinceBean province, CityBean city, DistrictBean district) {
+                String p=null,c=null,d=null;
+                //省份
+                if (province != null) {
+                    p=province.getName();
+                }
+
+                //城市
+                if (city != null) {
+                    c=city.getName();
+                }
+
+                //地区
+                if (district != null) {
+                    d=district.getName();
+                }
+
+                final String[] gps = {"", p, c, d, ""};
+                EventBus.getDefault().post(new GpsEvent(gps));
+
+            }
+
+            @Override
+            public void onCancel() {
+                ToastUtils.showLongToast(getActivity(), "已取消");
+            }
+        });
+
+
+    }
     private void initViews() {
-        mViewPager1 = (ViewPager) rootView.findViewById(R.id.mViewPager1);
-        mTabLayout = (TabLayout) rootView.findViewById(R.id.mTabLayout);
+         initPicker();
+
+
+
+
+
+
+        mViewPager1 = rootView.findViewById(R.id.mViewPager1);
+        mViewPager1.setOffscreenPageLimit(4);
+        mTabLayout =  rootView.findViewById(R.id.mTabLayout);
         adapter = new MyFragmentStatePagerAdapter(getChildFragmentManager(), tabTitle);
         floatingActionButton = rootView.findViewById(R.id.floatactionbutton);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -105,7 +177,7 @@ public class MainActivityFragment extends Fragment {
 
                                 startActivity(new Intent(getContext(),LoginActivity.class));
                                 getActivity().finish();
-                                Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(getContext(), "请先登录", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -115,9 +187,20 @@ public class MainActivityFragment extends Fragment {
         toolbar.setTitle("");
         gpsTextView = rootView.findViewById(R.id.gps_main_ac_toolbar);
         if (bmobUser != null) {
-            String[] gps = bmobUser.getGps();
+            String[] gps = BmobUser.getCurrentUser(MyUser.class).getGps();
+            gpsTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mPicker.showCityPicker();
+                }
+            });
             if (gps != null) {
+
                 gpsTextView.setText(gps[2]);
+                if (gpsTextView.getText().equals("")){
+                    gpsTextView.setText("请手动定位");
+                }
+
             }
         } else {
             gpsTextView.setText("未登录");
@@ -178,6 +261,9 @@ public class MainActivityFragment extends Fragment {
             String[] gps = gpsEvent.getMessage();
             if (gps != null) {
                 gpsTextView.setText(gps[2]);
+                if (gpsTextView.getText().equals("")){
+                    gpsTextView.setText("请手动定位");
+                }
             }
         }
 
@@ -199,89 +285,71 @@ public class MainActivityFragment extends Fragment {
         switch (item.getItemId()) {
 
             case R.id.menu_sort_recent: {
-                switch (mViewPager1.getCurrentItem()) {
-
-                    case 0: {
-                        ActivityFollowFragment fragment = ((ActivityFollowFragment) adapter.instantiateItem(mViewPager1, 0));
-                        fragment.setSize(0);
-                        fragment.initData(fragment.REFRESH);
-
-                        break;
-
-                    }
-
-                    case 1: {
-                        ActivityFragment fragment = ((ActivityFragment) adapter.instantiateItem(mViewPager1, 1));
-                        fragment.setSize(0);
-                        fragment.initData(fragment.REFRESH);
-
-                        break;
-
-                    }
-                    case 2: {
-                        ActivitygpsFragment fragment = ((ActivitygpsFragment) adapter.instantiateItem(mViewPager1, 2));
-                        fragment.setSize(0);
-                        fragment.initData(fragment.REFRESH);
-
-                        break;
-                    }
-                    case 3: {
-                        ActivityschoolFragment fragment = ((ActivityschoolFragment) adapter.instantiateItem(mViewPager1, 3));
-                        fragment.setSize(0);
-                        fragment.initData(fragment.REFRESH);
-
-                        break;
-                    }
-
-                }
+             refreshFragment(false);
+             break;
             }
 
             case R.id.menu_sort_time: {
-                switch (mViewPager1.getCurrentItem()) {
+                refreshFragment(true);
+                break;
 
-                    case 0: {
-                        ActivityFollowFragment fragment = ((ActivityFollowFragment) adapter.instantiateItem(mViewPager1, 0));
-                        fragment.setSize(0);
-                        fragment.sortData(fragment.REFRESH);
-
-                        break;
-
-                    }
-
-                    case 1: {
-                        ActivityFragment fragment = ((ActivityFragment) adapter.instantiateItem(mViewPager1, 1));
-                        fragment.setSize(0);
-                        fragment.sortData(fragment.REFRESH);
-
-                        break;
-
-                    }
-                    case 2: {
-                        ActivitygpsFragment fragment = ((ActivitygpsFragment) adapter.instantiateItem(mViewPager1, 2));
-                        fragment.setSize(0);
-                        fragment.sortData(fragment.REFRESH);
-
-                        break;
-                    }
-                    case 3: {
-                        ActivityschoolFragment fragment = ((ActivityschoolFragment) adapter.instantiateItem(mViewPager1, 3));
-                        fragment.setSize(0);
-                        fragment.sortData(fragment.REFRESH);
-                        break;
-                    }
-
-
-                    default:
-                        break;
-                }
-
-                return true;
             }
-
 
         }
         return true;
     }
 
+        private void refreshFragment (boolean ifsort) {
+            switch (mViewPager1.getCurrentItem()) {
 
-}
+                case 0: {
+
+                    ActivityFollowFragment fragment = ((ActivityFollowFragment) adapter.instantiateItem(mViewPager1, 0));
+
+                     fragment.setSORT(ifsort);
+                    fragment.refresh();
+
+                    break;
+
+                }
+
+                case 1: {
+                    ActivityFragment fragment = ((ActivityFragment) adapter.instantiateItem(mViewPager1, 1));
+
+                        fragment.setSORT(ifsort);
+
+                    fragment.refresh();
+
+                    break;
+
+                }
+                case 2: {
+                    ActivitygpsFragment fragment = ((ActivitygpsFragment) adapter.instantiateItem(mViewPager1, 2));
+
+                        fragment.setSORT(ifsort);
+
+                    fragment.refresh();
+
+                    break;
+                }
+                case 3: {
+                    ActivityschoolFragment fragment = ((ActivityschoolFragment) adapter.instantiateItem(mViewPager1, 3));
+
+                        fragment.setSORT(ifsort);
+
+                    fragment.refresh();
+                    break;
+                }
+
+
+                default:
+                    break;
+            }
+
+
+        }
+
+        }
+
+
+

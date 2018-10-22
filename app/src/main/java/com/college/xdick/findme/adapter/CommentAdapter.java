@@ -179,7 +179,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                        if (MyUser.getCurrentUser(MyUser.class)==null){
                            mContext.startActivity(new Intent(mContext,LoginActivity.class));
                            ((Activity)mContext).finish();
-                           Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                           //Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                            return;
                        }
                activity.ifReply=false;
@@ -317,7 +317,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                             if (MyUser.getCurrentUser(MyUser.class)==null){
                                 mContext.startActivity(new Intent(mContext,LoginActivity.class));
                                 ((Activity)mContext).finish();
-                                Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                              //  Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                                 return;
                             }
                                     Intent intent = new Intent(mContext, UserCenterActivity.class);
@@ -348,7 +348,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 if (MyUser.getCurrentUser(MyUser.class)==null){
                     mContext.startActivity(new Intent(mContext,LoginActivity.class));
                     ((Activity)mContext).finish();
-                    Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 final  String id = comment.getReplyuserId();

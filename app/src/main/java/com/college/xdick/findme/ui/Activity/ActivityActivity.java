@@ -1,14 +1,11 @@
 package com.college.xdick.findme.ui.Activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +22,7 @@ import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 import com.college.xdick.findme.ui.Fragment.StartactivityFragment;
 
 import java.util.ArrayList;
@@ -67,7 +65,7 @@ public class ActivityActivity extends BaseActivity {
    private Comment replyComment,fromComment;
    private   InputMethodManager imm ;
     private TextView  commentcount;
-    private MyActivity activity;
+    private static MyActivity activity;
     public boolean ifJoin=false;
 
 
@@ -103,7 +101,7 @@ public class ActivityActivity extends BaseActivity {
                 if (MyUser.getCurrentUser(MyUser.class)==null){
                     startActivity(new Intent(ActivityActivity.this,LoginActivity.class));
                     finish();
-                    Toast.makeText(ActivityActivity.this,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                  //  Toast.makeText(ActivityActivity.this,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 startEdit.setVisibility(View.VISIBLE);
@@ -165,7 +163,7 @@ public class ActivityActivity extends BaseActivity {
                 if (MyUser.getCurrentUser(MyUser.class)==null){
                     startActivity(new Intent(ActivityActivity.this,LoginActivity.class));
                    finish();
-                    Toast.makeText(ActivityActivity.this,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(ActivityActivity.this,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -188,9 +186,10 @@ public class ActivityActivity extends BaseActivity {
                 }
 
                 else{
-
-                    myUser.removeAll("like", Arrays.asList(activityId));
-                    myUser.update(new UpdateListener() {
+                    MyUser myUser1 = new MyUser();
+                    myUser1.setObjectId(myUser.getObjectId());
+                    myUser1.removeAll("like", Arrays.asList(activityId));
+                    myUser1.update(new UpdateListener() {
                         @Override
                         public void done(BmobException e) {
 
@@ -307,10 +306,12 @@ public class ActivityActivity extends BaseActivity {
             {finish();
                 return true;}
             case R.id.menu_delete_activity: {
+                MyUser myUser1 = new MyUser();
+                myUser1.setObjectId(myUser.getObjectId());
                 if (!myUser.isGod()||activity.getHostId().equals(myUser.getObjectId())){
-                    myUser.increment("setAcCount",-1);
+                    myUser1.increment("setAcCount",-1);
                 }
-                myUser.update(new UpdateListener() {
+                myUser1.update(new UpdateListener() {
                     @Override
                     public void done(BmobException e) {
                         if (e == null) {
@@ -377,7 +378,10 @@ public class ActivityActivity extends BaseActivity {
                 return true;
             }
             case R.id.menu_upload_pic:{
-
+                if (myUser==null){
+                    startActivity(new Intent(ActivityActivity.this,LoginActivity.class));
+                    return true;
+                }
                 if (activity.getHostId().equals(MyUser.getCurrentUser(MyUser.class).getObjectId())){
                     startActivity(new Intent(ActivityActivity.this,SetDynamicsActivity.class));
                     Toast.makeText(this,"插入活动上传照片",Toast.LENGTH_SHORT).show();
@@ -411,7 +415,10 @@ public class ActivityActivity extends BaseActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-
+         if (myUser==null){
+             menu.findItem(R.id.menu_delete_activity).setVisible(false);
+             return super.onPrepareOptionsMenu(menu);
+         }
         if(!activity.getHostId().equals(myUser.getObjectId())&&!myUser.isGod())
         {
             menu.findItem(R.id.menu_delete_activity).setVisible(false);

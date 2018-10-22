@@ -40,7 +40,14 @@
             android:textSize="20dp"
             android:textStyle="bold"
             />
-
+    <TextView
+        android:layout_marginTop="5dp"
+        android:id="@+id/gps_ac"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#bf0303"
+        android:textSize="12sp"
+        />
     <TextView
         android:layout_marginTop="5dp"
         android:id="@+id/join_ac"
@@ -59,6 +66,7 @@
         android:textSize="10sp"
 
         />
+
     <TextView
         android:layout_marginTop="5dp"
         android:id="@+id/time_ac"

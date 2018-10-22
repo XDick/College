@@ -2,27 +2,17 @@ package com.college.xdick.findme.ui.Activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.AddTagAdapter;
-import com.college.xdick.findme.adapter.DynamicsAdapter;
 import com.college.xdick.findme.adapter.MainTagAdapter;
 import com.college.xdick.findme.bean.AddTagBean;
-import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.MainTagBean;
 import com.college.xdick.findme.bean.MyUser;
-import com.donkingliang.labels.LabelsView;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 
-import java.lang.reflect.AccessibleObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -101,7 +91,8 @@ public class AddTagActivity extends BaseActivity {
 
 
         BmobQuery<AddTagBean> query2 = new BmobQuery<AddTagBean>();
-        query2.setLimit(999);
+        query2.setLimit(50);
+        query2.order("-updatedAt");
 //执行查询方法
         query2.findObjects(new FindListener<AddTagBean>() {
 

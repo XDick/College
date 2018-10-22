@@ -27,6 +27,7 @@ import com.college.xdick.findme.MyClass.DownLoadImageService;
 import com.college.xdick.findme.MyClass.ImageDownLoadCallBack;
 import com.college.xdick.findme.MyClass.PicturePageAdapter;
 import com.college.xdick.findme.MyClass.ViewPagerFixed;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.MyUser;
@@ -51,6 +52,21 @@ import static cn.bmob.v3.Bmob.getApplicationContext;
 import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHolder> {
+    private int ITEM_TYPE_NORMAL = 0;
+    private int ITEM_TYPE_HEADER = 1;
+    private int ITEM_TYPE_FOOTER = 2;
+    private int ITEM_TYPE_EMPTY = 3;
+    private int load_more_status;
+
+    private View mHeaderView;
+    private View mFooterView;
+    private View mEmptyView;
+    //上拉加载更多
+    public static final int  PULLUP_LOAD_MORE=0;
+    //正在加载中
+    public static final int  LOADING_MORE=1;
+
+    public static final int  NO_MORE=2;
 
     private Map<String,Dynamics> picMap;
     private List<String> picList;
@@ -81,6 +97,15 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         mContext=parent.getContext();
+
+
+        if (viewType == ITEM_TYPE_HEADER) {
+            return new ViewHolder(mHeaderView);
+        } else if (viewType == ITEM_TYPE_EMPTY) {
+            return new ViewHolder(mEmptyView);
+        } else if (viewType == ITEM_TYPE_FOOTER) {
+            return new ViewHolder(mFooterView);
+        } else {
         View view = LayoutInflater.from(mContext)
                 .inflate(R.layout.item_morepic,parent,false);
 
@@ -89,20 +114,59 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
 
 
 
-        return holder;
+        return holder;}
     }
 
 
 
 
+    @Override
+    public int getItemViewType(int position) {
+        if (null != mHeaderView && position == 0) {
+            return ITEM_TYPE_HEADER;
+        }
+        if (null != mFooterView
+                && position == getItemCount() - 1) {
+            return ITEM_TYPE_FOOTER;
+        }
+        if (null != mEmptyView && picList.size() == 0){
+            return ITEM_TYPE_EMPTY;
+        }
+        return ITEM_TYPE_NORMAL;
+
+    }
+
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
 
+        int type = getItemViewType(position);
 
+        if (type == ITEM_TYPE_HEADER
+                || type == ITEM_TYPE_EMPTY) {
+            return;
+        }
 
-            String uri =picList.get(position);
-            Glide.with(mContext).load(uri)
+        if (type == ITEM_TYPE_FOOTER) {
+            TextView textView= mFooterView.findViewById(R.id.footer_text);
+            switch (load_more_status) {
+                case PULLUP_LOAD_MORE:
+                    textView.setText("上拉加载更多");
+                    break;
+                case LOADING_MORE:
+                    textView.setText("正在加载数据...");
+                    break;
+
+                case NO_MORE:
+                    textView.setText("没有更多了");
+                    break;
+
+            }
+            return;
+        }
+        int realPos = getRealItemPosition(position);
+            String uri =picList.get(realPos);
+            Glide.with(mContext).load(new mGlideUrl(uri))
                     .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
                     .into(holder.image);
 
@@ -114,10 +178,9 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
         });
     }
 
-    @Override
-    public int getItemCount() {
-        return picList.size();
-    }
+
+
+
 
     public void showPictureDialog(final int mPosition, final List<String> mListPicPath,
                                   final Map<String,Dynamics>map) {
@@ -173,7 +236,7 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
                     if (MyUser.getCurrentUser(MyUser.class)==null){
                         mContext.startActivity(new Intent(mContext,LoginActivity.class));
                         ((Activity)mContext).finish();
-                        Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                         return;
                     }
                     BmobQuery<MyUser> query = new BmobQuery<MyUser>();
@@ -232,7 +295,7 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
                                 if (MyUser.getCurrentUser(MyUser.class)==null){
                                     mContext.startActivity(new Intent(mContext,LoginActivity.class));
                                     ((Activity)mContext).finish();
-                                    Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
+                                   // Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                                     return;
                                 }
                                 BmobQuery<MyUser> query = new BmobQuery<MyUser>();
@@ -365,4 +428,58 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
 
 
     }
+
+    private int getRealItemPosition(int position) {
+        if (null != mHeaderView) {
+            return position - 1;
+        }
+        return position;
+    }
+
+
+
+    @Override
+    public int getItemCount() {
+
+        if (picList!=null) {
+
+            int itemCount = picList.size();
+            if (null != mEmptyView && itemCount == 0) {
+                itemCount++;
+            }
+            if (null != mHeaderView) {
+                itemCount++;
+            }
+            if (null != mFooterView) {
+                itemCount++;
+            }
+            return itemCount;
+        }
+
+        return 0;
+
+    }
+
+
+    public void addHeaderView(View view) {
+        mHeaderView = view;
+        notifyItemInserted(0);
+    }
+
+    public void addFooterView(View view) {
+        mFooterView = view;
+        notifyItemInserted(getItemCount() - 1);
+    }
+
+    public void setEmptyView(View view) {
+        mEmptyView = view;
+        notifyDataSetChanged();
+    }
+
+
+    public void changeMoreStatus(int status){
+        load_more_status=status;
+    }
+
+
 }

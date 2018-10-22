@@ -3,19 +3,16 @@ package com.college.xdick.findme.ui.Activity;
 
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 
 import android.widget.Toast;
 
 import com.college.xdick.findme.R;
-import com.college.xdick.findme.bean.FollowChart;
 import com.college.xdick.findme.bean.MyUser;
 
+import com.college.xdick.findme.ui.Base.BaseActivity;
 import com.college.xdick.findme.util.SelectSchoolUtil;
 
 
@@ -79,7 +76,7 @@ public class SignupActivity  extends BaseActivity {
             }
         });
 
-     //手机号码验证注册暂时关闭
+
 
       sendIdentifyButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,6 +134,12 @@ public class SignupActivity  extends BaseActivity {
                 bu.setMobilePhoneNumberVerified(true);
                 bu.setEmailVerified(false);
                 bu.setGod(false);
+                bu.setBanned(false);
+                bu.setBannedReason("");
+                bu.setAvatar("http://bmob-cdn-18038.b0.upaiyun.com/2018/05/18/425ce45f40a6b2208074aa1dbce9f76c.png");
+                bu.setSchool("北京大学");
+                bu.setSetAcCount(0);
+                bu.setDynamicsCount(0);
                 if (password.length()<8){
                     Toast.makeText(SignupActivity.this,"密码至少8位",Toast.LENGTH_SHORT).show();
                 }

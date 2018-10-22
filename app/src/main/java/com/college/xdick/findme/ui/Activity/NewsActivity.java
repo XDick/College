@@ -2,12 +2,12 @@ package com.college.xdick.findme.ui.Activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.college.xdick.findme.R;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 
 /**
  * Created by Administrator on 2018/5/6.
