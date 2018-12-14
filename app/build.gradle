@@ -12,7 +12,7 @@ android {
         applicationId "com.college.xdick.findme"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 26
+        versionCode 27
         versionName "2.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -27,10 +27,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+
 }
 
+
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation fileTree(include: '*.jar', dir: 'libs')
     configurations {
         all*.exclude group: 'com.google.code.gson'

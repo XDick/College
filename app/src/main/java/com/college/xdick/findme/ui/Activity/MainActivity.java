@@ -17,15 +17,17 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.ashokvarma.bottomnavigation.TextBadgeItem;
 
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.baidu.mapapi.SDKInitializer;
 import com.college.xdick.findme.Listener.MyLocationListener;
 import com.college.xdick.findme.MyClass.BackHandlerHelper;
 import com.college.xdick.findme.MyClass.GpsEvent;
@@ -76,7 +78,7 @@ import cn.bmob.v3.listener.FetchUserInfoListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.update.BmobUpdateAgent;
 
-public class    MainActivity extends AppCompatActivity implements MessageListHandler {
+public class MainActivity extends AppCompatActivity implements MessageListHandler {
 
 
     private BottomNavigationBar mBottomNavigationBar;
@@ -89,7 +91,7 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
     private  AlertDialog dialog2=null;
     private Fragment mContent;
     private List<Fragment> mFragment;
-
+    private String country,province,city,district,street;
     private AlertDialog bannedDialog=null;
 
 
@@ -103,10 +105,22 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
         CancelNotify();
         initFragment();
         bmobTime=getIntent().getLongExtra("TIME",0);
-
         mLocationClient = new LocationClient(getApplicationContext());
-        mLocationClient.registerLocationListener(new MyLocationListener());
-        SDKInitializer.initialize(getApplicationContext());
+        mLocationClient.registerLocationListener(new BDAbstractLocationListener() {
+            @Override
+            public void onReceiveLocation(BDLocation bdLocation) {
+
+                country = bdLocation.getCountry();
+                city = bdLocation.getCity();
+                street = bdLocation.getStreet();
+                district = bdLocation.getDistrict();
+                province = bdLocation.getProvince();
+                final String[] gps = {country, province, city, district, street};
+                EventBus.getDefault().post(new GpsEvent(gps));
+                Log.d("TAG", "更新地址了"+Arrays.toString(gps));
+
+            }
+        });
         initView();
         switchFragment(mContent,getFragment(0));
         if (BmobUser.getCurrentUser(MyUser.class) != null) {
@@ -150,13 +164,12 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
     public void initView() {
 
         mBottomNavigationBar = findViewById(R.id.bottom_navigation_bar);
-        setBottomNav();   //设置底部导航栏
 
-
-
+        setBottomNav();   //设置底部导航栏.
 
 
     }
+
 
 
     public void setBottomNav() {
@@ -174,7 +187,7 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
         // mBottomNavigationBar.setInActiveColor("#FFFFFF");
         mBottomNavigationBar.setActiveColor(R.color.colorPrimary);
         // mBottomNavigationBar.setBarBackgroundColor(R.color.colorPrimaryDark);
-
+        mBottomNavigationBar.setAutoHideEnabled(true);
         mBottomNavigationBar.addItem(new BottomNavigationItem(R.drawable.main, "首页"))
                 .addItem(new BottomNavigationItem(R.drawable.find, "发现"))
                 .addItem(new BottomNavigationItem(R.drawable.talk, "动态"))
@@ -219,12 +232,16 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
                         }
                         break;
                     default:
+
                         break;
                 }
 
 
                 Fragment to = getFragment(position);
+
                 switchFragment(mContent,to);
+
+
 
             }
 
@@ -367,6 +384,7 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
     private void requestLocation() {
         initLocation();
         mLocationClient.start();
+
     }
 
 
@@ -401,7 +419,7 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
                 }
             });
         }
-        mLocationClient.stop();
+       mLocationClient.stop();
 
     }
 
@@ -634,6 +652,16 @@ public class    MainActivity extends AppCompatActivity implements MessageListHan
         bannedDialog.setCancelable(false);
         bannedDialog.setCanceledOnTouchOutside(false);
         bannedDialog.show();
+    }
+
+    public void ifHideBar(boolean hide){
+        if (hide){
+            mBottomNavigationBar.hide(false);
+        }
+        else {
+            mBottomNavigationBar.show(false);
+        }
+
     }
 }
 

@@ -220,7 +220,7 @@ public class SelectSchoolUtil {
                         public void done(BmobException e) {
                             if(e==null){
                                 if(schoolTextView!=null){
-                                    schoolTextView.setText("学校："+schoolName.getName());
+                                    schoolTextView.setText("学校:"+schoolName.getName());
                                 }
                                 else
                                 {

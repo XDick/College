@@ -129,17 +129,7 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
         mActivityList = activity;
     }
 
-    public void setJoin(MyJoinActivity activity){
-         activityjoin=activity;
-        currentActivity = 0;
-    }
-    public void setLike (MyLikeActivity activity){
-        activitylike=activity;
-        currentActivity = 1;
-    }public void setSet(MySetActivity activity){
-      activityset=activity;
-       currentActivity = 2;
-}
+
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -257,57 +247,47 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
                 int position = holder.getAdapterPosition();
                 final MyActivity activity = mActivityList.get(position);
                 final MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
-                switch (currentActivity){
-
-                    case 0: {
-
-                        MyActivity myActivity = new MyActivity();
-                        myActivity.setObjectId(activity.getObjectId());
-                        myActivity.setDate(activity.getDate());
-                        myActivity.removeAll("joinUser", Arrays.asList(myUser.getObjectId()));
-                        myActivity.increment("joinCount",-1);
-                        myActivity.update(new UpdateListener() {
-                            @Override
-                            public void done(BmobException e) {
-                                if (e==null){
-                                    holder.setVisibility(false);
-                                    Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(mContext,"删除失败",Toast.LENGTH_SHORT).show();
-                                }
+                if (mContext instanceof MyJoinActivity) {
+                    MyActivity myActivity = new MyActivity();
+                    myActivity.setObjectId(activity.getObjectId());
+                    myActivity.setDate(activity.getDate());
+                    myActivity.removeAll("joinUser", Arrays.asList(myUser.getObjectId()));
+                    myActivity.increment("joinCount", -1);
+                    myActivity.update(new UpdateListener() {
+                        @Override
+                        public void done(BmobException e) {
+                            if (e == null) {
+                                holder.setVisibility(false);
+                                Toast.makeText(mContext, "删除成功", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(mContext, "删除失败", Toast.LENGTH_SHORT).show();
                             }
-                        });
+                        }
+                    });
+                } else if (mContext instanceof MyLikeActivity) {
+                    MyUser myUser1 = new MyUser();
+                    myUser1.setObjectId(myUser.getObjectId());
+                    myUser1.removeAll("like", Arrays.asList(activity.getObjectId()));
+                    myUser1.update(new UpdateListener() {
+                        @Override
+                        public void done(BmobException e) {
+                            if (e == null) {
 
+                                holder.setVisibility(false);
+                                Toast.makeText(mContext, "删除成功", Toast.LENGTH_SHORT).show();
 
-                        break;
-
-                    }
-                    case 1:
-                    {   MyUser myUser1= new MyUser();
-                        myUser1.setObjectId(myUser.getObjectId());
-                        myUser1.removeAll("like", Arrays.asList(activity.getObjectId()));
-                        myUser1.update(new UpdateListener() {
-                            @Override
-                            public void done(BmobException e) {
-                                if (e == null) {
-
-                                    holder.setVisibility(false);
-                                    Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
-
-                                } else {
-                                    Toast.makeText(mContext,"删除失败",Toast.LENGTH_SHORT).show();
-                                }
+                            } else {
+                                Toast.makeText(mContext, "删除失败", Toast.LENGTH_SHORT).show();
                             }
+                        }
 
-                        });
-                        break;
-                    }
+                    });
+                } else if (mContext instanceof MySetActivity) {
 
-                    case 2:
-
-                    {   MyUser myUser1= new MyUser();
+                    {
+                        MyUser myUser1 = new MyUser();
                         myUser1.setObjectId(myUser.getObjectId());
-                        myUser1.increment("setAcCount",-1);
+                        myUser1.increment("setAcCount", -1);
                         myUser1.update(new UpdateListener() {
                             @Override
                             public void done(BmobException e) {
@@ -317,21 +297,21 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
                                     myActivity.delete(new UpdateListener() {
                                         @Override
                                         public void done(BmobException e) {
-                                            if (e==null){
+                                            if (e == null) {
 
-                                                BmobQuery<Comment>query =new BmobQuery<>();
-                                                query.addWhereEqualTo("ActivityID",activity.getObjectId());
+                                                BmobQuery<Comment> query = new BmobQuery<>();
+                                                query.addWhereEqualTo("ActivityID", activity.getObjectId());
                                                 query.findObjects(new FindListener<Comment>() {
                                                     @Override
                                                     public void done(List<Comment> list, BmobException e) {
-                                                        List<BmobObject> commentList= new ArrayList<BmobObject>();
-                                                           commentList.addAll(list);
+                                                        List<BmobObject> commentList = new ArrayList<BmobObject>();
+                                                        commentList.addAll(list);
                                                         new BmobBatch().deleteBatch(commentList).doBatch(new QueryListListener<BatchResult>() {
                                                             @Override
                                                             public void done(List<BatchResult> list, BmobException e) {
-                                                                 if (e==null){
+                                                                if (e == null) {
 
-                                                                 }
+                                                                }
                                                             }
                                                         });
                                                     }
@@ -343,19 +323,18 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
 
                                                     @Override
                                                     public void done(BmobException e) {
-                                                        if(e==null){
+                                                        if (e == null) {
 
-                                                        }else{
+                                                        } else {
 
                                                         }
                                                     }
                                                 });
 
                                                 holder.setVisibility(false);
-                                                Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
-                                            }
-                                            else {
-                                                Toast.makeText(mContext,"删除失败",Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(mContext, "删除成功", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Toast.makeText(mContext, "删除失败", Toast.LENGTH_SHORT).show();
                                             }
                                         }
                                     });
@@ -363,19 +342,12 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
                             }
 
                         });
-
-
-                        break;
-
                     }
 
-                    default:
-                        break;
+
                 }
             }
         });
-
-
 
 
     }

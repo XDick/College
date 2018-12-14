@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -57,6 +58,7 @@ public class ActivityActivity extends BaseActivity {
    private EditText editComment;
    private ImageView comment,like,sendComment;
    private LinearLayout startEdit,statusbar;
+   private FrameLayout activityStatusBar;
    private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
    private boolean ifLike ;
    public boolean ifReply=false;
@@ -89,7 +91,7 @@ public class ActivityActivity extends BaseActivity {
         statusbar = findViewById(R.id.activity_statusbar);
         like = findViewById(R.id.activity_like_imageview);
         startEdit = findViewById(R.id.activity_startedit);
-
+        activityStatusBar = findViewById(R.id.activity_statusBar);
         commentcount = findViewById(R.id.activity_comment_count);
         final Intent intent =getIntent();
         activity = (MyActivity)intent.getSerializableExtra("ACTIVITY");
@@ -525,6 +527,17 @@ public class ActivityActivity extends BaseActivity {
                 }
             });
         }
+    }
+
+
+    public void ifHideBar(boolean hide){
+        if (hide){
+            activityStatusBar.setVisibility(View.GONE);
+        }
+        else {
+            activityStatusBar.setVisibility(View.VISIBLE);
+        }
+
     }
 
 }

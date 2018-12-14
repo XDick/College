@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.provider.CalendarContract;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -70,6 +71,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
     private View mHeaderView;
     private View mFooterView;
     private View mEmptyView;
+    private DateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日");
 
 
 
@@ -286,15 +288,20 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
             holder.finish.setBackground(mContext.getDrawable(R.drawable.blank_pic));
         }
 
-          if (activity.getDate()<((MainActivity)mContext).getBmobTime()&&((MainActivity)mContext).getBmobTime()<activity.getDate()+60*60*24*1000)
+
+          if (sdf2.format(new Date(((MainActivity)mContext).getBmobTime())).equals(sdf2.format(activity.getDate())))
         {
             holder.time.setTextColor(Color.parseColor("#e91111"));
             holder.date.setTextColor(Color.parseColor("#e91111"));
+            holder.time.setTypeface(Typeface.DEFAULT_BOLD);
+            holder.date.setTypeface(Typeface.DEFAULT_BOLD);
 
         }
         else {
               holder.time.setTextColor(Color.parseColor("#000000"));
               holder.date.setTextColor(Color.parseColor("#000000"));
+              holder.time.setTypeface(Typeface.DEFAULT);
+              holder.date.setTypeface(Typeface.DEFAULT);
           }
 
 

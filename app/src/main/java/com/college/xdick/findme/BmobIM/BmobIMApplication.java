@@ -8,6 +8,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.baidu.mapapi.CoordType;
+import com.baidu.mapapi.SDKInitializer;
 import com.college.xdick.findme.Broadcast.NetWorkChangReceiver;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.MainActivity;
@@ -40,7 +42,6 @@ import cn.bmob.v3.exception.BmobException;
 
 //TODO 集成：1.7、自定义Application，并在AndroidManifest.xml中配置
 public class BmobIMApplication extends Application {
-    private NetWorkChangReceiver netWorkChangReceiver;
     private static BmobIMApplication INSTANCE;
 
     public static BmobIMApplication INSTANCE() {
@@ -59,7 +60,7 @@ public class BmobIMApplication extends Application {
     public void onCreate() {
         super.onCreate();
         //TODO 集成：1.8、初始化IM SDK，并注册消息接收器
-
+        SDKInitializer.initialize(this);
         LitePalApplication.initialize(this);
         setInstance(this);
         Connector.getDatabase();
@@ -68,7 +69,6 @@ public class BmobIMApplication extends Application {
             //Bmob 服务器的初始化也放在Application
             BmobIM.init(this);
             BmobIM.registerDefaultMessageHandler(new MyMessageHandler(this));
-
 
             //推送服务
             BmobInstallationManager.getInstance().initialize(new InstallationListener<BmobInstallation>() {

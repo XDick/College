@@ -52,7 +52,7 @@
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="1LeFUCWmIl8gEuD2p5skN4TsinQ6U9ro	"/>
+            android:value="1LeFUCWmIl8gEuD2p5skN4TsinQ6U9ro"/>
 
         <!--监听网络状态-->
         <receiver android:name=".Broadcast.NetWorkChangReceiver" >
@@ -93,8 +93,8 @@
     <activity android:name="com.college.xdick.findme.ui.Activity.MainActivity"
         android:launchMode="singleTask"
         android:configChanges="orientation|screenSize|keyboardHidden"
-
         />
+        <activity android:name=".ui.Activity.MapActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.LoginActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.SignupActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.SetDynamicsActivity"/>

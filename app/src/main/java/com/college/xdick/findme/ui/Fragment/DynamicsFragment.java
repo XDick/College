@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.college.xdick.findme.adapter.ActivityAdapter;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Activity.MainActivity;
 import com.college.xdick.findme.ui.Activity.SetDynamicsActivity;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Dynamics;
@@ -187,6 +188,11 @@ public  class DynamicsFragment extends BaseFragment {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0) {
+                    ((MainActivity) getActivity()).ifHideBar(true);
+                } else {
+                    ((MainActivity) getActivity()).ifHideBar(false);
+                }
             }
         });
 

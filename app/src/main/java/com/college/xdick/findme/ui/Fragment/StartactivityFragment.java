@@ -1,7 +1,9 @@
 package com.college.xdick.findme.ui.Fragment;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.widget.NestedScrollView;
@@ -38,6 +40,7 @@ import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.HostNotifyActivity;
 import com.college.xdick.findme.ui.Activity.LoginActivity;
+import com.college.xdick.findme.ui.Activity.MapActivity;
 import com.college.xdick.findme.ui.Activity.SearchActivity;
 import com.college.xdick.findme.ui.Activity.SearchUserActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
@@ -46,6 +49,7 @@ import com.college.xdick.findme.ui.Base.BaseFragment;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +98,8 @@ public class StartactivityFragment extends BaseFragment {
    public static int ADD=2,REFRESH=1,REPLY=3;
     private int commentCount;
     private NestedScrollView scroller;
-    private LinearLayout avatarLayout;
+    private LinearLayout avatarLayout,hostAvatarLayout,
+            activityTimeLayout,activityMapLayout;
     private boolean ifHavePeopleIn=false;
 
 
@@ -120,7 +125,7 @@ public class StartactivityFragment extends BaseFragment {
         final String activityHost = activity.getHostName();
         String activityCover =activity.getCover();
         String activityContent = activity.getContent();
-        String activityTime = activity.getTime();
+        final String activityTime = activity.getTime();
         String activityPlace = activity.getPlace();
         final String[] activityTag= activity.getTag();
         hostID=  activity.getHostId();
@@ -144,7 +149,7 @@ public class StartactivityFragment extends BaseFragment {
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout)
                 rootView.findViewById(R.id.collapsing_toolbar_activity);
 
-
+        hostAvatarLayout = rootView.findViewById(R.id.host_avatar_layout);
         avatar1=rootView.findViewById(R.id.ac_main_avatar1);
         avatar2=rootView.findViewById(R.id.ac_main_avatar2);
         avatar3=rootView.findViewById(R.id.ac_main_avatar3);
@@ -160,6 +165,22 @@ public class StartactivityFragment extends BaseFragment {
         avatar[5]=avatar6;
 
 
+
+
+        final LinearLayout loadmore=  rootView.findViewById(R.id.activity_loadmore);
+        ImageView activityImageView = rootView.findViewById(R.id.activity_image_view);
+        final TextView activityContentText =  rootView.findViewById(R.id.activity_content_text);
+        TextView activityHostText =  rootView.findViewById(R.id.activity_host_text);
+        TextView activityTimeText =  rootView.findViewById(R.id.activity_time_text);
+        TextView activityDateText =  rootView.findViewById(R.id.activity_date_text);
+        TextView activityPlaceText =  rootView.findViewById(R.id.activity_place_text);
+        TextView activityTagText1 =  rootView.findViewById(R.id.activity_tag1_text);
+        TextView activityHostSchoolText = rootView.findViewById(R.id.activity_school_text);
+        TextView findme_text = rootView.findViewById(R.id.activity_findme_text);
+        final TextView activityTagText2 =  rootView.findViewById(R.id.activity_tag2_text);
+        final TextView activityTagText3 =  rootView.findViewById(R.id.activity_tag3_text);
+
+
         BmobQuery<MyUser> query1= new BmobQuery<>();
         query1.getObject(activity.getHostId(), new QueryListener<MyUser>() {
             @Override
@@ -170,45 +191,10 @@ public class StartactivityFragment extends BaseFragment {
                     Glide.with(getActivity()).load(hostAvatarUri)
                             .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
                             .apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(hostAvatarImg);
-                    hostAvatarImg.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
 
-
-                            if (MyUser.getCurrentUser(MyUser.class)==null){
-                                startActivity(new Intent(getContext(),LoginActivity.class));
-                                getActivity().finish();
-                               return;
-
-                            }
-                            BmobQuery<MyUser>  query1 = new BmobQuery<>();
-                            query1.getObject(activity.getHostId(), new QueryListener<MyUser>() {
-                                @Override
-                                public void done(MyUser myUser, BmobException e) {
-                                    if (e==null){
-                                        Intent intent = new Intent(getActivity(), UserCenterActivity.class);
-                                        intent.putExtra("USER",myUser);
-                                        startActivity(intent);
-                                    }
-                                }
-                            });
-                        }
-                    });
                 }
             }
         });
-
-        final LinearLayout loadmore=  rootView.findViewById(R.id.activity_loadmore);
-        ImageView activityImageView = rootView.findViewById(R.id.activity_image_view);
-        final TextView activityContentText =  rootView.findViewById(R.id.activity_content_text);
-        TextView activityHostText =  rootView.findViewById(R.id.activity_host_text);
-        TextView activityTimeText =  rootView.findViewById(R.id.activity_time_text);
-        TextView activityPlaceText =  rootView.findViewById(R.id.activity_place_text);
-        TextView activityTagText1 =  rootView.findViewById(R.id.activity_tag1_text);
-        TextView findme_text = rootView.findViewById(R.id.activity_findme_text);
-        final TextView activityTagText2 =  rootView.findViewById(R.id.activity_tag2_text);
-        final TextView activityTagText3 =  rootView.findViewById(R.id.activity_tag3_text);
-
         commentcount = rootView.findViewById(R.id.activity_comment_count);
         joincount = rootView.findViewById(R.id.ac_main_joincount);
         joinButton = rootView.findViewById(R.id.join_ac_button);
@@ -223,17 +209,28 @@ public class StartactivityFragment extends BaseFragment {
 
 
         collapsingToolbar.setTitle(activityTitle);
+
+        collapsingToolbar.setExpandedTitleTypeface(Typeface.DEFAULT_BOLD);
+
+
         Glide.with(this).load(activityCover)
                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
                 .apply(RequestOptions.bitmapTransform(new BlurTransformation())).into(activityImageView);
         activityContentText.setText(activityContent);
-        activityTimeText.setText(""+activityTime);
+        activityDateText.setText( activityTime.substring(0,activityTime.lastIndexOf(" ")));
+        activityTimeText.setText(activityTime.substring(activityTime.indexOf(" ")+1));
+        if(activity.getHostSchool().equals("")){
+            activityHostSchoolText.setVisibility(View.GONE);
+        }
+        activityHostSchoolText.setText(activity.getHostSchool());
+
         activityPlaceText.setText(""+activityPlace);
         activityHostText.setText(""+activityHost);
         activityTagText1.setText(activityTag[0]);
         if (activityTag[0].equals("泛觅活动")){
             findme_text.setVisibility(View.VISIBLE);
         }
+
         activityTagText2.setText(activityTag[1]);
         activityTagText3.setText(activityTag[2]);
         activityTagText2.setOnClickListener(new View.OnClickListener() {
@@ -253,6 +250,43 @@ public class StartactivityFragment extends BaseFragment {
             }
         });
 
+        activityMapLayout = rootView.findViewById(R.id.activity_map_layout);
+        activityMapLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), MapActivity.class);
+                startActivity(intent);
+            }
+        });
+        activityTimeLayout = rootView.findViewById(R.id.activity_time_layout);
+        activityTimeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    Intent calendarIntent = new Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI);
+                    Calendar calendar = Calendar.getInstance();
+
+                    calendar.set( Integer.valueOf(activityTime.substring(0,
+                            activityTime.indexOf("年"))),
+                            Integer.valueOf(activityTime.substring(activityTime.indexOf("年")+1,
+                                    activityTime.indexOf("月")))-1,
+                            Integer.valueOf(activityTime.substring(activityTime.indexOf("月")+1,
+                                    activityTime.indexOf("日"))),
+                            Integer.valueOf(activityTime.substring(activityTime.indexOf(" ")+1,
+                            activityTime.indexOf(":"))),Integer.valueOf(activityTime.substring( activityTime.indexOf(":")+1)));
+
+                    calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, calendar.getTimeInMillis());
+                  //  calendar.set(2016, 10, 19, 10, 30);
+                   // calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, calendar.getTimeInMillis());
+                    calendarIntent.putExtra(CalendarContract.Events.TITLE, activity.getTitle());
+                    calendarIntent.putExtra(CalendarContract.Events.EVENT_LOCATION, activity.getGps());
+                    calendarIntent.putExtra(CalendarContract.Events.DESCRIPTION, activity.getContent());
+                    calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, CalendarContract.EXTRA_EVENT_ALL_DAY);
+                calendarIntent.putExtra(CalendarContract.Events.EVENT_TIMEZONE, "Asia/Shanghai");
+                    startActivity(calendarIntent);
+            }
+        });
+
+
 
 
    /*  if (activityTag[0].equals("二手交易")){
@@ -269,7 +303,7 @@ public class StartactivityFragment extends BaseFragment {
          e.printStackTrace();
         }
         joincount.setText(joinnum+"");
-        activityHostText.setOnClickListener(new View.OnClickListener() {
+        hostAvatarLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (MyUser.getCurrentUser(MyUser.class)==null){
@@ -278,19 +312,17 @@ public class StartactivityFragment extends BaseFragment {
                     return;
 
                 }
-               BmobQuery<MyUser>  query1 = new BmobQuery<>();
-               query1.getObject(activity.getHostId(), new QueryListener<MyUser>() {
-                   @Override
-                   public void done(MyUser myUser, BmobException e) {
-                       if (e==null){
-                           Intent intent = new Intent(getActivity(), UserCenterActivity.class);
-                           intent.putExtra("USER",myUser);
-                           startActivity(intent);
-                       }
-                   }
-               });
-
-
+                BmobQuery<MyUser>  query1 = new BmobQuery<>();
+                query1.getObject(activity.getHostId(), new QueryListener<MyUser>() {
+                    @Override
+                    public void done(MyUser myUser, BmobException e) {
+                        if (e==null){
+                            Intent intent = new Intent(getActivity(), UserCenterActivity.class);
+                            intent.putExtra("USER",myUser);
+                            startActivity(intent);
+                        }
+                    }
+                });
             }
         });
 
@@ -298,13 +330,13 @@ public class StartactivityFragment extends BaseFragment {
         loadmore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(loadmore_text.getText().equals("加 载 更 多")){
+                if(loadmore_text.getText().equals("加载更多∨")){
                     activityContentText.setSingleLine(false);
-                    loadmore_text.setText("收 起");}
+                    loadmore_text.setText("收起∧");}
 
                 else {
-                    activityContentText.setMaxLines(5);
-                    loadmore_text.setText("加 载 更 多");
+                    activityContentText.setMaxLines(7);
+                    loadmore_text.setText("加载更多∨");
 
                 }
 
@@ -409,7 +441,7 @@ public class StartactivityFragment extends BaseFragment {
                                       getActivity().runOnUiThread(new Runnable() {
                                           @Override
                                           public void run() {
-                                              joinButton.setText("加 入!");
+                                              joinButton.setText("加 入");
                                               joincount.setText(--joinnum+"");
                                               joinButton.setBackgroundResource(R.drawable.join_button_radius_false);
                                           }
@@ -480,8 +512,10 @@ public  void initJoin(){
 
             }
             else
-            {
-                Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+            {      if (getActivity()!=null){
+                Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+
             }
 
         }
@@ -514,9 +548,14 @@ public  void initJoin(){
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
 
                 if (scrollY > oldScrollY) {
+
+
+                    ((ActivityActivity)getActivity()).ifHideBar(true);
                     //Log.i(TAG, "Scroll DOWN");
+
                 }
                 if (scrollY < oldScrollY) {
+                    ((ActivityActivity)getActivity()).ifHideBar(false);
                     //Log.i(TAG, "Scroll UP");
                 }
 
@@ -525,7 +564,7 @@ public  void initJoin(){
                 }
 
                 if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
-
+                    ((ActivityActivity)getActivity()).ifHideBar(false);
                     if (ifEmpty) {
                         adapter.changeMoreStatus(CommentAdapter.NO_MORE);
 
@@ -641,7 +680,7 @@ public  void initJoin(){
        }
         if (!Arrays.toString(activity.getJoinUser()).contains(myUser.getObjectId())) {
             ifJoin = false;
-            joinButton.setText("加 入!");
+            joinButton.setText("加 入");
             joinButton.setBackgroundResource(R.drawable.join_button_radius_false);
 
         } else {

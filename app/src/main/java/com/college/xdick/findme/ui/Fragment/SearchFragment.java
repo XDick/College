@@ -29,6 +29,7 @@ import com.college.xdick.findme.adapter.FindNewsAdapter;
 import com.college.xdick.findme.bean.FindNews;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
+import com.college.xdick.findme.ui.Activity.MainActivity;
 import com.college.xdick.findme.ui.Activity.SearchActivity;
 import com.college.xdick.findme.ui.Base.BaseFragment;
 import com.youth.banner.Banner;
@@ -120,14 +121,14 @@ public class SearchFragment extends BaseFragment implements FragmentBackHandler 
 
 
 
-    private void initRecyclerView(){
+    private void initRecyclerView() {
 
         recyclerView = rootView.findViewById(R.id.recyclerview_search);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new FindNewsAdapter(newsList);
         View header = LayoutInflater.from(getContext()).inflate(R.layout.item_header_banner, recyclerView, false);
-        banner =  header.findViewById(R.id.banner);
+        banner = header.findViewById(R.id.banner);
         //设置图片加载器
         banner.setImageLoader(new MyBannerImageLoader());
         //设置图片集合
@@ -143,7 +144,7 @@ public class SearchFragment extends BaseFragment implements FragmentBackHandler 
             @Override
             public void OnBannerClick(int position) {
                 Intent intent = new Intent(getContext(), ActivityActivity.class);
-                intent.putExtra("ACTIVITY",activityList.get(position));
+                intent.putExtra("ACTIVITY", activityList.get(position));
                 startActivity(intent);
             }
         });
@@ -155,10 +156,20 @@ public class SearchFragment extends BaseFragment implements FragmentBackHandler 
         adapter.setEmptyView(empty);
         adapter.addFooterView(footer);
         recyclerView.setAdapter(adapter);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0) {
+                    ((MainActivity) getActivity()).ifHideBar(true);
+                } else {
+                    ((MainActivity) getActivity()).ifHideBar(false);
+                }
+            }
 
 
+        });
     }
-
 
     private void refresh(){
         swipeRefresh.setRefreshing(true);
