@@ -65,10 +65,6 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
     private int ITEM_TYPE_FOOTER = 2;
     private int ITEM_TYPE_EMPTY = 3;
 
-    private int currentActivity;
-    private MyJoinActivity activityjoin;
-    private MyLikeActivity activitylike;
-    private MySetActivity activityset;
 
 
     private int load_more_status;
@@ -233,7 +229,7 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
          Glide.with(mContext).load(activity.getCover())
                  .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover);
 
-          holder.host.setText("由"+activity.getHostName()+"发起");
+          holder.host.setText("由"+activity.getHost().getUsername()+"发起");
 
         try {
             holder.join.setText(activity.getJoinUser().length+"人参与");

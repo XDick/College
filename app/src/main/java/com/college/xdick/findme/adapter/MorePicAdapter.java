@@ -240,8 +240,8 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
                         return;
                     }
                     BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-                    query.addWhereEqualTo("username", map.get(mListPicPath.get(mPosition)).getUser());
-                    query.getObject(map.get(mListPicPath.get(mPosition)).getUserId(), new QueryListener<MyUser>() {
+                    query.addWhereEqualTo("username", map.get(mListPicPath.get(mPosition)).getMyUser().getUsername());
+                    query.getObject(map.get(mListPicPath.get(mPosition)).getMyUser().getObjectId(), new QueryListener<MyUser>() {
 
                         @Override
                         public void done(final MyUser object, BmobException e) {
@@ -299,8 +299,8 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
                                     return;
                                 }
                                 BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-                                query.addWhereEqualTo("username", map.get(mListPicPath.get(position)).getUser());
-                                query.getObject(map.get(mListPicPath.get(position)).getUserId(), new QueryListener<MyUser>() {
+                                query.addWhereEqualTo("username", map.get(mListPicPath.get(position)).getMyUser().getUsername());
+                                query.getObject(map.get(mListPicPath.get(position)).getMyUser().getObjectId(), new QueryListener<MyUser>() {
 
                                     @Override
                                     public void done(final MyUser object, BmobException e) {

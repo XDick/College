@@ -103,7 +103,7 @@
         <activity android:name="com.college.xdick.findme.ui.Activity.InterestActivity" />
         <activity android:name="com.college.xdick.findme.ui.Activity.SetActivitiyActivity"/>
        <activity android:name="com.college.xdick.findme.ui.Activity.ActivityActivity" />
-        <activity android:name="com.college.xdick.findme.ui.Activity.NewsActivity"/>
+        <activity android:name="com.college.xdick.findme.ui.Activity.WebActivity"/>
         <activity android:name=".ui.Activity.MyInterestActivity"/>
         <activity android:name=".ui.Activity.AddTagActivity"/>
         <activity android:name="com.linchaolong.android.imagepicker.cropper.CropImageActivity"
@@ -113,6 +113,7 @@
         <activity android:name=".ui.Activity.HostNotifyActivity"/>
        <activity android:name=".ui.Activity.SearchActivityActivity"/>
         <activity android:name=".ui.Activity.SearchUserActivity"/>
+        <activity android:name=".ui.Activity.DetailActivityActivity"/>
 
 
         <activity

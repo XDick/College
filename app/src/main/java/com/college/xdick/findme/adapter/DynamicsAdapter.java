@@ -230,7 +230,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                     final Dynamics dynamics = mDynamicsList.get(position);
 
                     BmobQuery<MyUser> query = new BmobQuery<>();
-                    query.getObject(dynamics.getUserId(), new QueryListener<MyUser>() {
+                    query.getObject(dynamics.getMyUser().getObjectId(), new QueryListener<MyUser>() {
                         @Override
                         public void done(MyUser myUser, BmobException e) {
                             if (e==null){
@@ -315,16 +315,9 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
         final LinearLayout report = easyPopup.findViewById(R.id.dynamics_report);
 
       final Dynamics dynamics = mDynamicsList.get(realPos);
-       final  List<MyUser> user=new ArrayList<>();
-        BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-        query.addWhereEqualTo("username", dynamics.getUser());
-        query.getObject(dynamics.getUserId(), new QueryListener<MyUser>() {
 
-            @Override
-            public void done(final MyUser object, BmobException e) {
-                if (e == null) {
-                        user.add(object);
-                    Glide.with(mContext).load(object.getAvatar())
+
+                    Glide.with(mContext).load(dynamics.getMyUser().getAvatar())
                             .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
 
 
@@ -334,7 +327,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
                             Intent intent = new Intent(mContext, MainDynamicsActivity.class);
                             intent.putExtra("DYNAMICS", dynamics);
-                            intent.putExtra("USER",object);
+                            intent.putExtra("USER",dynamics.getMyUser());
 
                             mContext.startActivity(intent);
                         }
@@ -344,10 +337,8 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
 
 
-                }
-            }
 
-        });
+
         mAdapter = new NineGridImageViewAdapter<String>() {
 
             @Override
@@ -363,7 +354,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
             @Override
             protected void onItemImageClick(Context context, ImageView imageView, final int index, final List<String> photoList) {
                 List<String> picList = new  ArrayList<>(photoList);
-                showPictureDialog(index,picList,dynamics,user.get(0));
+                showPictureDialog(index,picList,dynamics,dynamics.getMyUser());
 
 
             }
@@ -389,6 +380,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
               @Override
               public void onClick(View v) {
                 BmobQuery<MyActivity> query = new BmobQuery<>();
+                query.include("host[avatar|username]");
                 query.getObject(dynamics.getActivityId(), new QueryListener<MyActivity>() {
                     @Override
                     public void done(MyActivity activity, BmobException e) {
@@ -436,7 +428,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                        }
                    });
 
-           if (dynamics.getUser().equals(myUser.getUsername())|| myUser.isGod()){
+           if (dynamics.getMyUser().getUsername().equals(myUser.getUsername())|| myUser.isGod()){
 
                delete.setVisibility(View.VISIBLE);
                delete.setOnClickListener(new View.OnClickListener() {
@@ -555,7 +547,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
                     holder.gridImageView.setVisibility(View.VISIBLE);
                     holder.content.setVisibility(View.VISIBLE);
-                    holder.username.setText(dynamics.getUser());
+                    holder.username.setText(dynamics.getMyUser().getUsername());
 
                     holder.reply.setText(dynamics.getReplycount() + "");
 
@@ -638,7 +630,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                                     public void done(BmobException e) {
                                         if (e == null) {
                                             sendMessage(myUser.getUsername() + "点赞了你的动态",
-                                                    new BmobIMUserInfo(dynamics.getUserId(), dynamics.getUser(), null),
+                                                    new BmobIMUserInfo(dynamics.getMyUser().getObjectId(), dynamics.getMyUser().getUsername(), null),
                                                     dynamics.getObjectId(), dynamics.getContent());
 
 

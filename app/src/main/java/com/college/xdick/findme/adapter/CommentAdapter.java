@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,22 +20,16 @@ import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
-import com.college.xdick.findme.ui.Activity.ChatActivity;
 import com.college.xdick.findme.ui.Activity.LoginActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
-import com.college.xdick.findme.ui.Fragment.StartactivityFragment;
+import com.college.xdick.findme.ui.Fragment.StartActivityFragment;
 import com.zyyoona7.popup.EasyPopup;
 import com.zyyoona7.popup.XGravity;
 import com.zyyoona7.popup.YGravity;
 
 
-import java.util.Arrays;
 import java.util.List;
 
-import cn.bmob.newim.BmobIM;
-import cn.bmob.newim.bean.BmobIMConversation;
-import cn.bmob.newim.bean.BmobIMUserInfo;
-import cn.bmob.newim.listener.ConversationListener;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
@@ -137,7 +130,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                deletePop.showAtAnchorView(holder.layout, YGravity.CENTER, XGravity.CENTER, 0, 0);
 
                LinearLayout delete =  deletePop.findViewById(R.id.delete_comment);
-               if (!BmobUser.getCurrentUser().getObjectId().equals(activity2.getHostId())&&!BmobUser.getCurrentUser().getObjectId().equals(comment.getUserID()))
+               if (!BmobUser.getCurrentUser().getObjectId().equals(activity2.getHost().getObjectId())&&!BmobUser.getCurrentUser().getObjectId().equals(comment.getUser().getObjectId()))
                    delete.setVisibility(View.GONE);
                    delete.setOnClickListener(new View.OnClickListener() {
                    @Override
@@ -154,7 +147,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                                    myActivity.update();
                                    activity.myfragment.setSize(0);
                                    activity.myfragment.setCount(0);
-                                   activity.myfragment.initComment(StartactivityFragment.REFRESH);
+                                   activity.myfragment.initComment(StartActivityFragment.REFRESH);
 
                                    deletePop.dismiss();
                                    Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
@@ -186,10 +179,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                int position = holder.getAdapterPosition();
                Comment comment = mCommentList.get(position);
                Comment comment2 = new Comment();
-               comment2.setReplyusername(comment.getUserName());
-               comment2.setReplyuserId(comment.getUserID());
-               comment2.setReplycontent(comment.getContent());
-               comment2.setActivityID(comment.getActivityID());
+               comment2.setReplyUser(comment.getUser());
+
+               comment2.setReplyComment(comment);
+               comment2.setActivity(comment.getActivity());
                activity.reply(comment,comment2);
              /*  if (activity2.getHostId().equals(MyUser.getCurrentUser(MyUser.class).getObjectId())){
                        activity.ifReply=false;
@@ -290,22 +283,27 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
 
 
-        if (comment.getReplyuserId()==null&&comment.getReplycontent()==null){
+        if (comment.getReplyUser()==null&&comment.getReplyComment()==null){
 
             holder.replylayout.setVisibility(View.GONE);
         }
         else {
-            fromwho=comment.getReplyusername();
-            fromcontent= comment.getReplycontent();
+            fromwho=comment.getReplyUser().getUsername();
+            if (comment.getReplyComment().getContent()==null){
+                fromcontent= "该评论已被删除";
+            }else {
+                fromcontent= comment.getReplyComment().getContent();
+            }
+
             holder.replyto.setText("@"+  fromwho);
             holder.replycontent.setText(":"+ fromcontent);
         }
 
-        holder.username.setText(comment.getUserName());
+        holder.username.setText(comment.getUser().getUsername());
         holder.content.setText(comment.getContent());
         holder.time.setText(comment.getCreatedAt());
         BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-        query.getObject(comment.getUserID(), new QueryListener<MyUser>() {
+        query.getObject(comment.getUser().getObjectId(), new QueryListener<MyUser>() {
 
             @Override
             public void done(final MyUser object, BmobException e) {
@@ -351,8 +349,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                    // Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                final  String id = comment.getReplyuserId();
-                final String name = comment.getReplyusername();
+                final  String id = comment.getReplyUser().getObjectId();
                 BmobQuery<MyUser> query = new BmobQuery<>();
                 query.getObject(id, new QueryListener<MyUser>() {
                     @Override

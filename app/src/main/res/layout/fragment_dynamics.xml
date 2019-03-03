@@ -23,10 +23,21 @@
             android:layout_height="?attr/actionBarSize"
             android:id="@+id/toolbar_main"
             android:background="@color/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            android:theme="@style/FullToolbarTheme"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:layout_scrollFlags="scroll|enterAlways|snap">
-
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:scaleType="centerCrop"
+                android:id="@+id/background"/>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#C1A71E20">
        <TextView
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
@@ -34,7 +45,8 @@
            android:textSize="20sp"
            android:layout_gravity="center"
            android:textColor="#fff" />
-
+            </FrameLayout>
+            </FrameLayout>
 
         </android.support.v7.widget.Toolbar>
 

@@ -23,6 +23,7 @@ public class MyJoinActivity extends MyBaseActivity {
         query.order("-date");
         query.setLimit(10);
         query.setSkip(size);
+        query.include("host[username|avatar]");
         return query;
     }
 }

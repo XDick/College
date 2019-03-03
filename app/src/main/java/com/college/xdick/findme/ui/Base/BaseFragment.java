@@ -12,8 +12,8 @@ import com.college.xdick.findme.R;
 
 public abstract class BaseFragment extends Fragment {
 
-    protected Context context = null;
-
+    protected Context context = getContext();
+    protected View rootView;
 
 
 

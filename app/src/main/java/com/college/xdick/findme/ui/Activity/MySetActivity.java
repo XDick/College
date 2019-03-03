@@ -18,10 +18,11 @@ public class MySetActivity extends MyBaseActivity {
     @Override
     protected BmobQuery<MyActivity> condition() {
         BmobQuery<MyActivity> query = new BmobQuery<>();
-        query.addWhereEqualTo("hostId",myUser.getObjectId());
+        query.addWhereEqualTo("host",myUser.getObjectId());
         query.order("-date");
         query.setLimit(10);
         query.setSkip(size);
+        query.include("host[username|avatar]");
         return query;
     }
 }

@@ -15,7 +15,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.FindNews;
-import com.college.xdick.findme.ui.Activity.NewsActivity;
+import com.college.xdick.findme.ui.Activity.WebActivity;
 
 import java.util.List;
 
@@ -89,7 +89,7 @@ public class FindNewsAdapter extends RecyclerView.Adapter<FindNewsAdapter.ViewHo
                 public void onClick(View v) {
                     int position =getRealItemPosition(holder.getAdapterPosition());
                    FindNews news = mNewsList.get(position);
-                    Intent intent= new Intent(mContext, NewsActivity.class);
+                    Intent intent= new Intent(mContext, WebActivity.class);
                     intent.putExtra("URL",news.getContent());
                     mContext.startActivity(intent);
                 }

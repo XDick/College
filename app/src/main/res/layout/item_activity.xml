@@ -8,13 +8,11 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    app:cardCornerRadius="10dp"
-    android:layout_marginLeft="11dp"
-    android:layout_marginRight="11dp"
-    android:layout_marginTop="15dp"
+    app:cardCornerRadius="8dp"
+    android:layout_margin="3dp"
     android:id="@+id/cardview_ac"
     android:foreground="?attr/selectableItemBackground"
-    app:cardElevation="2dp">
+    app:cardElevation="5dp">
 
 
     <LinearLayout
@@ -30,16 +28,18 @@
             <ImageView
                 android:id="@+id/cover_ac"
                 android:layout_width="match_parent"
-                android:layout_height="165dp"
+                android:layout_height="120dp"
                 android:scaleType="centerCrop" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#92000000"
+                android:orientation="horizontal"
                 android:layout_gravity="bottom">
                 <FrameLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="match_parent">
                 <TextView
                     android:id="@+id/place_ac"
@@ -49,33 +49,39 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
-                    android:layout_marginEnd="25dp"
+                    android:layout_marginEnd="5dp"
                     android:textColor="#ffffff"
                     android:textStyle="bold"
-                    android:textSize="15sp" />
+                    android:textSize="12sp" />
                 </FrameLayout>
+
+
+
+
+
             </LinearLayout>
+
+
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center|right"
+                android:layout_gravity="end"
                 android:layout_margin="5dp"
                 >
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
                     android:background="@drawable/gps_white" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/gps_ac"
+                    android:textSize="12sp"
                     android:textColor="#ffffff"/>
             </LinearLayout>
-
-
 
 
 
@@ -89,44 +95,53 @@
             android:id="@+id/tag1_ac"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
             android:padding="5dp"
             android:textColor="#121212"
             android:background="@drawable/label_text_color2"
-            android:textSize="10dp" />
+            android:textSize="8sp" />
     <TextView
         android:id="@+id/tag2_ac"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="7dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="8dp"
         android:textColor="#6b6b6b"
-        android:textSize="10dp" />
+        android:textSize="8sp" />
     <TextView
         android:id="@+id/tag3_ac"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="7dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="8dp"
         android:textColor="#6b6b6b"
-        android:textSize="10dp" />
+        android:textSize="8sp" />
+    <TextView
+        android:id="@+id/tag4_ac"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="8dp"
+        android:textColor="#6b6b6b"
+        android:textSize="8sp" />
 </LinearLayout>
         <TextView
             android:id="@+id/title_ac"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="10dp"
             android:textColor="#000000"
-            android:textSize="28sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
 
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_marginLeft="23dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <TextView
@@ -136,7 +151,7 @@
 
                 android:layout_gravity="center"
                 android:textColor="#000000"
-                android:textSize="17sp" />
+                android:textSize="14sp" />
             <TextView
                 android:id="@+id/time_ac"
                 android:layout_width="wrap_content"
@@ -145,7 +160,7 @@
                 android:textColor="#000000"
 
                 android:layout_marginLeft="5dp"
-                android:textSize="17sp"
+                android:textSize="14sp"
                 />
 
         </LinearLayout>
@@ -155,10 +170,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginRight="20dp"
-        android:orientation="horizontal">
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+
+        android:orientation="vertical">
         <LinearLayout
             android:orientation="horizontal"
             android:layout_weight="1"
@@ -169,23 +184,23 @@
                android:layout_height="match_parent"
                android:orientation="horizontal">
                <ImageView
-                   android:layout_width="35dp"
-                   android:layout_height="35dp"
+                   android:layout_width="30dp"
+                   android:layout_height="30dp"
                    android:id="@+id/host_avatar"/>
             <TextView
                 android:id="@+id/host_ac"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textColor="#676767"
-                android:textSize="15sp"
+                android:textColor="#126EB9"
+                android:textSize="12sp"
+                android:textStyle="bold"
                 android:layout_marginLeft="5dp"
                 />
            </LinearLayout>
         </LinearLayout>
         <LinearLayout
-
-            android:layout_weight="1.5"
+            android:layout_margin="12dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">

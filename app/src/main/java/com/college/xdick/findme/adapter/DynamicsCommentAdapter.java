@@ -2,7 +2,6 @@ package com.college.xdick.findme.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,26 +14,17 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.college.xdick.findme.R;
-import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.DynamicsComment;
-import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
-import com.college.xdick.findme.ui.Activity.ActivityActivity;
-import com.college.xdick.findme.ui.Activity.ChatActivity;
 import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
-import com.college.xdick.findme.ui.Fragment.StartactivityFragment;
 import com.zyyoona7.popup.EasyPopup;
 import com.zyyoona7.popup.XGravity;
 import com.zyyoona7.popup.YGravity;
 
 import java.util.List;
 
-import cn.bmob.newim.BmobIM;
-import cn.bmob.newim.bean.BmobIMConversation;
-import cn.bmob.newim.bean.BmobIMUserInfo;
-import cn.bmob.newim.listener.ConversationListener;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
@@ -137,7 +127,7 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
                     deletePop.showAtAnchorView(holder.layout, YGravity.CENTER, XGravity.CENTER, 0, 0);
 
                     LinearLayout delete =  deletePop.findViewById(R.id.delete_comment);
-                    if (!BmobUser.getCurrentUser().getObjectId().equals(dynamics.getUserId())&&!BmobUser.getCurrentUser().getObjectId().equals(comment.getUserID()))
+                    if (!BmobUser.getCurrentUser().getObjectId().equals(dynamics.getMyUser().getObjectId())&&!BmobUser.getCurrentUser().getObjectId().equals(comment.getUser().getObjectId()))
                         delete.setVisibility(View.GONE);
                     delete.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -180,10 +170,9 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
                int position = holder.getAdapterPosition();
                DynamicsComment comment = mCommentList.get(position);
                DynamicsComment comment2 = new DynamicsComment();
-               comment2.setReplyusername(comment.getUserName());
-               comment2.setReplyuserId(comment.getUserID());
-               comment2.setReplycontent(comment.getContent());
-               comment2.setDynamicsID(comment.getDynamicsID());
+               comment2.setReplyUser(comment.getUser());
+               comment2.setReplyComment(comment);
+               comment2.setDynamics(comment.getDynamics());
                activity.reply(comment,comment2);
 
            }
@@ -194,8 +183,7 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
            public void onClick(View v) {
                int position = holder.getAdapterPosition();
                DynamicsComment comment = mCommentList.get(position);
-               final String id = comment.getReplyuserId();
-               final  String name = comment.getReplyusername();
+               final String id = comment.getReplyUser().getObjectId();
                BmobQuery<MyUser> query = new BmobQuery<>();
                query.getObject(id, new QueryListener<MyUser>() {
                    @Override
@@ -268,53 +256,45 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
 
         int realPos = getRealItemPosition(position);
 
-        DynamicsComment comment = mCommentList.get(realPos);
+        final DynamicsComment comment = mCommentList.get(realPos);
         String fromwho,fromcontent;
 
 
 
-        if (comment.getReplyuserId()==null&&comment.getReplycontent()==null){
+        if (comment.getReplyUser()==null&&comment.getReplyComment()==null){
 
             holder.replylayout.setVisibility(View.GONE);
         }
         else {
-            fromwho=comment.getReplyusername();
-            fromcontent= comment.getReplycontent();
+            fromwho=comment.getReplyUser().getUsername();
+            if (comment.getReplyComment().getContent()==null){
+                fromcontent= "该评论已被删除";
+            }else {
+                fromcontent= comment.getReplyComment().getContent();
+            }
             holder.replyto.setText("@"+  fromwho);
             holder.replycontent.setText(":"+ fromcontent);
         }
 
-        holder.username.setText(comment.getUserName());
+        holder.username.setText(comment.getUser().getUsername());
         holder.content.setText(comment.getContent());
         holder.time.setText(comment.getCreatedAt());
-        BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-        query.getObject(comment.getUserID(), new QueryListener<MyUser>() {
 
-            @Override
-            public void done(final MyUser object, BmobException e) {
-                if(e==null){
 
                     holder.avatar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
 
                                     Intent intent = new Intent(mContext, UserCenterActivity.class);
-                                    intent.putExtra("USER",object);
+                                    intent.putExtra("USER",comment.getUser());
                                     mContext.startActivity(intent);
 
                         }
                     });
-                    Glide.with(mContext).load(object.getAvatar())
+                    Glide.with(mContext).load(comment.getUser().getAvatar())
                             .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
                             .apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
 
-
-                }else{
-
-                }
-            }
-
-        });
 
 
 

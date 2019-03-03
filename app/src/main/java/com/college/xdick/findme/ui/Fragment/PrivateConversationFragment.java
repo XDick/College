@@ -41,13 +41,13 @@ import static cn.bmob.v3.Bmob.getApplicationContext;
  */
 
 public class PrivateConversationFragment extends BaseFragment implements MessageListHandler {
-    View rootview;
+
     private List<PrivateConversation> conversationList = new ArrayList<>();
     private ConversationAdapter adapter;
     private SwipeRefreshLayout swipeRefresh;
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootview =inflater.inflate(R.layout.fragment_conversation,container,false);
+        rootView =inflater.inflate(R.layout.fragment_conversation,container,false);
         initView();
         swipeRefresh.post(new Runnable() {
             @Override
@@ -62,13 +62,13 @@ public class PrivateConversationFragment extends BaseFragment implements Message
 
 
 
-        return rootview;
+        return rootView;
 
 
     }
     private void initView(){
         initRecyclerView();
-        swipeRefresh =rootview.findViewById(R.id.swipe_refresh);
+        swipeRefresh =rootView.findViewById(R.id.swipe_refresh);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -79,7 +79,7 @@ public class PrivateConversationFragment extends BaseFragment implements Message
     }
     public void initRecyclerView(){
 
-        RecyclerView recyclerView = rootview.findViewById(R.id.recyclerview_conversation);
+        RecyclerView recyclerView = rootView.findViewById(R.id.recyclerview_conversation);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new ConversationAdapter(conversationList);

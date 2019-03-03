@@ -35,8 +35,10 @@ import com.college.xdick.findme.MyClass.IMMLeaks;
 import com.college.xdick.findme.MyClass.ReadEvent;
 import com.college.xdick.findme.bean.ActivityMessageBean;
 
+import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Fragment.MainActivityFragment;
+import com.college.xdick.findme.ui.Fragment.MainFragment;
 import com.college.xdick.findme.ui.Fragment.MainMessageFragment;
 import com.college.xdick.findme.ui.Fragment.DynamicsFragment;
 import com.college.xdick.findme.ui.Fragment.MessageFragment;
@@ -72,9 +74,11 @@ import cn.bmob.newim.event.MessageEvent;
 import cn.bmob.newim.listener.ConnectListener;
 import cn.bmob.newim.listener.ConnectStatusChangeListener;
 import cn.bmob.newim.listener.MessageListHandler;
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FetchUserInfoListener;
+import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.update.BmobUpdateAgent;
 
@@ -158,6 +162,9 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
         EventBus.getDefault().register(this);
 
 
+
+
+
     }
 
 
@@ -189,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
         // mBottomNavigationBar.setBarBackgroundColor(R.color.colorPrimaryDark);
         mBottomNavigationBar.setAutoHideEnabled(true);
         mBottomNavigationBar.addItem(new BottomNavigationItem(R.drawable.main, "首页"))
-                .addItem(new BottomNavigationItem(R.drawable.find, "发现"))
+                //.addItem(new BottomNavigationItem(R.drawable.find, "发现"))
                 .addItem(new BottomNavigationItem(R.drawable.talk, "动态"))
                 .addItem(new BottomNavigationItem(R.drawable.message, "消息").setBadgeItem(mBadgeItem))
                 .addItem(new BottomNavigationItem(R.drawable.user, "我"))
@@ -202,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
 
                 switch (position) {
 
-                    case 2:
+                    case 1:
                         if (MyUser.getCurrentUser(MyUser.class) == null) {
                             startActivity(new Intent(MainActivity.this, LoginActivity.class));
                             finish();
@@ -215,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
 
 
                         break;
-                    case 3:
+                    case 2:
                         if (MyUser.getCurrentUser(MyUser.class) == null) {
                             startActivity(new Intent(MainActivity.this, LoginActivity.class));
                             finish();
@@ -223,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
                             return;
                         }
                         break;
-                    case 4:
+                    case 3:
                         if (MyUser.getCurrentUser(MyUser.class) == null) {
                             startActivity(new Intent(MainActivity.this, LoginActivity.class));
                             finish();
@@ -292,8 +299,8 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
   private void initFragment(){
 
       mFragment = new ArrayList<>();
-      mFragment.add(new MainActivityFragment());
-      mFragment.add(new SearchFragment());
+      mFragment.add(new MainFragment());
+     // mFragment.add(new SearchFragment());
       mFragment.add(new DynamicsFragment());
       mFragment.add(new MainMessageFragment());
       mFragment.add(new UserFragment());
@@ -323,6 +330,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
         if (dialog2!=null){
             dialog2.dismiss();}
         }
+
 
         super.onResume();
     }
@@ -453,12 +461,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(1);    }
 
-    public  void setBmobTime(long bmobTime) {
-        this.bmobTime = bmobTime;
-    }
-    public  long getBmobTime(){
-        return this.bmobTime;
-    }
+
 
 
     @Override

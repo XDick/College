@@ -9,24 +9,15 @@ import cn.bmob.v3.BmobObject;
 public class Comment extends BmobObject {
 
 
-    String userName;
-    String content;
-    String ActivityID;
-    String userID;
-    String replyusername;
-    String replyuserId;
-    String replycontent;
-    Integer replyNum=0;
+    private MyUser user,replyUser;
+    private  String content;
+    private  MyActivity activity;
+    private  Comment replyComment;
+    private  Integer replyNum;
 
 
 
-    public String getUserName() {
-        return userName;
-    }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
 
 
 
@@ -39,54 +30,44 @@ public class Comment extends BmobObject {
     }
 
 
+    public MyUser getUser() {
+        return user;
+    }
 
-    public int getReplyNum() {
+    public void setUser(MyUser user) {
+        this.user = user;
+    }
+
+    public MyUser getReplyUser() {
+        return replyUser;
+    }
+
+    public void setReplyUser(MyUser replyUser) {
+        this.replyUser = replyUser;
+    }
+
+    public MyActivity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(MyActivity activity) {
+        this.activity = activity;
+    }
+
+    public Integer getReplyNum() {
         return replyNum;
     }
 
-    public void setReplyNum(int replyNum) {
+    public void setReplyNum(Integer replyNum) {
         this.replyNum = replyNum;
     }
 
-    public String getActivityID() {
-        return ActivityID;
+    public Comment getReplyComment() {
+        return replyComment;
     }
 
-    public void setActivityID(String activityID) {
-        ActivityID = activityID;
-    }
-
-    public String getUserID() {
-        return userID;
-    }
-
-    public void setUserID(String userID) {
-        this.userID = userID;
-    }
-
-
-    public String getReplyusername() {
-        return replyusername;
-    }
-
-    public void setReplyusername(String replyusername) {
-        this.replyusername = replyusername;
-    }
-
-    public String getReplyuserId() {
-        return replyuserId;
-    }
-
-    public void setReplyuserId(String replyuserId) {
-        this.replyuserId = replyuserId;
-    }
-
-    public String getReplycontent() {
-        return replycontent;
-    }
-
-    public void setReplycontent(String replycontent) {
-        this.replycontent = replycontent;
+    public void setReplyComment(Comment replyComment) {
+        this.replyComment = replyComment;
     }
 
     public void addReply(){

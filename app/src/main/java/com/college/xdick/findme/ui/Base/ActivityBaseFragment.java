@@ -3,6 +3,7 @@ package com.college.xdick.findme.ui.Base;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,9 +16,12 @@ import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.ActivityAdapter;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
-import com.college.xdick.findme.ui.Activity.MainActivity;
+import com.college.xdick.findme.ui.Activity.DetailActivityActivity;
+import com.donkingliang.labels.LabelsView;
+
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import cn.bmob.v3.Bmob;
@@ -29,7 +33,7 @@ import cn.bmob.v3.listener.QueryListener;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
  public abstract class ActivityBaseFragment extends BaseFragment {
-    protected View rootview;
+
     protected MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     protected boolean ifsort = false;
     protected boolean ifEmpty= false;
@@ -40,22 +44,40 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
     protected List<MyActivity> activityList= new ArrayList<>();
     protected SwipeRefreshLayout swipeRefresh;
     protected ActivityAdapter adapter;
+    private String tag=null;
+    private String subTag=null;
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootview =inflater.inflate(R.layout.fragment_activity,container,false);
+        rootView =inflater.inflate(R.layout.fragment_activity,container,false);
+        if (((DetailActivityActivity)getActivity()).tagBean!=null){
+            tag = ((DetailActivityActivity)getActivity()).tagBean.getMainTag();
+        }
+
+
         initBaseView();
         initRecyclerView();
         onCreateViewOperation();
-        return rootview;
+        return rootView;
     }
 
 
      protected abstract BmobQuery<MyActivity> condition(String order,long aLong);
 
-     protected abstract void onCreateViewOperation();
+     protected void onCreateViewOperation(){
+
+             swipeRefresh.post(new Runnable() {
+                 @Override
+                 public void run() {
+                     swipeRefresh.setRefreshing(true);
+                     size=0;
+                     initData(REFRESH);
+                 }
+             });
+
+     }
 
     private void initBaseView(){
-        swipeRefresh =rootview.findViewById(R.id.swipe_refresh);
+        swipeRefresh =rootView.findViewById(R.id.swipe_refresh);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -66,12 +88,15 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
     }
     private void initRecyclerView(){
 
-        RecyclerView recyclerView = rootview.findViewById(R.id.recyclerview);
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        RecyclerView recyclerView = rootView.findViewById(R.id.recyclerview);
+        final GridLayoutManager layoutManager = new GridLayoutManager(getContext(),2);
         recyclerView.setLayoutManager(layoutManager);
         adapter = new ActivityAdapter(activityList);
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView, false);
         View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_activity, recyclerView, false);
+
+
+
         adapter.setEmptyView(empty);
         adapter.addFooterView(footer);
         if (ifEmpty){
@@ -103,7 +128,7 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
                     }
                     else {
                         if (ifsort){
-                            sortData(SORT);
+                            sortData(ADD);
                         }
                         else {
                             initData(ADD);}
@@ -112,17 +137,7 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
                 }
             }
 
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
 
-                if (dy>0){
-                    ((MainActivity)getActivity()).ifHideBar(true);
-                }
-                else {
-                    ((MainActivity)getActivity()).ifHideBar(false);
-                }
-            }
         });
 
     }
@@ -139,22 +154,38 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
     private void initActivities(final int state , final boolean ifSort, final String order){
 
-        if(BmobUser.getCurrentUser(MyUser.class) ==null){
+      /*  if(BmobUser.getCurrentUser(MyUser.class) ==null){
             swipeRefresh.setRefreshing(false);
             return;
-        }
+        }*/
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
             public void done(Long aLong, BmobException e) {
 
                 if (e==null){
                     if (getContext()!=null) {
-                        ((MainActivity) getContext()).setBmobTime(aLong * 1000L);
+                        ((DetailActivityActivity) getContext()).setBmobTime(aLong * 1000L);
                     }
+                    final int listsize = activityList.size();
+                    BmobQuery<MyActivity> query ;
+                    if(BmobUser.getCurrentUser(MyUser.class) !=null) {
+                        query = condition(order, aLong);
+                    }
+                        else {
+                            query = new BmobQuery<>();
+                            query.order(order);
+                            query.setSkip(size);
+                            query.setLimit(10);
+                        }
 
-                    if(BmobUser.getCurrentUser(MyUser.class) !=null){
-                        final int listsize = activityList.size();
-                        BmobQuery<MyActivity> query=condition(order,aLong);
+                        if (tag!=null){
+                            query.addWhereContainsAll("tag", Arrays.asList(tag));
+                        }
+                        if (subTag!=null){
+                            query.addWhereContainsAll("tag", Arrays.asList(subTag));
+                        }
+
+                        query.include("host[avatar|username]");
                         query.findObjects(new FindListener<MyActivity>() {
                             @Override
                             public void done(List<MyActivity> object, BmobException e) {
@@ -207,7 +238,7 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
                         });
 
                     }
-                }
+
 
             }
         });
@@ -232,6 +263,7 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
         this.ifsort = ifsort;
     }
 
+    public void setSubTag(String subTag){this.subTag=subTag;}
 
 
 }

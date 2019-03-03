@@ -332,6 +332,7 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
           public void onClick(View v) {
               if (activity.getType().equals("activity")){
                  BmobQuery<MyActivity> query = new BmobQuery<>();
+                 query.include("host[username|avatar]");
                   query.getObject(activity.getActivityId(), new QueryListener<MyActivity>() {
                       @Override
                       public void done(MyActivity activity, BmobException e) {
@@ -344,16 +345,14 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
               }
               else if (activity.getType().equals("dynamics")){
 
-
-
-
                                    final BmobQuery<Dynamics> query = new BmobQuery<>();
+                                   query.include("myUser[avatar|username]");
                                    query.getObject(activity.getActivityId(), new QueryListener<Dynamics>() {
                                        @Override
                                        public void done(final Dynamics dynamics, BmobException e) {
                                         if (e==null){
                                             BmobQuery<MyUser> query1 = new BmobQuery<>();
-                                            query1.getObject(dynamics.getUserId(), new QueryListener<MyUser>() {
+                                            query1.getObject(dynamics.getMyUser().getObjectId(), new QueryListener<MyUser>() {
                                                 @Override
                                                 public void done(MyUser myUser, BmobException e) {
                                                     if (e==null){
@@ -374,11 +373,12 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
               }
               else if (activity.getType().equals("dynamics_picture")){
                   final BmobQuery<Dynamics> query = new BmobQuery<>();
+                  query.include("myUser[avatar|username]");
                   query.getObject(activity.getActivityId().substring(0,activity.getActivityId().lastIndexOf(";")), new QueryListener<Dynamics>() {
                       @Override
                       public void done(final Dynamics dynamics, BmobException e) {
                           if (e==null){  BmobQuery<MyUser> query1 = new BmobQuery<>();
-                              query1.getObject(dynamics.getUserId(), new QueryListener<MyUser>() {
+                              query1.getObject(dynamics.getMyUser().getObjectId(), new QueryListener<MyUser>() {
                                   @Override
                                   public void done(MyUser myUser, BmobException e) {
                                       if (e==null){

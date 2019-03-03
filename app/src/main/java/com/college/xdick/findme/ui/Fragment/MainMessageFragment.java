@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.college.xdick.findme.MyClass.ReadEvent;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.MessageFragmentStatePagerAdapter;
@@ -46,14 +47,17 @@ import cn.bmob.newim.event.MessageEvent;
 import cn.bmob.newim.event.OfflineMessageEvent;
 import cn.bmob.newim.listener.MessageListHandler;
 import cn.bmob.v3.BmobUser;
+import jp.wasabeef.glide.transformations.BlurTransformation;
 import q.rorbin.badgeview.QBadgeView;
+
+import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
 /**
  * Created by Administrator on 2018/5/23.
  */
 
 public class MainMessageFragment extends BaseFragment implements MessageListHandler {
-     View rootView;
+
     private ViewPager mViewPager1;
     private TabLayout mTabLayout;
     private String[] tabTitle = {"私信", "通知"};//每个页面顶部标签的名字
@@ -76,6 +80,12 @@ public class MainMessageFragment extends BaseFragment implements MessageListHand
     }
 
     private void initView(){
+
+
+        ImageView background = rootView.findViewById(R.id.background);
+        Glide.with(this).load(R.drawable.findme_background)
+                .apply(bitmapTransform(new BlurTransformation(4, 3)))
+                .into(background);
         Button clearButton = rootView.findViewById(R.id.clear_button);
        clearButton.setOnClickListener(new View.OnClickListener() {
             @Override

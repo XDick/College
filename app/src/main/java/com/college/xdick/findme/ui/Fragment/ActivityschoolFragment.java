@@ -19,6 +19,7 @@ public class ActivityschoolFragment extends ActivityBaseFragment {
     @Override
     protected BmobQuery<MyActivity> condition(String order,long aLong) {
         BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
+
         query.addWhereEqualTo("hostSchool",  BmobUser.getCurrentUser(MyUser.class).getSchool());
         if (order.equals("date")) {
             query.addWhereGreaterThan("date", aLong * 1000L - 60 * 60 * 24 * 1000);
@@ -29,19 +30,7 @@ public class ActivityschoolFragment extends ActivityBaseFragment {
         return query;
     }
 
-    @Override
-    protected void onCreateViewOperation() {
-        if (myUser!=null){
-            swipeRefresh.post(new Runnable() {
-                @Override
-                public void run() {
-                    swipeRefresh.setRefreshing(true);
-                    size=0;
-                    initData(REFRESH);
-                }
-            });
-        }
-    }
+
 
 
 }

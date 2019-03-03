@@ -183,6 +183,7 @@ public class SearchActivity extends BaseActivity {
         BmobQuery<MyActivity> query = new BmobQuery<>();
         query.or(queries);
         query.setLimit(10);
+        query.include("host[username|avatar]");
         query.findObjects(new FindListener<MyActivity>() {
             @Override
             public void done(List<MyActivity> list, BmobException e) {

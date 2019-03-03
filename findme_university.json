@@ -1,5 +1,24 @@
 ﻿{
   "data": [
+  
+    {
+      "departId": "0",
+      "departName": "",
+      "collegeLocations": [
+        {
+          "locationId": "1",
+          "departId": "0",
+          "locationName": "",
+          "collegeNames": [
+            {
+              "locationId": "1",
+              "name": ""
+            }
+        
+          ]
+        }
+      ]
+    },
     {
       "departId": "1",
       "departName": "北京市",

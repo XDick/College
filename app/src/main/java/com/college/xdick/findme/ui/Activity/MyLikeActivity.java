@@ -30,6 +30,7 @@ public class MyLikeActivity extends MyBaseActivity {
 
         query.setLimit(10);
         query.setSkip(size);
+        query.include("host[username|avatar]");
         return query;
     }
 }

@@ -19,8 +19,7 @@ public class Dynamics extends BmobObject implements Serializable {
     private String activityHost;
 
 
-    private String user;
-    private String userId;
+    MyUser  myUser;
     private String content;
     private String[] picture;
     private String[] like;
@@ -30,18 +29,12 @@ public class Dynamics extends BmobObject implements Serializable {
     private boolean ifAdd2Gallery;
 
 
-
-
-
-
-
-
-    public String getUser() {
-        return user;
+    public MyUser getMyUser() {
+        return myUser;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setMyUser(MyUser myUser) {
+        this.myUser = myUser;
     }
 
     public String getContent() {
@@ -54,14 +47,6 @@ public class Dynamics extends BmobObject implements Serializable {
 
 
 
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
     public int getReplycount() {
         return replycount;

@@ -57,8 +57,8 @@ public class ActivityFragment extends ActivityBaseFragment {
 
     @Override
     protected void onCreateViewOperation() {
-        MainActivity activity = (MainActivity) getActivity();
-        List<MyActivity>list=(List<MyActivity>)activity.getIntent().getSerializableExtra("LISTDATA");;
+       // MainActivity activity = (MainActivity) getActivity();
+        List<MyActivity>list=(List<MyActivity>)getActivity().getIntent().getSerializableExtra("LISTDATA");
 
         if (list!=null) {
             activityList.addAll(list);

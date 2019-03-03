@@ -1,6 +1,7 @@
 package com.college.xdick.findme.util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.util.Log;
 import android.view.Gravity;
@@ -24,6 +25,10 @@ import com.college.xdick.findme.bean.School;
 import com.college.xdick.findme.bean.SelectSchool;
 import com.google.gson.Gson;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,9 +65,12 @@ public class SelectSchoolUtil {
     private static Button schoolButton;
     private static TextView schoolTextView;
     private static MyUser user=null;
+    private static Activity activity;
 
 
-    public static void initPopView(Activity activity , Button button,TextView textView,MyUser myUser) {
+
+    public static void initPopView(Activity activity1 , Button button,TextView textView,MyUser myUser) {
+        activity=activity1;
         parent = activity.getWindow().getDecorView();
         View popView = View.inflate( activity, R.layout.item_select_school, null);
         mTitle = (TextView) popView.findViewById(R.id.select_list_title);
@@ -116,9 +124,9 @@ public class SelectSchoolUtil {
     }
 
 
-    private static void loadProvince(){
+    private static void loadProvince() {
 
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -128,26 +136,50 @@ public class SelectSchoolUtil {
                             .build();
                     Response response = client.newCall(request).execute();
                     JsonData = response.body().string();
-
                     Gson gson = new Gson();
-                    selectSchool = gson.fromJson(JsonData,SelectSchool.class);
-                    provinceList=selectSchool.getData();
+                    selectSchool = gson.fromJson(JsonData, SelectSchool.class);
+                    provinceList = selectSchool.getData();
 
 
                     mProvinceAdapter.setList(provinceList);
                     mProvinceAdapter.notifyDataSetChanged();
 
-                }
-                catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
 
             }
-        }).start();
+        }).start();*/
+        InputStreamReader inputStreamReader;
+        try {
+            inputStreamReader = new InputStreamReader(activity.getAssets().open("findme_university.json"), "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(
+                    inputStreamReader);
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            inputStreamReader.close();
+            bufferedReader.close();
+            JsonData = stringBuilder.toString();
+            Gson gson = new Gson();
+            selectSchool = gson.fromJson(JsonData, SelectSchool.class);
+            provinceList = selectSchool.getData();
 
 
+            mProvinceAdapter.setList(provinceList);
+            mProvinceAdapter.notifyDataSetChanged();
+
+            Log.i("TAG", stringBuilder.toString());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
 
     private static void loadCity() {

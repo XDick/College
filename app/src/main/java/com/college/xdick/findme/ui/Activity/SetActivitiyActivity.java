@@ -71,22 +71,22 @@ import static cn.bmob.newim.core.BmobIMClient.getContext;
  */
 
 public class SetActivitiyActivity extends BaseActivity implements TimePickerDialog.OnTimeSetListener,DatePickerDialog.OnDateSetListener {
-    EditText titleE,  placeE, contentE,createE;
-    ImageView cover;
-    LinearLayout layout,chooselayout,labellayout;
-    TextView picTitle,chooseText,createText,timeE;
-    Button createButton;
-
-    Calendar now;
-    List<String> selectTagList = new ArrayList<>();
-    boolean ifcreateAdd =false;
-    String usedAddTag="";
-    String myTime;
-    int day;
-    long time;
-    MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
-    ImagePicker imagePicker ;
-    static String picturePath;
+    private EditText titleE,  placeE, contentE,createE;
+    private ImageView cover;
+    private LinearLayout layout,chooselayout,labellayout;
+    private  TextView picTitle,chooseText,createText,timeE;
+    private Button createButton;
+    private List<MainTagBean> mainTagBeanList = new ArrayList<>();
+    private Calendar now;
+    private  List<String> selectTagList = new ArrayList<>();
+    private  boolean ifcreateAdd =false;
+    private  String usedAddTag="";
+    private String myTime;
+    private  int day;
+    private long time;
+    private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
+    private ImagePicker imagePicker ;
+    private static String picturePath;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +99,9 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
     private void initView() {
         final LabelsView labelsView =  findViewById(R.id.setac_main_labels);
         final LabelsView labelsView2 = findViewById(R.id.setac_add_labels);
+        final LabelsView labelsView_sub = findViewById(R.id.setac_sub_labels);
         final LabelsView labelsView_sort = findViewById(R.id.setac_sort_labels);
+
         createText = findViewById(R.id.setac_createtag_text);
         titleE = findViewById(R.id.setac_title_edittext);
         createE = findViewById(R.id.setac_createtag_edit);
@@ -119,7 +121,7 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
             @Override
             public void onClick(View v) {
                 if(!createText.getText().equals("没有合适的？创建标签")) {
-                    selectTagList.set(2,"");
+                    selectTagList.set(3,"");
                     ifcreateAdd =false;
 
 
@@ -146,16 +148,19 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
                 if (tag.equals("")) {
                     createText.setText("没有合适的？创建标签");
                     ifcreateAdd =false;
+                    selectTagList.set(3,"");
                     labelsView2.setMaxSelect(1);
+                    labelsView2.setSelectType(LabelsView.SelectType.SINGLE);
 
 
                 }
                 else {
-                    selectTagList.set(2,tag);
-                    createText.setText(tag);
-                    ifcreateAdd =true;
                     labelsView2.clearAllSelect();
                     labelsView2.setSelectType(LabelsView.SelectType.NONE);
+
+                    selectTagList.set(3,tag);
+                    createText.setText(tag);
+                    ifcreateAdd =true;
 
                 }
 
@@ -291,10 +296,7 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
 
 
         BmobQuery<MainTagBean> query = new BmobQuery<MainTagBean>();
-
-//返回50条数据，如果不加上这条语句，默认返回10条数据
-        query.setLimit(999);
-//执行查询方法
+        query.order("order");
         query.findObjects(new FindListener<MainTagBean>() {
 
 
@@ -302,7 +304,7 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
             public void done(List<MainTagBean> object, BmobException e) {
                 if (e == null) {
 
-
+                    mainTagBeanList.addAll(object);
                     labelsView.setLabels(object, new LabelsView.LabelTextProvider<MainTagBean>() {
                         @Override
                         public CharSequence getLabelText(TextView label, int position, MainTagBean data) {
@@ -322,16 +324,14 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
 
         BmobQuery<AddTagBean> query2 = new BmobQuery<AddTagBean>();
 
-//返回50条数据，如果不加上这条语句，默认返回10条数据
+
         query2.setLimit(50);
         query2.order("-updatedAt");
-//执行查询方法
         query2.findObjects(new FindListener<AddTagBean>() {
             @Override
             public void done(List<AddTagBean> object, BmobException e) {
                 if (e == null) {
-                  //  Collections.sort(object);
-                   // Collections.reverse(object); // 倒序排列
+
                     labelsView2.setLabels(object, new LabelsView.LabelTextProvider<AddTagBean>() {
                         @Override
                         public CharSequence getLabelText(TextView label, int position, AddTagBean data) {
@@ -344,7 +344,7 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
             }
         });
 
-        for (int i=0;i<3;i++){
+        for (int i=0;i<4;i++){
             selectTagList.add("");
         }
 
@@ -354,8 +354,6 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
             public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
                 if (isSelect) {
                     selectTagList.set(0,label.getText().toString());
-
-
                     Log.d("TAG", "数据" + label.getText().toString());
                 } else {
 
@@ -374,12 +372,25 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
             public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
                 if (isSelect) {
                     selectTagList.set(1,label.getText().toString());
-
+                    labelsView_sub.setLabels(Arrays.asList(mainTagBeanList.get(position).getSubTag()));
                     Log.d("TAG", "数据" + label.getText().toString());
                 } else {
-
+                    labelsView_sub.setLabels(null);
                     selectTagList.set(1,"");
 
+                }
+
+            }
+        });
+
+        labelsView_sub.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
+            @Override
+            public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
+                if (isSelect) {
+                    selectTagList.set(2,label.getText().toString());
+                    Log.d("TAG", "数据" + label.getText().toString());
+                } else {
+                    selectTagList.set(2,"");
                 }
 
             }
@@ -391,12 +402,12 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
             @Override
             public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
                 if (isSelect) {
-                    selectTagList.set(2,label.getText().toString());
+                    selectTagList.set(3,label.getText().toString());
                     usedAddTag=label.getText().toString();
 
                     Log.d("TAG", "数据" + label.getText().toString());
                 } else {
-                    selectTagList.set(2,"");
+                    selectTagList.set(3,"");
                     usedAddTag="";
                 }
 
@@ -478,14 +489,13 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
                                 final String coverURL = bmobFile.getFileUrl();
 
                                 activity.setCover(coverURL);
+                                activity.setHost(myUser);
                                 activity.setTitle(title);
                                 activity.setTime(date);
                                 activity.setContent(content);
                                 activity.setPlace(place);
                                 activity.setGps(gps);
-                                activity.setHostId(user.getObjectId());
                                 activity.setTag(tag);
-                                activity.setHostName(user.getUsername());
                                 activity.setHostSchool(user.getSchool());
                                 activity.setDate(time);
                                 activity.setCommentCount(0);

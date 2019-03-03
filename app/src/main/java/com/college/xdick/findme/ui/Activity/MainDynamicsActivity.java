@@ -164,7 +164,7 @@ public class MainDynamicsActivity extends BaseActivity {
         dynamics = (Dynamics)intent.getSerializableExtra("DYNAMICS");
         final MyUser nowUser = (MyUser) intent.getSerializableExtra("USER");
          commentCount= dynamics.getReplycount();
-        final  String user = dynamics.getUser();
+        final  String user = dynamics.getMyUser().getUsername();
         String content = dynamics.getContent();
         dynamicsId = dynamics.getObjectId();
 
@@ -228,7 +228,7 @@ public class MainDynamicsActivity extends BaseActivity {
                         public void done(BmobException e) {
                             if (e == null) {
                                 sendMessage(myUser1.getUsername() + "点赞了你的动态",
-                                        new BmobIMUserInfo(dynamics.getUserId(), dynamics.getUser(), null),
+                                        new BmobIMUserInfo(dynamics.getMyUser().getObjectId(), dynamics.getMyUser().getUsername(), null),
                                         dynamics.getObjectId(), dynamics.getContent());
 
 
@@ -296,6 +296,7 @@ public class MainDynamicsActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     BmobQuery<MyActivity> query = new BmobQuery<>();
+                    query.include("host[avatar|username]");
                     query.getObject(dynamics.getActivityId(), new QueryListener<MyActivity>() {
                         @Override
                         public void done(MyActivity activity, BmobException e) {
@@ -399,9 +400,8 @@ public class MainDynamicsActivity extends BaseActivity {
                 imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
                 if(ifReply){
                     replyComment.setContent(editComment.getText().toString());
-                    replyComment.setUserName(myUser.getUsername());
-                    replyComment.setUserID(myUser.getObjectId());
-                    fromComment.addReply();
+                    replyComment.setUser(myUser);
+                    replyComment.setReplyNum(0);
                     fromComment.update();
                     final String content=editComment.getText().toString();
                     editComment.setText("");
@@ -411,8 +411,8 @@ public class MainDynamicsActivity extends BaseActivity {
                             if(e==null){
                                 Toast.makeText(MainDynamicsActivity.this,"回复成功",Toast.LENGTH_SHORT).show();
                                 sendMessage(myUser1.getUsername()+"回复了你:"+content,
-                                        new BmobIMUserInfo(replyComment.getReplyuserId(),
-                                                replyComment.getUserName(),null),
+                                        new BmobIMUserInfo(replyComment.getReplyUser().getObjectId(),
+                                                replyComment.getUser().getUsername(),null),
                                         dynamics.getObjectId(),dynamics.getContent());
 
 
@@ -442,10 +442,10 @@ public class MainDynamicsActivity extends BaseActivity {
 
                     DynamicsComment comment = new DynamicsComment ();
 
-                    comment.setUserName(myUser.getUsername());
-                    comment.setUserID(myUser.getObjectId());
+                    comment.setUser(myUser);
                     comment.setContent(editComment.getText().toString());
-                    comment.setDynamicsID(dynamicsId);
+                    comment.setDynamics(dynamics);
+                    comment.setReplyNum(0);
                     final String content=editComment.getText().toString();
                     editComment.setText("");
                     comment.save(new SaveListener<String>() {
@@ -461,7 +461,7 @@ public class MainDynamicsActivity extends BaseActivity {
 
                                 Toast.makeText(MainDynamicsActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
 
-                                sendMessage(myUser1.getUsername()+"评论了你的动态:"+content,new BmobIMUserInfo(dynamics.getUserId(),dynamics.getUser(),null),
+                                sendMessage(myUser1.getUsername()+"评论了你的动态:"+content,new BmobIMUserInfo(dynamics.getMyUser().getObjectId(),dynamics.getMyUser().getUsername(),null),
                                         dynamics.getObjectId(),dynamics.getContent());
 
                                 commentList.clear();
@@ -521,7 +521,7 @@ public class MainDynamicsActivity extends BaseActivity {
         imm.showSoftInput( editComment, 0);
         replyComment=tocomment;
         fromComment=fromcomment;
-        editComment.setHint("@"+ fromComment.getUserName());
+        editComment.setHint("@"+ fromComment.getUser().getUsername());
 
         ifReply=true;
     }
@@ -530,8 +530,11 @@ public class MainDynamicsActivity extends BaseActivity {
     public void initComment(final int state){
 
         BmobQuery<DynamicsComment> query = new BmobQuery<DynamicsComment>();
-        query.addWhereEqualTo("dynamicsID", dynamicsId);
+        query.addWhereEqualTo("dynamics", dynamicsId);
         query.order("-createdAt");
+        query.include("user[avatar|username|following|school]," +
+                "replyUser[avatar|username],replyComment[content]"
+        );
         query.setLimit(10);
         query.setSkip(size);
         final int listsize = commentList.size();
@@ -650,7 +653,7 @@ public class MainDynamicsActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu){
 
 
-        if (dynamics.getUser().equals(myUser1.getUsername())){
+        if (dynamics.getMyUser().getUsername().equals(myUser1.getUsername())){
             getMenuInflater().inflate(R.menu.toolbar_delete_dynamics,menu);
         }
 

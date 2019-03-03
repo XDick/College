@@ -36,7 +36,7 @@ import cn.bmob.v3.BmobUser;
  */
 
 public class MessageFragment extends BaseFragment implements MessageListHandler {
-    View rootView;
+
     private List<ActivityMessageBean> activityList= new ArrayList<>();
     private ActivityMessageAdapter adapter;
     private SwipeRefreshLayout swipeRefresh;

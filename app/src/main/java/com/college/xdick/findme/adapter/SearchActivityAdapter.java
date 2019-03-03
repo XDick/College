@@ -242,7 +242,7 @@ public class SearchActivityAdapter extends RecyclerView.Adapter<SearchActivityAd
          Glide.with(mContext).load(activity.getCover())
                  .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover);
 
-          holder.host.setText("由"+activity.getHostName()+"发起");
+          holder.host.setText("由"+activity.getHost().getUsername()+"发起");
 
         try {
             holder.join.setText(activity.getJoinUser().length+"人参与");

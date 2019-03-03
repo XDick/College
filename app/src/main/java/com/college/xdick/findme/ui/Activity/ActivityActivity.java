@@ -24,7 +24,7 @@ import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Base.BaseActivity;
-import com.college.xdick.findme.ui.Fragment.StartactivityFragment;
+import com.college.xdick.findme.ui.Fragment.StartActivityFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +63,7 @@ public class ActivityActivity extends BaseActivity {
    private boolean ifLike ;
    public boolean ifReply=false;
    private String activityId;
-   public StartactivityFragment myfragment;
+   public StartActivityFragment myfragment;
    private Comment replyComment,fromComment;
    private   InputMethodManager imm ;
     private TextView  commentcount;
@@ -83,7 +83,7 @@ public class ActivityActivity extends BaseActivity {
 
 
 
-        myfragment=new StartactivityFragment();
+        myfragment=new StartActivityFragment();
         replaceFragment(myfragment);
         editComment = findViewById(R.id.activity_edit_comment_edittext);
         sendComment = findViewById(R.id.activity_send_comment_imageview);
@@ -142,10 +142,6 @@ public class ActivityActivity extends BaseActivity {
                                 Toast.makeText(ActivityActivity.this, "加入活动才可以评论", Toast.LENGTH_SHORT).show();
 
                             }
-
-
-
-
                     }*/
 
             }
@@ -219,9 +215,8 @@ public class ActivityActivity extends BaseActivity {
                 imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
                if(ifReply){
                    replyComment.setContent(editComment.getText().toString());
-                   replyComment.setUserName(myUser.getUsername());
-                   replyComment.setUserID(myUser.getObjectId());
-
+                   replyComment.setUser(myUser);
+                   replyComment.setReplyNum(0);
                    fromComment.addReply();
                    fromComment.update();
                    final String content=editComment.getText().toString();
@@ -238,13 +233,13 @@ public class ActivityActivity extends BaseActivity {
                            if(e==null){
                                Toast.makeText(ActivityActivity.this,"回复成功",Toast.LENGTH_SHORT).show();
                                myfragment.sendMessage(myUser.getUsername()+"回复了你:"+content
-                                       ,new BmobIMUserInfo(replyComment.getReplyuserId(),replyComment.getReplyusername(),null));
+                                       ,new BmobIMUserInfo(replyComment.getReplyUser().getObjectId(),replyComment.getReplyUser().getUsername(),null));
 
                                startEdit.setVisibility(View.GONE);
                                statusbar.setVisibility(View.VISIBLE);
                                myfragment.commentList.clear();
                                myfragment.setSize(0);
-                               myfragment.initComment(StartactivityFragment.REPLY);
+                               myfragment.initComment(StartActivityFragment.REPLY);
                                ifReply=false;
 
 
@@ -262,10 +257,10 @@ public class ActivityActivity extends BaseActivity {
 
                 final Comment comment = new Comment();
 
-                comment.setUserName(myUser.getUsername());
-                comment.setUserID(myUser.getObjectId());
+                comment.setUser(myUser);
+                comment.setReplyNum(0);
                 comment.setContent(editComment.getText().toString());
-                comment.setActivityID(activityId);
+                comment.setActivity(activity);
                    final String content=editComment.getText().toString();
                    editComment.setText("");
                 comment.save(new SaveListener<String>() {
@@ -274,14 +269,14 @@ public class ActivityActivity extends BaseActivity {
                         if(e==null){
                             Toast.makeText(ActivityActivity.this,"评论成功",Toast.LENGTH_SHORT).show();
                             myfragment.sendMessage(myUser.getUsername()+"评论了你:"+content
-                                    ,new BmobIMUserInfo(myfragment.activity.getHostId(),
-                                            myfragment.activity.getHostName(),null));
+                                    ,new BmobIMUserInfo(myfragment.activity.getHost().getObjectId(),
+                                            myfragment.activity.getHost().getUsername(),null));
 
                             startEdit.setVisibility(View.GONE);
                             statusbar.setVisibility(View.VISIBLE);
                             myfragment.commentList.clear();
                             myfragment.setSize(0);
-                            myfragment.initComment(StartactivityFragment.REPLY);
+                            myfragment.initComment(StartActivityFragment.REPLY);
                         }else{
                             Toast.makeText(ActivityActivity.this,"评论失败",Toast.LENGTH_SHORT).show();
                         }
@@ -310,7 +305,7 @@ public class ActivityActivity extends BaseActivity {
             case R.id.menu_delete_activity: {
                 MyUser myUser1 = new MyUser();
                 myUser1.setObjectId(myUser.getObjectId());
-                if (!myUser.isGod()||activity.getHostId().equals(myUser.getObjectId())){
+                if (!myUser.isGod()||activity.getHost().getObjectId().equals(myUser.getObjectId())){
                     myUser1.increment("setAcCount",-1);
                 }
                 myUser1.update(new UpdateListener() {
@@ -325,7 +320,7 @@ public class ActivityActivity extends BaseActivity {
                                     if (e==null){
                                         if (myUser.isGod()){
                                             try {
-                                                sendMessage("因你的活动违规已被删除",new BmobIMUserInfo(activity.getHostId(),activity.getHostName(),
+                                                sendMessage("因你的活动违规已被删除",new BmobIMUserInfo(activity.getHost().getObjectId(),activity.getHost().getUsername(),
                                                         null));
                                             }
                                             catch (Exception e1){
@@ -384,7 +379,7 @@ public class ActivityActivity extends BaseActivity {
                     startActivity(new Intent(ActivityActivity.this,LoginActivity.class));
                     return true;
                 }
-                if (activity.getHostId().equals(MyUser.getCurrentUser(MyUser.class).getObjectId())){
+                if (activity.getHost().getObjectId().equals(MyUser.getCurrentUser(MyUser.class).getObjectId())){
                     startActivity(new Intent(ActivityActivity.this,SetDynamicsActivity.class));
                     Toast.makeText(this,"插入活动上传照片",Toast.LENGTH_SHORT).show();
                     return true;
@@ -421,7 +416,7 @@ public class ActivityActivity extends BaseActivity {
              menu.findItem(R.id.menu_delete_activity).setVisible(false);
              return super.onPrepareOptionsMenu(menu);
          }
-        if(!activity.getHostId().equals(myUser.getObjectId())&&!myUser.isGod())
+        if(!activity.getHost().getObjectId().equals(myUser.getObjectId())&&!myUser.isGod())
         {
             menu.findItem(R.id.menu_delete_activity).setVisible(false);
         }
@@ -479,7 +474,7 @@ public class ActivityActivity extends BaseActivity {
         imm.showSoftInput( editComment, 0);
         replyComment=tocomment;
         fromComment=fromcomment;
-        editComment.setHint("@"+ fromComment.getUserName());
+        editComment.setHint("@"+ fromComment.getUser().getUsername());
 
         ifReply=true;
     }

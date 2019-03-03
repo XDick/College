@@ -27,6 +27,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     private ProgressDialog dialog=null;
     private AlertDialog.Builder builder=null ;
     private  AlertDialog dialog2=null;
+    static private long bmobTime=0;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

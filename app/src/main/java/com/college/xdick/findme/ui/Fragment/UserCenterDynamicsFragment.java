@@ -43,7 +43,7 @@ import cn.bmob.v3.listener.UpdateListener;
 
 public class UserCenterDynamicsFragment extends BaseFragment {
 
-    private View rootView;
+
     private List<Dynamics> dynamicsList= new ArrayList<>();
     private DynamicsAdapter adapter;
 
@@ -130,9 +130,10 @@ public class UserCenterDynamicsFragment extends BaseFragment {
 
 
         BmobQuery<Dynamics> query = new BmobQuery<Dynamics>();
-        query.addWhereEqualTo("userId",nowUser.getObjectId());
+        query.addWhereEqualTo("myUser",nowUser.getObjectId());
         query.order("-createdAt");
         query.setLimit(20);
+        query.include("myUser[avatar|username]");
         query.setSkip(size);
         final int listsize = dynamicsList.size();
                     query.findObjects(new FindListener<Dynamics>() {

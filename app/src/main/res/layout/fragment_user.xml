@@ -18,21 +18,26 @@
         android:layout_height="wrap_content">
 
 
+
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:background="?attr/colorPrimary">
+            android:layout_height="160dp">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:scaleType="centerCrop"
+                android:id="@+id/user_background"/>
 
-         <ImageView
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:scaleType="centerCrop"
-             android:id="@+id/user_background"/>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#C1A71E20">
 
             <com.college.xdick.findme.MyClass.WaveView3
                 android:id="@+id/wave_view"
                 android:layout_width="match_parent"
                 android:layout_height="15dp"
+                android:background="#D72F31"
                 android:layout_gravity="bottom" />
 
 
@@ -42,8 +47,10 @@
                 android:layout_height="65dp"
                 android:layout_gravity="center|bottom"
                 />
-
+            </FrameLayout>
         </FrameLayout>
+
+
         <android.support.v7.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"

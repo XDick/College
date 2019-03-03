@@ -9,8 +9,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.college.xdick.findme.BmobIM.UserModel;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyUser;
@@ -35,6 +38,9 @@ import cn.bmob.newim.listener.ConnectStatusChangeListener;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.LogInListener;
+import jp.wasabeef.glide.transformations.BlurTransformation;
+
+import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
 /**
  * Created by Administrator on 2018/4/2.
@@ -42,13 +48,15 @@ import cn.bmob.v3.listener.LogInListener;
 
 public class LoginActivity extends BaseActivity {
     private EditText accountEdit, passwordEdit;
-    private Button login, signup,qqLogin;
+    private Button login, signup;
+    private LinearLayout qqLogin;
     private Tencent mTencent;
     private BaseUiListener mIUiListener;
     private UserInfo mUserInfo;
     private ProgressDialog dialog=null;
     private android.app.AlertDialog.Builder builder=null ;
     private android.app.AlertDialog dialog2=null;
+    private ImageView background;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +77,10 @@ public class LoginActivity extends BaseActivity {
         login = findViewById(R.id.login_button);
         signup = findViewById(R.id.tosignup_button);
         qqLogin= findViewById(R.id.qq_button);
-
+        background = findViewById(R.id.background);
+        Glide.with(this).load(R.drawable.findme_background)
+                /*.apply(bitmapTransform(new BlurTransformation(6, 6)))*/
+                .into(background);
 
         qqLogin.setOnClickListener(new View.OnClickListener() {
             @Override

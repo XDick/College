@@ -18,9 +18,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.college.xdick.findme.adapter.ActivityAdapter;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.MainActivity;
@@ -42,7 +44,10 @@ import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 
+import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+
+import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
 
 /**
@@ -50,7 +55,7 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
  */
 
 public  class DynamicsFragment extends BaseFragment {
-    View rootview;
+
     private RecyclerView recyclerView;
 
     private MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
@@ -67,7 +72,7 @@ public  class DynamicsFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootview =inflater.inflate(R.layout.fragment_dynamics,container,false);
+        rootView =inflater.inflate(R.layout.fragment_dynamics,container,false);
 
         initBaseView();
 
@@ -90,7 +95,7 @@ public  class DynamicsFragment extends BaseFragment {
 
 
 
-        return rootview;
+        return rootView;
     }
 
 
@@ -106,7 +111,13 @@ public  class DynamicsFragment extends BaseFragment {
       /*  toolbar = rootview.findViewById(R.id.toolbar_main);
         toolbar.setTitle("");
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);*/
-        swipeRefresh = rootview.findViewById(R.id.swipe_refresh_main);
+
+        ImageView background = rootView.findViewById(R.id.background);
+        Glide.with(this).load(R.drawable.findme_background)
+                .apply(bitmapTransform(new BlurTransformation(4, 3)))
+                .into(background);
+
+      swipeRefresh = rootView.findViewById(R.id.swipe_refresh_main);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -115,7 +126,7 @@ public  class DynamicsFragment extends BaseFragment {
             }
         });
 
-         floatingActionButton = rootview.findViewById(R.id.floatactionbutton);
+         floatingActionButton = rootView.findViewById(R.id.floatactionbutton);
          floatingActionButton.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View v) {
@@ -149,7 +160,7 @@ public  class DynamicsFragment extends BaseFragment {
 
     private void initRecyclerView(){
 
-        recyclerView = rootview.findViewById(R.id.recyclerview_main);
+        recyclerView = rootView.findViewById(R.id.recyclerview_main);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new DynamicsAdapter(dynamicsList);
@@ -206,9 +217,10 @@ public  class DynamicsFragment extends BaseFragment {
           final List<String> list =new ArrayList<>(Arrays.asList(following));
           list.add(bmobUser.getObjectId());
 
-          query.addWhereContainedIn("userId", list);
+          query.addWhereContainedIn("myUser", list);
           query.order("-createdAt");
           query.setLimit(20);
+          query.include("myUser[avatar|username]");
           query.setSkip(size);
           final int listsize = dynamicsList.size();
 

@@ -38,7 +38,7 @@ import cn.bmob.v3.listener.UpdateListener;
  */
 
 public class MyInterestActivity extends BaseActivity {
-    private   LabelsView myTagLabel,myTagLabelmain,myTagLabeladd;
+    private   LabelsView myTagLabel,myTagLabelmain,myTagLabeladd,labelsView_sub;
     private   Button add,delete,createButton;
     private   LinearLayout layout,chooselayout ;
     private   TextView mytagText,createText;
@@ -47,6 +47,7 @@ public class MyInterestActivity extends BaseActivity {
     private  List< String> selectTagList = new ArrayList<>();
     private  List<String> selectAddTagList= new ArrayList<>();
     private  List< MainTagBean> mainTagList = new ArrayList<>();
+    private  List<String> subTagList= new ArrayList<>();
     private  List< AddTagBean> addTagList = new ArrayList<>();
     private String createdTag="";
     private EditText createE;
@@ -75,12 +76,38 @@ public class MyInterestActivity extends BaseActivity {
         myTagLabel = findViewById(R.id.mytag_labels);
         myTagLabel.setLabels(Arrays.asList(user.getTag()));
         myTagLabelmain = findViewById(R.id.mytag_main_labels);
+        labelsView_sub = findViewById(R.id.setac_sub_labels);
 
 
         myTagLabelmain.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
             @Override
             public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
                 if (isSelect) {
+                    subTagList.clear();
+                    for (String tag : Arrays.asList(mainTagList.get(position).getSubTag())) {
+
+                        if(user.getTag()!=null) {
+                            if (Arrays.toString(user.getTag()).contains(tag)) {
+                                continue;
+                            }
+                            subTagList.add(tag);}
+                    }
+
+                    labelsView_sub.setLabels(subTagList);
+
+                } else {
+                    labelsView_sub.setLabels(null);
+                }
+
+            }
+        });
+
+        labelsView_sub.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
+            @Override
+            public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
+
+                if (isSelect) {
+
                     selectAddTagList.add(label.getText().toString());
                 } else {
                     selectAddTagList.remove(label.getText().toString());
@@ -88,7 +115,6 @@ public class MyInterestActivity extends BaseActivity {
 
             }
         });
-
         myTagLabeladd = findViewById(R.id.mytag_add_labels);
 
 
@@ -330,12 +356,10 @@ public class MyInterestActivity extends BaseActivity {
     private void initLabels(){
        addTagList.clear();
        mainTagList.clear();
+       subTagList.clear();
         BmobQuery<AddTagBean> query2 = new BmobQuery<AddTagBean>();
-
-//返回50条数据，如果不加上这条语句，默认返回10条数据
         query2.setLimit(50);
         query2.order("-updatedAt");
-//执行查询方法
         query2.findObjects(new FindListener<AddTagBean>() {
             @Override
             public void done(List<AddTagBean> object, BmobException e) {
@@ -350,8 +374,6 @@ public class MyInterestActivity extends BaseActivity {
                         addTagList.add(tag);
                     }
 
-                    //Collections.sort(addTagList);
-                   // Collections.reverse(addTagList); // 倒序排列
 
                     myTagLabeladd.setLabels(addTagList, new LabelsView.LabelTextProvider<AddTagBean>() {
                         @Override
@@ -366,29 +388,16 @@ public class MyInterestActivity extends BaseActivity {
         });
 
         BmobQuery<MainTagBean> query = new BmobQuery<MainTagBean>();
-
-//返回50条数据，如果不加上这条语句，默认返回10条数据
-        query.setLimit(999);
-//执行查询方法
         query.findObjects(new FindListener<MainTagBean>() {
 
 
             @Override
             public void done(List<MainTagBean> object, BmobException e) {
                 if (e == null) {
-                    Log.d("", "遍历标签1");
-                    for (MainTagBean tag : object) {
-
-                        if(user.getTag()!=null) {
-                        if (Arrays.toString(user.getTag()).contains(tag.getMainTag())) {
-                                continue;
-                        }
-                            mainTagList.add(tag);}
-                    }
-                    myTagLabelmain.setLabels(mainTagList, new LabelsView.LabelTextProvider<MainTagBean>() {
+                    mainTagList.addAll(object);
+                    myTagLabelmain.setLabels(object, new LabelsView.LabelTextProvider<MainTagBean>() {
                         @Override
                         public CharSequence getLabelText(TextView label, int position, MainTagBean data) {
-                            //根据data和position返回label需要显示的数据。
                             return data.getMainTag();
                         }
                     });

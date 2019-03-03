@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<android.support.v7.widget.CardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="4dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardview_ac"
+    app:cardBackgroundColor="@color/colorPrimary"
+    android:layout_margin="1dp"
+    android:foreground="?attr/selectableItemBackground"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageView
+        android:layout_width = "match_parent"
+        android:layout_height = "match_parent"
+        android:scaleType="centerCrop"
+        android:id="@+id/cover_ac"/>
+
+
+
+
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginTop="40dp"
+    android:layout_marginBottom="40dp"
+    android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title_ac"
+            android:padding="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:shadowRadius="8"
+            android:shadowColor="#ff000000"
+            android:textColor="#ffffff"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            />
+    <TextView
+        android:layout_marginTop="5dp"
+        android:id="@+id/time_ac"
+        android:shadowRadius="8"
+        android:shadowColor="#ff000000"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:textSize="12sp"
+        />
+
+    <TextView
+        android:layout_marginTop="5dp"
+        android:id="@+id/join_ac"
+        android:layout_gravity="center"
+        android:shadowRadius="8"
+        android:shadowColor="#ff000000"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:text="0人参与"
+        android:textSize="12dp"
+        />
+</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:layout_margin="5dp">
+        <ImageView
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_gravity="center"
+            android:background="@drawable/face_white"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:padding="2dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:shadowRadius="8"
+            android:shadowColor="#ff000000"
+            android:textColor="#fff"
+            android:id="@+id/host_info"
+            android:textSize="10sp"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:orientation="horizontal"
+        android:layout_margin="2dp">
+        <ImageView
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_gravity="center"
+            android:background="@drawable/gps_white"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:padding="1dp"
+            android:shadowRadius="8"
+            android:shadowColor="#ff000000"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#fff"
+            android:id="@+id/gps_info"
+            android:textSize="10sp"/>
+
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
+

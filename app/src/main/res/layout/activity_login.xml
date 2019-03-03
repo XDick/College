@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<FrameLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:id="@+id/background"/>
+
+
+<LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary">
+    android:background="#72D72F31">
 
 
     <LinearLayout
@@ -54,6 +67,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:counterEnabled="true"
+            android:textColorHint="#FFD4D4"
             app:counterMaxLength="11"
             android:id="@+id/textInputLayout_account">
 
@@ -62,7 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_width="200dp"
         android:hint="用户名/手机号"
-        android:textColor="#ffcdcd"
+        android:textColor="#F8F8F8"
         android:textSize="14dp"
         android:inputType="text"
        />
@@ -92,7 +106,7 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
+            android:textColorHint="#FFD4D4"
             app:passwordToggleEnabled="true"
 
             app:passwordToggleDrawable="@drawable/passwordeye"
@@ -105,7 +119,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:hint="密码"
-            android:textColor="#ffcdcd"
+            android:textColor="#FFFFFF"
             android:textSize="14dp"
             android:inputType="textPassword"/>
         </android.support.design.widget.TextInputLayout>
@@ -143,6 +157,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:id="@+id/qq_button"
+        android:background="?attr/selectableItemBackground"
         android:layout_gravity="bottom|center"
         android:layout_marginBottom="35dp">
 <!--<TextView
@@ -152,9 +170,9 @@
     android:layout_marginTop="10dp"
     android:text="第三方登录"
     android:textColor="#fff"/>-->
-    <Button
+    <ImageView
         android:layout_marginTop="30dp"
-        android:id="@+id/qq_button"
+
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="center"
@@ -171,3 +189,5 @@
 </FrameLayout>
 
 </LinearLayout>
+
+</FrameLayout>

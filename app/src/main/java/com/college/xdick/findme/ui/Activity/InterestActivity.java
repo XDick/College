@@ -19,6 +19,7 @@ import com.college.xdick.findme.ui.Base.BaseActivity;
 import com.donkingliang.labels.LabelsView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,6 +37,7 @@ import cn.bmob.v3.listener.UpdateListener;
 public class InterestActivity extends BaseActivity {
    MyUser user = BmobUser.getCurrentUser(MyUser.class);
    List< String> selectTagList = new ArrayList<>();
+    List<MainTagBean> mainTagBeanList = new ArrayList<>();
     @Override
 
 
@@ -44,6 +46,7 @@ public class InterestActivity extends BaseActivity {
         setContentView(R.layout.activity_interest);
         final LabelsView labelsView =  findViewById(R.id.main_labels);
         final LabelsView labelsView2 = findViewById(R.id.add_labels);
+        final LabelsView labelsView_sub = findViewById(R.id.setac_sub_labels);
         Button confirm = findViewById(R.id.interest_confirm_button);
 
 
@@ -174,14 +177,9 @@ public class InterestActivity extends BaseActivity {
                   }
 
 
-//LabelsView可以设置任何类型的数据，而不仅仅是String。
-
 
                     BmobQuery<MainTagBean> query = new BmobQuery<MainTagBean>();
 
-//返回50条数据，如果不加上这条语句，默认返回10条数据
-                    query.setLimit(999);
-//执行查询方法
                     query.findObjects(new FindListener<MainTagBean>() {
 
 
@@ -189,7 +187,7 @@ public class InterestActivity extends BaseActivity {
                         public void done(List<MainTagBean> object, BmobException e) {
                             if (e == null) {
                                 Log.d("","遍历标签1");
-
+                                mainTagBeanList.addAll(object);
                                 labelsView.setLabels(object, new LabelsView.LabelTextProvider<MainTagBean>() {
                                     @Override
                                     public CharSequence getLabelText(TextView label, int position, MainTagBean data) {
@@ -210,17 +208,14 @@ public class InterestActivity extends BaseActivity {
 
 
                     BmobQuery<AddTagBean> query2 = new BmobQuery<AddTagBean>();
-
-//返回50条数据，如果不加上这条语句，默认返回10条数据
                     query2.setLimit(50);
-//执行查询方法
+                    query2.order("-updatedAt");
                     query2.findObjects(new FindListener<AddTagBean>() {
                         @Override
                         public void done(List<AddTagBean> object, BmobException e) {
                             if (e == null) {
 
-                                Collections.sort(object);
-                                Collections.reverse(object); // 倒序排列
+
                                 labelsView2.setLabels(object, new LabelsView.LabelTextProvider<AddTagBean>() {
                                     @Override
                                     public CharSequence getLabelText(TextView label, int position, AddTagBean data) {
@@ -234,25 +229,32 @@ public class InterestActivity extends BaseActivity {
                     });
 
 
-//标签的点击监听
 
-//标签的选中监听
                     labelsView.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
                         @Override
                         public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
                             if (isSelect) {
-                                selectTagList.add(label.getText().toString());
-                                Log.d("TAG", "数据" + label.getText().toString());
-                            } else {
 
-                                selectTagList.remove(label.getText().toString());
+                                labelsView_sub.setLabels(Arrays.asList(mainTagBeanList.get(position).getSubTag()));
+                                Log.d("TAG", "数据" + label.getText().toString());
                             }
 
                         }
                     });
 
 
+        labelsView_sub.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
+            @Override
+            public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
+                if (isSelect) {
+                    selectTagList.add(label.getText().toString());
+                    Log.d("TAG", "数据" + label.getText().toString());
+                } else {
+                    selectTagList.remove(label.getText().toString());
+                }
 
+            }
+        });
 //标签的选中监听
                     labelsView2.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
                         @Override

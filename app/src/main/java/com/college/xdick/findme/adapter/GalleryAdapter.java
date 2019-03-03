@@ -360,8 +360,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                        return;
                    }
                    BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-                   query.addWhereEqualTo("username", map.get(uriList.get(mPosition)).getUser());
-                   query.getObject(map.get(uriList.get(mPosition)).getUserId(), new QueryListener<MyUser>() {
+                   query.addWhereEqualTo("username", map.get(uriList.get(mPosition)).getMyUser().getUsername());
+                   query.getObject(map.get(uriList.get(mPosition)).getMyUser().getObjectId(), new QueryListener<MyUser>() {
 
                        @Override
                        public void done(final MyUser object, BmobException e) {
@@ -419,8 +419,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                                 return;
                             }
                             BmobQuery<MyUser> query = new BmobQuery<MyUser>();
-                            query.addWhereEqualTo("username", map.get(uriList.get(position)).getUser());
-                            query.getObject(map.get(uriList.get(position)).getUserId(), new QueryListener<MyUser>() {
+                            query.addWhereEqualTo("username", map.get(uriList.get(position)).getMyUser().getUsername());
+                            query.getObject(map.get(uriList.get(position)).getMyUser().getObjectId(), new QueryListener<MyUser>() {
 
                                 @Override
                                 public void done(final MyUser object, BmobException e) {

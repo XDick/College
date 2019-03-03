@@ -37,7 +37,7 @@ public class GalleryActivity extends BaseActivity {
     private List<String> picList= new ArrayList<>();
     private RecyclerView recyclerView;
     private String activityId;
-    private int LIMIT=2;
+    private int LIMIT=10;
     private int size=LIMIT;
     private boolean ifEmpty=false;
 
@@ -116,7 +116,7 @@ public class GalleryActivity extends BaseActivity {
         query.and(Arrays.asList(q1));
 
         query.addWhereEqualTo("activityId",activityId);
-        query.order("-likeCount");
+        query.order("-createdAt");
         query.setLimit(LIMIT);
         query.setSkip(size);
         query.findObjects(new FindListener<Dynamics>() {

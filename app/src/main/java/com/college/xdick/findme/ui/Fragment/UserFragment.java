@@ -63,7 +63,7 @@ import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
  */
 
 public class UserFragment extends BaseFragment {
-    private View rootview;
+
     private String picturePath;
     private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     private TextView user,setcountText,dynamicscountText;
@@ -77,33 +77,34 @@ public class UserFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootview =inflater.inflate(R.layout.fragment_user,container,false);
+        rootView =inflater.inflate(R.layout.fragment_user,container,false);
 
 
 
         startImagePicker();
         initView();
         BmobCheckIfLogin();
-        return rootview;
+        return rootView;
     }
 
     private void initView(){
-        user= rootview.findViewById(R.id.user_username);
-        avatar=rootview.findViewById(R.id.user_avatar);
-        maytag = rootview.findViewById(R.id.user_mytag);
-        setting = rootview.findViewById(R.id.setting);
+        user= rootView.findViewById(R.id.user_username);
+        avatar=rootView.findViewById(R.id.user_avatar);
+        maytag = rootView.findViewById(R.id.user_mytag);
+        setting = rootView.findViewById(R.id.setting);
 
-        setcountText = rootview.findViewById(R.id.user_set_count);
-        userset = rootview.findViewById(R.id.user_set);
-        userjoin = rootview.findViewById(R.id.user_join);
-        userlike=rootview.findViewById(R.id.user_like);
+        setcountText = rootView.findViewById(R.id.user_set_count);
+        userset = rootView.findViewById(R.id.user_set);
+        userjoin = rootView.findViewById(R.id.user_join);
+        userlike=rootView.findViewById(R.id.user_like);
 
-        dynamicscountText = rootview.findViewById(R.id.user_dynamics_count);
-        userdynamics = rootview.findViewById(R.id.user_dynamics);
-        TextView schoolText = rootview.findViewById(R.id.userschool);
-        background = rootview.findViewById(R.id.user_background);
+        dynamicscountText = rootView.findViewById(R.id.user_dynamics_count);
+        userdynamics = rootView.findViewById(R.id.user_dynamics);
+        TextView schoolText = rootView.findViewById(R.id.userschool);
+        background = rootView.findViewById(R.id.user_background);
         try {
             schoolText.setText("学校:"+ myUser.getSchool());
+
             SelectSchoolUtil.initPopView(getActivity(),null,schoolText, myUser);
             schoolText.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -244,7 +245,7 @@ public class UserFragment extends BaseFragment {
        });
 
 
-        waveView3 = (WaveView3) rootview.findViewById(R.id.wave_view);
+        waveView3 = (WaveView3) rootView.findViewById(R.id.wave_view);
         final FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-2,-2);
         lp.gravity = Gravity.BOTTOM|Gravity.CENTER;
         waveView3.setOnWaveAnimationListener(new WaveView3.OnWaveAnimationListener() {
@@ -254,9 +255,9 @@ public class UserFragment extends BaseFragment {
                 avatar.setLayoutParams(lp);
             }
         });
-        background.setColorFilter(Color.parseColor("#d72f31"), PorterDuff.Mode.DARKEN);
         Glide.with(this).load(myUser.getAvatar())
-                        .apply(bitmapTransform(new BlurTransformation(9, 7))
+                        .apply(bitmapTransform(new BlurTransformation
+                                (7, 7))
                         .error(R.drawable.head))
                         .into(background);
 

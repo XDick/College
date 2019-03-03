@@ -29,6 +29,7 @@ import cn.bmob.v3.listener.FindListener;
 public class AddTagActivity extends BaseActivity {
     private MyUser user = BmobUser.getCurrentUser(MyUser.class);
    private List<MainTagBean> mainTagList= new ArrayList<>();
+
     private MainTagAdapter adapter;
     private List<AddTagBean> addTagList= new ArrayList<>();
     private AddTagAdapter adapter2;
@@ -66,8 +67,7 @@ public class AddTagActivity extends BaseActivity {
 
     private void initData() {
         BmobQuery<MainTagBean> query = new BmobQuery<MainTagBean>();
-        query.setLimit(999);
-//执行查询方法
+
         query.findObjects(new FindListener<MainTagBean>() {
 
 
@@ -93,7 +93,6 @@ public class AddTagActivity extends BaseActivity {
         BmobQuery<AddTagBean> query2 = new BmobQuery<AddTagBean>();
         query2.setLimit(50);
         query2.order("-updatedAt");
-//执行查询方法
         query2.findObjects(new FindListener<AddTagBean>() {
 
 

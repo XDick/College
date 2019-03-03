@@ -115,7 +115,7 @@ public class HostNotifyActivity extends BaseActivity {
                     Map<String, Object> map = new HashMap<>();
                     map.put("activityid",activity.getObjectId());
                     map.put("activitycover",activity.getCover());
-                    map.put("activityhost",activity.getHostName());
+                    map.put("activityhost",activity.getHost().getUsername());
                     map.put("activitytime",activity.getTime());
                     map.put("activitytitle",activity.getTitle());
                     msg.setExtraMap(map);

@@ -67,7 +67,7 @@ import cn.bmob.v3.listener.UpdateListener;
  */
 
 public class MainActivityFragment extends BaseFragment {
-    private View rootView;
+
     private ViewPager mViewPager1;
     private TabLayout mTabLayout;
     private CityPickerView  mPicker;
@@ -306,7 +306,7 @@ public class MainActivityFragment extends BaseFragment {
 
                     ActivityFollowFragment fragment = ((ActivityFollowFragment) adapter.instantiateItem(mViewPager1, 0));
 
-                     fragment.setSORT(ifsort);
+                    fragment.setSORT(ifsort);
                     fragment.refresh();
 
                     break;

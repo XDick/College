@@ -49,17 +49,5 @@ public class ActivityFollowFragment extends ActivityBaseFragment {
         return query;
     }
 
-    @Override
-    protected void onCreateViewOperation() {
-        if (myUser!=null){
-            swipeRefresh.post(new Runnable() {
-                @Override
-                public void run() {
-                    swipeRefresh.setRefreshing(true);
-                    size=0;
-                    initData(REFRESH);
-                }
-            });
-        }
-    }
+
 }

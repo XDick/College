@@ -31,11 +31,10 @@ public class MyFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
             case 0:
                 return new ActivityFollowFragment();//第1页面的fragment
             case 1:
-                return new ActivityFragment();//第2页面的fragment
+                return new ActivityschoolFragment();
             case 2:
                 return new ActivitygpsFragment();//第3页面的fragment
-            case 3:
-                return new ActivityschoolFragment();//第4页面的fragment
+
         }
         return null;
     }

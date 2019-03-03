@@ -61,7 +61,6 @@ public class SearchFragment extends BaseFragment implements FragmentBackHandler 
    private static List<FindNews> newsList = new ArrayList<>();
     private FindNewsAdapter adapter;
     private SwipeRefreshLayout swipeRefresh;
-    private View rootView;
     private RecyclerView recyclerView;
     private Banner banner;
     private SearchView searchView;

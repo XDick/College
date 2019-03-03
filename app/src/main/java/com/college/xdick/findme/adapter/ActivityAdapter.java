@@ -27,6 +27,7 @@ import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
+import com.college.xdick.findme.ui.Activity.DetailActivityActivity;
 import com.college.xdick.findme.ui.Activity.MainActivity;
 
 import java.text.DateFormat;
@@ -80,7 +81,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
     static class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView place,title,host,time,join,gps,tag1,tag2,tag3,date,comment;
+        TextView place,title,host,time,join,gps,tag1,
+                tag2,tag3,tag4,date,comment;
         ImageView cover,avatar,finish;
         CardView cardView;
 
@@ -98,6 +100,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
             tag1 = view.findViewById(R.id.tag1_ac);
             tag2 = view.findViewById(R.id.tag2_ac);
             tag3 = view.findViewById(R.id.tag3_ac);
+            tag4 = view.findViewById(R.id.tag4_ac);
             date = view. findViewById(R.id.date_ac);
             avatar = view.findViewById(R.id.host_avatar);
             comment = view.findViewById(R.id.comment_ac);
@@ -239,18 +242,11 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         holder.time.setText(time);
         holder.title.setText(activity.getTitle());
         holder.place.setText(activity.getPlace());
-        holder.host.setText(activity.getHostName());
-        BmobQuery<MyUser> query = new BmobQuery();
-        query.getObject(activity.getHostId(), new QueryListener<MyUser>() {
-            @Override
-            public void done(MyUser myUser, BmobException e) {
-                if (e==null){
-                    Glide.with(mContext).load(myUser.getAvatar())
-                            .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
-                            .apply(bitmapTransform(new CircleCrop())).into(holder.avatar);
-                }
-            }
-        });
+        holder.host.setText(activity.getHost().getUsername());
+        Glide.with(mContext).load(activity.getHost().getAvatar())
+                .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
+                .apply(bitmapTransform(new CircleCrop())).into(holder.avatar);
+
 
 
         holder.comment.setText(activity.getCommentCount()+"评论");
@@ -266,6 +262,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         holder.tag1.setText(tag[0]);
         holder.tag2.setText(tag[1]);
         holder.tag3.setText(tag[2]);
+        holder.tag4.setText(tag[3]);
 
         //holder.cover.setColorFilter(Color.parseColor(color), PorterDuff.Mode.MULTIPLY);
 
@@ -273,14 +270,14 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
        if (gps!=null){
         holder.gps.setText(gps[2]);}
         Glide.with(mContext).load(activity.getCover())
-                .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new BlurTransformation(9, 3))).into(holder.cover);
+                .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))/*.apply(bitmapTransform(new BlurTransformation(9, 3)))*/.into(holder.cover);
 
            holder.join.setText( joincount +"人参与");
 
 
 
 
-        if (activity.getDate()+0.9*60*60*24*1000<((MainActivity)mContext).getBmobTime()){
+        if (activity.getDate()+0.9*60*60*24*1000<((DetailActivityActivity)mContext).bmobTime){
                holder.finish.setBackground(mContext.getDrawable(R.drawable.finish));
         }
 
@@ -289,7 +286,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         }
 
 
-          if (sdf2.format(new Date(((MainActivity)mContext).getBmobTime())).equals(sdf2.format(activity.getDate())))
+          if (sdf2.format(new Date(((DetailActivityActivity)mContext).bmobTime)).equals(sdf2.format(activity.getDate())))
         {
             holder.time.setTextColor(Color.parseColor("#e91111"));
             holder.date.setTextColor(Color.parseColor("#e91111"));

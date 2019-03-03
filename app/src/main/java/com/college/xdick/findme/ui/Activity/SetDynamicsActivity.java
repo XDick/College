@@ -208,13 +208,12 @@ public class SetDynamicsActivity extends BaseActivity {
                         dynamics.setActivityTitle(myActivity.getTitle());
                         dynamics.setActivityCover(myActivity.getCover());
                         dynamics.setActivityTime(myActivity.getTime());
-                        dynamics.setActivityHost(myActivity.getHostName());
+                        dynamics.setActivityHost(myActivity.getHost().getUsername());
                         dynamics.setActivityId(myActivity.getObjectId());
                     }
                     dynamics.setContent(content);
                     dynamics.setIfAdd2Gallery(false);
-                    dynamics.setUserId(BmobUser.getCurrentUser().getObjectId());
-                    dynamics.setUser(BmobUser.getCurrentUser().getUsername());
+                    dynamics.setMyUser(BmobUser.getCurrentUser(MyUser.class));
                     dynamics.setLikeCount(0);
                     dynamics.setReplycount(0);
                     finish();
@@ -279,9 +278,9 @@ public class SetDynamicsActivity extends BaseActivity {
                                     dynamics.setActivityTitle(myActivity.getTitle());
                                         dynamics.setActivityCover(myActivity.getCover());
                                         dynamics.setActivityTime(myActivity.getTime());
-                                        dynamics.setActivityHost(myActivity.getHostName());
+                                        dynamics.setActivityHost(myActivity.getHost().getUsername());
                                         dynamics.setActivityId(myActivity.getObjectId());
-                                        if (myActivity.getHostId().equals(myUser.getObjectId())){
+                                        if (myActivity.getHost().getObjectId().equals(myUser.getObjectId())){
                                             dynamics.setIfAdd2Gallery(ifAddPic2Ac);
                                         }else {
                                             dynamics.setIfAdd2Gallery(false);
@@ -290,8 +289,7 @@ public class SetDynamicsActivity extends BaseActivity {
 
                                     dynamics.setLikeCount(0);
                                     dynamics.setReplycount(0);
-                                    dynamics.setUserId(BmobUser.getCurrentUser().getObjectId());
-                                    dynamics.setUser(BmobUser.getCurrentUser().getUsername());
+                                    dynamics.setMyUser(BmobUser.getCurrentUser(MyUser.class));
                                     dynamics.addAll("picture", list1);
 
                                     dynamics.save(new SaveListener<String>() {
@@ -306,7 +304,7 @@ public class SetDynamicsActivity extends BaseActivity {
                                                     public void done(BmobException e) {
                                                  if (ifAddPic2Ac){
                                                      sendMessage(myUser.getUsername()+"请求添加图片到活动#"+myActivity.getTitle()+"#",
-                                                     new BmobIMUserInfo(myActivity.getHostId(),myActivity.getHostName(),""),
+                                                     new BmobIMUserInfo(myActivity.getHost().getObjectId(),myActivity.getHost().getUsername(),""),
                                                              content+";"+myActivity.getTitle(),objectId+";"+myActivity.getObjectId());
 
                                                  }
@@ -359,13 +357,14 @@ public class SetDynamicsActivity extends BaseActivity {
         BmobQuery<MyActivity> q2 = new BmobQuery<>();
 
         List<BmobQuery<MyActivity>> queries = new ArrayList<>();
-        q1.addWhereEqualTo("hostName",myUser.getUsername());
+        q1.addWhereEqualTo("host",myUser);
         q2.addWhereContainsAll("joinUser",Arrays.asList(myUser.getObjectId()));
 
         queries.add(q1);
         queries.add(q2);
         query.order("-createdAt");
         query.or(queries);
+        query.include("host[username|avatar]");
         query.findObjects(new FindListener<MyActivity>() {
             @Override
             public void done(List<MyActivity> list, BmobException e) {

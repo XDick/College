@@ -37,7 +37,7 @@ import cn.bmob.v3.listener.UpdateListener;
  */
 
 public class UserCenterActivityFragment extends BaseFragment {
-   private View rootView;
+
     private List<MyActivity> activityList= new ArrayList<>();
     private ActivityAdapter3 adapter;
     private MyUser nowUser ;
@@ -108,10 +108,11 @@ public class UserCenterActivityFragment extends BaseFragment {
     }
     public void initData(final int state){
         BmobQuery<MyActivity> query = new BmobQuery<>();
-        query.addWhereEqualTo("hostId",nowUser.getObjectId());
+        query.addWhereEqualTo("host",nowUser.getObjectId());
         query.order("-createdAt");
         query.setLimit(10);
         query.setSkip(size);
+        query.include("host[username|avatar]");
         final int listsize = activityList.size();
 
         query.findObjects(new FindListener<MyActivity>() {

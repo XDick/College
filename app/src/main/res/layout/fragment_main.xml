@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:SearchView="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    SearchView:layout_editor_absoluteX="244dp"
+    SearchView:layout_editor_absoluteY="0dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:fitsSystemWindows="true">
+
+
+
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:id="@+id/toolbar_ac"
+            android:theme="@style/FullToolbarTheme"
+            app:contentInsetEnd="0dp"
+            app:contentInsetLeft="0dp"
+            app:contentInsetRight="0dp"
+            app:contentInsetStart="0dp"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:layout_scrollFlags="scroll|enterAlways|snap">
+
+
+
+
+
+           <FrameLayout
+               android:layout_width="match_parent"
+               android:layout_height="match_parent">
+               <ImageView
+                   android:layout_width="match_parent"
+                   android:layout_height="?attr/actionBarSize"
+                   android:scaleType="centerCrop"
+                   android:id="@+id/background"/>
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#C1A71E20">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center"
+                android:layout_margin="10dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/gps_white" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#fff"
+                    android:id="@+id/gps_main_ac_toolbar"/>
+            </LinearLayout>
+
+
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="48dp"
+                android:id="@+id/logo"
+                android:layout_gravity="center"
+                android:background="@drawable/findme" />
+
+            <Button
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/search"
+                android:id="@+id/search_button"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="right|center" />
+</FrameLayout>
+           </FrameLayout>
+
+
+        </android.support.v7.widget.Toolbar>
+
+
+
+    </android.support.design.widget.AppBarLayout>
+        <km.lmy.searchview.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="5dp"
+            SearchView:hintText="输入用户名" />
+
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView_main"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <com.youth.banner.Banner
+                android:id="@+id/banner"
+                android:layout_width="match_parent"
+                android:layout_height="125dp"
+              />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="20dp"
+                    android:background="@color/colorPrimary"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="活动"
+                    android:textSize="15sp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/black"/>
+
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:id="@+id/all_activity_layout"
+                            android:layout_gravity="right|center"
+                           >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="全部"/>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/arrow_right"/>
+                        </LinearLayout>
+                    </FrameLayout>
+
+
+            </LinearLayout>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="85dp"
+    android:layout_marginTop="5dp"
+    android:orientation="horizontal">
+
+    <android.support.v7.widget.CardView
+        app:cardCornerRadius="10dp"
+        android:layout_width="0dp"
+        android:id="@+id/cardview1"
+        android:layout_height="match_parent"
+        android:foreground="?attr/selectableItemBackground"
+        android:layout_weight="1"
+        app:cardElevation="5dp"
+        android:layout_margin="3dp">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+       android:id="@+id/img_music"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/title1"
+            android:textStyle="bold"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:layout_margin="8dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="MUSIC"
+        android:textSize="20sp"
+
+        android:textColor="@color/white"
+        android:layout_marginTop="13dp"/>
+</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="学生演唱会、音乐节、Livehouse、古典音乐..."
+            android:textSize="8sp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/white" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+    <android.support.v7.widget.CardView
+        app:cardCornerRadius="10dp"
+        android:layout_width="0dp"
+        app:cardElevation="5dp"
+        android:id="@+id/cardview2"
+        android:layout_height="match_parent"
+        android:foreground="?attr/selectableItemBackground"
+        android:layout_weight="1"
+        android:layout_margin="3dp">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:id="@+id/img_study"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/title2"
+                    android:textStyle="bold"
+                    android:textSize="25sp"
+                    android:textColor="@color/white"
+                    android:layout_margin="8dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="STUDY"
+                    android:textSize="20sp"
+
+                    android:textColor="@color/white"
+                    android:layout_marginTop="13dp"/>
+            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="考研交流、雅思托福、学校课程、讲座..."
+                android:layout_marginStart="8dp"
+                android:textSize="8sp"
+                android:layout_marginEnd="10dp"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="85dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+    <android.support.v7.widget.CardView
+        app:cardCornerRadius="10dp"
+        android:id="@+id/cardview3"
+        app:cardElevation="5dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:foreground="?attr/selectableItemBackground"
+        android:layout_weight="1"
+        android:layout_margin="3dp">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:id="@+id/img_sports"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/title3"
+                    android:textStyle="bold"
+                    android:textSize="25sp"
+                    android:textColor="@color/white"
+                    android:layout_margin="8dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="SPORTS"
+                    android:textSize="20sp"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="13dp"/>
+            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="篮球觅、跑步觅、户外觅、健身房..."
+                android:textSize="8sp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+    <android.support.v7.widget.CardView
+        app:cardCornerRadius="10dp"
+        android:layout_width="0dp"
+        app:cardElevation="5dp"
+        android:clickable="true"
+        android:id="@+id/cardview4"
+        android:focusable="true"
+        android:layout_height="match_parent"
+        android:foreground="?attr/selectableItemBackground"
+        android:layout_weight="1"
+        android:layout_margin="3dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:id="@+id/img_party"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                   android:id="@+id/title4"
+                    android:textStyle="bold"
+                    android:textSize="25sp"
+                    android:textColor="@color/white"
+                    android:layout_margin="8dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="PARTY"
+                    android:textSize="20sp"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="13dp"/>
+            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="棋牌、KTV、电影觅、游戏觅..."
+                android:textSize="8sp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="10dp"
+                android:textColor="@color/white" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+
+</LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:layout_width="10dp"
+                        android:layout_height="20dp"
+                        android:background="@color/colorPrimary"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="推荐"
+                        android:textSize="15sp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="horizontal"
+                        android:id="@+id/recommend_activity_layout"
+                        android:layout_gravity="right|center"
+                        >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="换一换"/>
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:background="@drawable/arrow_right"/>
+                    </LinearLayout>
+                </FrameLayout>
+
+
+            </LinearLayout>
+
+
+
+
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerview_recommend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+
+                />
+
+
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+           <ImageView
+               android:layout_width="10dp"
+               android:layout_height="20dp"
+               android:background="@color/colorPrimary"
+               android:layout_marginStart="10dp"
+               android:layout_marginTop="10dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="我的行程"
+                android:textSize="15sp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="@color/black"/>
+            </LinearLayout>
+
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerview_join_ac"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+
+                   />
+
+
+
+
+</LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+    </android.support.design.widget.CoordinatorLayout>
+
+
+
+
+
+
+

@@ -55,10 +55,8 @@ public class SplashActivity extends Activity {
         final View view = View.inflate(this, R.layout.activity_splash, null);
         setContentView(view);
         super.onCreate(arg0);
-        List<MyActivity> list = new ArrayList<>();
         intent= new Intent(SplashActivity.this, MainActivity.class);
         intent.putExtra("TIME", 0);
-        intent.putExtra("LISTDATA", (Serializable) list);
 
     }
 
@@ -73,159 +71,50 @@ public class SplashActivity extends Activity {
 
     private void initData(){
 
-        //进入主页面
-        Bmob.getServerTime(new QueryListener<Long>() {
-            @Override
-            public void done(final Long aLong, BmobException e) {
 
-                if (e == null) {
-                    BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
-                    List<BmobQuery<MyActivity>> queries = new ArrayList<>();
-//返回50条数据，如果不加上这条语句，默认返回10条数据
+
                     if (bmobUser != null) {
-                      /*  String gps[] = bmobUser.getGps();
-                        if (gps != null) {
-                            query.addWhereEqualTo("gps", gps[1]);
-                        }*/
+                        IMconnectBomob();
+                        BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+                            @Override
+                            public void onChange(ConnectionStatus status) {
 
-
-                        String tag[] = bmobUser.getTag();
-                        if (tag!=null){
-
-
-                            if (tag.length==0){
-
-
-                                intent.putExtra("TIME", aLong * 1000L);
-                                if (bmobUser!=null){
-                                    BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
-                                        @Override
-                                        public void onChange(ConnectionStatus status) {
-
-                                            if (status.getMsg().equals("connected")) {
-                                                startActivity(intent);
-                                                finish();
-
-                                            }
-                                            else if (status.getMsg().equals("disconnect")){
-                                                IMconnectBomob();
-
-                                            }
-                                        }
-                                    });
-                                }
-                                else {
-
+                                if (status.getMsg().equals("connected")) {
                                     startActivity(intent);
                                     finish();
+
+                                } else if (status.getMsg().equals("disconnect")) {
+                                    IMconnectBomob();
+
                                 }
-                                IMconnectBomob();
-                                return;
-
-
                             }
-                            for (int i =0; i<tag.length;i++){
-                                BmobQuery<MyActivity> q = new BmobQuery<MyActivity>();
-                                q.addWhereContainsAll("tag",Arrays.asList(tag[i]));
-                                queries.add(q);
-                                query.or(queries);
+                        });
+                    } else {
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(2000);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
                             }
+                        });
 
-                        }
-                        else {
-                            intent.putExtra("TIME", aLong * 1000L);
-                            if (bmobUser!=null){
-                                BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
-                                    @Override
-                                    public void onChange(ConnectionStatus status) {
-
-                                        if (status.getMsg().equals("connected")) {
-                                            startActivity(intent);
-                                            finish();
-
-                                        }
-                                        else if (status.getMsg().equals("disconnect")){
-                                            IMconnectBomob();
-
-                                        }
-                                    }
-                                });
-                            }
-                            else {
-
-                                startActivity(intent);
-                                finish();
-                            }
-                            IMconnectBomob();
-                            return;
-                        }
-
-
-
+                        startActivity(intent);
+                        finish();
 
                     }
-                    //query.addWhereGreaterThan("date", aLong * 1000L - 60 * 60 * 24 * 1000);
 
-
-
-
-                     query.setLimit(10);
-
-                    query.order("-createdAt");
-//执行查询方法
-                    query.findObjects(new FindListener<MyActivity>() {
-                        @Override
-                        public void done(List<MyActivity> object, BmobException e) {
-
-                            if (e == null) {
-                                intent.putExtra("LISTDATA", (Serializable)object);
-                                intent.putExtra("TIME", aLong * 1000L);
-                            } else {
-                                Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-
-                            if (bmobUser!=null){
-                                BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
-                                    @Override
-                                    public void onChange(ConnectionStatus status) {
-
-                                        if (status.getMsg().equals("connected")) {
-                                            startActivity(intent);
-                                            finish();
-
-                                        }
-                                        else if (status.getMsg().equals("disconnect")){
-                                            IMconnectBomob();
-
-                                        }
-                                    }
-                                });
-                            }
-                            else {
-
-                             startActivity(intent);
-                             finish();
-                            }
-                            IMconnectBomob();
-                        }
-
-
-                    });
 
                 }
-                else {
-
-                    Toast.makeText(getBaseContext(),"无法连接服务器o(╥﹏╥)o"+'\n'+"请检查网络或重新打开应用", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
 
 
 
 
 
-    }
+
 
 
 
@@ -253,8 +142,6 @@ public class SplashActivity extends Activity {
         }
 }
     private void IMconnectBomob() {
-
-        final MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
         if (bmobUser != null) {
             if (!TextUtils.isEmpty(bmobUser.getObjectId())) {
                 BmobIM.connect(bmobUser.getObjectId(), new ConnectListener() {
@@ -271,7 +158,6 @@ public class SplashActivity extends Activity {
                             }
 
                         } else {
-
                             //连接失败
                             Toast.makeText(getBaseContext(),"无法连接服务器o(╥﹏╥)o"+'\n'+"请检查网络或重新打开应用", Toast.LENGTH_SHORT).show();
                         }

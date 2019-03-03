@@ -11,18 +11,17 @@ import cn.bmob.v3.BmobObject;
 public class MyActivity extends BmobObject implements Serializable ,Comparable<MyActivity>{
 
     String title;
-      String hostName;
      String hostSchool;
      String time;
      String place;
      String content;
      String cover;
      String[] gps;
-     String hostId;
      String[]joinUser;
      String[] picture;
     String[] tag;
     Integer commentCount;
+    MyUser host;
     long date;
 
     public String[] getGps() {
@@ -33,13 +32,7 @@ public class MyActivity extends BmobObject implements Serializable ,Comparable<M
         this.gps = gps;
     }
 
-    public String getHostId() {
-        return hostId;
-    }
 
-    public void setHostId(String host) {
-        this.hostId = host;
-    }
 
     public String[] getTag() {
         return tag;
@@ -92,13 +85,7 @@ public class MyActivity extends BmobObject implements Serializable ,Comparable<M
         this.cover = cover;
     }
 
-    public String getHostName() {
-        return hostName;
-    }
 
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
-    }
 
     public String getHostSchool() {
         return hostSchool;
@@ -131,6 +118,15 @@ public class MyActivity extends BmobObject implements Serializable ,Comparable<M
 
     public void setPicture(String[] picture) {
         this.picture = picture;
+    }
+
+
+    public MyUser getHost() {
+        return host;
+    }
+
+    public void setHost(MyUser host) {
+        this.host = host;
     }
 
     @Override

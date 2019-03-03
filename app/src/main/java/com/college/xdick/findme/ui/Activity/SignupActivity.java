@@ -7,8 +7,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyUser;
 
@@ -36,6 +38,7 @@ public class SignupActivity  extends BaseActivity {
    private Button signup,selectSchoolButton,sendIdentifyButton,confirmIdentityButton;
    private boolean ifConfirm=false;
    private String number;
+   private ImageView background;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,10 @@ public class SignupActivity  extends BaseActivity {
 
     private void initView(){
 
+        background = findViewById(R.id.background);
+        Glide.with(this).load(R.drawable.findme_background)
+                /*.apply(bitmapTransform(new BlurTransformation(6, 6)))*/
+                .into(background);
 
         accountEdit = findViewById(R.id.account_signup);
         passwordEdit =findViewById(R.id.password_signup);

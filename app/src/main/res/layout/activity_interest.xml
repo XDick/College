@@ -130,7 +130,28 @@
                 app:selectType="MULTI"
                 app:maxSelect="0" />
 
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_gravity="center"
+                android:background="#eaeaea"
+                android:layout_margin="10dp"/>
+            <com.donkingliang.labels.LabelsView
+                android:layout_margin="10dp"
+                android:id="@+id/setac_sub_labels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:labelBackground="@drawable/label_bg"
+                app:labelTextColor="@drawable/label_text_color"
+                app:labelTextSize="14sp"
+                app:labelTextPaddingBottom="5dp"
+                app:labelTextPaddingLeft="10dp"
+                app:labelTextPaddingRight="10dp"
+                app:labelTextPaddingTop="5dp"
+                app:lineMargin="10dp"
+                app:wordMargin="10dp"
+                app:selectType="MULTI"
+                app:maxSelect="1" />
 
             <TextView
                 android:layout_width="wrap_content"
