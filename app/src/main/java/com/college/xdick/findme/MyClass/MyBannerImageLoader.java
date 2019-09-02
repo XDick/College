@@ -24,7 +24,7 @@ public class MyBannerImageLoader extends ImageLoader {
 
 
         //Glide 加载图片简单用法
-        Glide.with(context).load(path).into(imageView);
+        Glide.with(context).load(new mGlideUrl(path +"!/scale/50")).into(imageView);
 
 /*
         //用fresco加载图片简单用法，记得要写下面的createImageView方法

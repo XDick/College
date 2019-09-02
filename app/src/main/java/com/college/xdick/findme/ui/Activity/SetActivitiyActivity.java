@@ -77,16 +77,19 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
     private  TextView picTitle,chooseText,createText,timeE;
     private Button createButton;
     private List<MainTagBean> mainTagBeanList = new ArrayList<>();
-    private Calendar now;
+    private Calendar now,end;
     private  List<String> selectTagList = new ArrayList<>();
     private  boolean ifcreateAdd =false;
     private  String usedAddTag="";
-    private String myTime;
     private  int day;
-    private long time;
+    private long time,endTime;
     private MyUser myUser = BmobUser.getCurrentUser(MyUser.class);
     private ImagePicker imagePicker ;
     private static String picturePath;
+    private int chooseCalendarCount=0;
+    private  long  nowtime =0,choosetime=0 ;
+
+    private   String startDate ,endDate;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -204,6 +207,7 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
         timeE.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                chooseCalendarCount=1;
                 now = Calendar.getInstance();
                 DatePickerDialog dpd = DatePickerDialog.newInstance(
                         SetActivitiyActivity.this,
@@ -449,7 +453,7 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
 
 
                 if(content.length()!=0&&title.length()!=0
-                        &&place.length()!=0&&date.length()!=0&&date.contains("年")
+                        &&place.length()!=0&&date.length()!=0&&date.contains(" - ")
                         &&!selectTagList.contains("")){
 
                  if (contentE.getText().toString().length()<=50){
@@ -491,13 +495,15 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
                                 activity.setCover(coverURL);
                                 activity.setHost(myUser);
                                 activity.setTitle(title);
-                                activity.setTime(date);
+                                activity.setTime(startDate);
+                                activity.setEndTime(endDate);
                                 activity.setContent(content);
                                 activity.setPlace(place);
                                 activity.setGps(gps);
                                 activity.setTag(tag);
                                 activity.setHostSchool(user.getSchool());
                                 activity.setDate(time);
+                                activity.setEndDate(endTime);
                                 activity.setCommentCount(0);
                                 activity.save(new SaveListener<String>() {
 
@@ -505,21 +511,20 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
                                     public void done(final String objectId, BmobException e) {
                                         if (e == null) {
 
-                                            Bmob.getServerTime(new QueryListener<Long>() {
-                                                @Override
-                                                public void done(Long aLong, BmobException e) {
+
                                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                                    String date = sdf.format(new Date(aLong * 1000L));
+                                                    String date = sdf.format(new Date(bmobTime));
                                                     user.setSetAcTime(date);
                                                     user.increment("setAcCount",1);
+                                                    user.increment("Exp",10);
                                                     user.update(new UpdateListener() {
                                                         @Override
                                                         public void done(BmobException e) {
 
                                                         }
                                                     });
-                                                }
-                                            });
+
+
 
 
                                             if (ifcreateAdd) {
@@ -631,66 +636,151 @@ public class SetActivitiyActivity extends BaseActivity implements TimePickerDial
 
     @Override
     public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
-       // DateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分");
-        time=time+hourOfDay*60*60*1000+minute*60*1000+second*1000;
-         String min=""+minute;
-        if (minute<10){min="0"+minute;}
+       if (chooseCalendarCount==1){
+           // DateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分");
+           time=time+hourOfDay*60*60*1000+minute*60*1000+second*1000;
+           String min=""+minute;
+           if (minute<10){min="0"+minute;}
 
-        String time = hourOfDay+":"+min;
-        myTime=myTime+" "+time;
+           String time = hourOfDay+":"+min;
+           startDate=startDate+" "+time;
+
+           timeE.setText(startDate);
+
+           end = Calendar.getInstance();
+           DatePickerDialog dpd = DatePickerDialog.newInstance(
+                   SetActivitiyActivity.this,
+                   end.get(Calendar.YEAR),
+                   end.get(Calendar.MONTH),
+                   end.get(Calendar.DAY_OF_MONTH)
+           );
+           dpd.setVersion(DatePickerDialog.Version.VERSION_2);
+           dpd.show(getFragmentManager(), "Datepickerdialog");
+           Toast.makeText(SetActivitiyActivity.this,"选择截止时间(最多1天)",Toast.LENGTH_SHORT).show();
+           chooseCalendarCount=2;
+       }
+       else if (chooseCalendarCount==2){
 
 
-        timeE.setText(myTime);
+
+           // DateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分");
+           endTime=endTime+hourOfDay*60*60*1000+minute*60*1000+second*1000;
+
+               if (endTime<time){
+                   timeE.setText("选择时间(15天内)");
+                   Toast.makeText(SetActivitiyActivity.this,"请选择正确的时间",Toast.LENGTH_SHORT).show();
+                   return;
+               }
+
+
+           String min=""+minute;
+           if (minute<10){min="0"+minute;}
+
+           String time = hourOfDay+":"+min;
+           endDate=endDate+" "+time;
+
+
+           timeE.setText(startDate+" - "+endDate);
+
+
+           chooseCalendarCount=0;
+
+       }
+
+
+
+
     }
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-         final String date = year+"年"+(monthOfYear+1)+"月"+dayOfMonth+"日";
-         myTime=date;
-        final  DateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
+
+
+        if (chooseCalendarCount==1){
+
+            final String date = year+"年"+(monthOfYear+1)+"月"+dayOfMonth+"日";
+            startDate=date;
+            final  DateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
+                    String  datestringnow = sdf.format(new Date(bmobTime));
+                    String datestring=date;
+                    Date date1=null;
+                    Date date3 =null;
+
+
+                    try {
+                        date1 =sdf.parse(datestring);
+                        date3 = sdf.parse(datestringnow);
+                    }
+                    catch (ParseException e2){
+                        e2.getMessage();
+                    }
+                     nowtime = date3.getTime();
+                     choosetime = date1.getTime();
+
+                    time= choosetime;
+
+                    day=(int) (choosetime-nowtime)/(1000*3600*24);
+
+                    if (day>=0&&day<=15) {
+                        TimePickerDialog tpd = TimePickerDialog.newInstance(
+                                SetActivitiyActivity.this,
+                                now.get(Calendar.HOUR),
+                                now.get(Calendar.MINUTE),
+                                false
+                        );
+                        tpd.setVersion(TimePickerDialog.Version.VERSION_2);
+                        tpd.show(getFragmentManager(), "Timepickerdialog");
+                    }
+                    else {
+
+                        Toast.makeText(SetActivitiyActivity.this,"请选择正确的时间",Toast.LENGTH_SHORT).show();
+                    }
 
 
 
-        Bmob.getServerTime(new QueryListener<Long>() {
-            @Override
-            public void done(Long aLong, BmobException e) {
-                String  datestringnow = sdf.format(new Date(aLong * 1000L));
-                String datestring=date;
-                Date date1=null;
-                Date date3 =null;
+        }
+        else if (chooseCalendarCount==2){
+            final String date = year+"年"+(monthOfYear+1)+"月"+dayOfMonth+"日";
+            endDate=date;
+            final  DateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
+
+            String datestring=date;
+            Date date1=null;
 
 
-                try {
-                    date1 =sdf.parse(datestring);
-                    date3 = sdf.parse(datestringnow);
-                }
-                catch (ParseException e2){
-                    e2.getMessage();
-                }
-                long  nowtime = date3.getTime();
-                long  choosetime = date1.getTime();
-
-                time= choosetime;
-
-                day=(int) (choosetime-nowtime)/(1000*3600*24);
-
-                if (day>=0&&day<=15) {
-                    TimePickerDialog tpd = TimePickerDialog.newInstance(
-                            SetActivitiyActivity.this,
-                            now.get(Calendar.HOUR),
-                            now.get(Calendar.MINUTE),
-                            false
-                    );
-                    tpd.setVersion(TimePickerDialog.Version.VERSION_2);
-                    tpd.show(getFragmentManager(), "Timepickerdialog");
-                }
-                else {
-
-                    Toast.makeText(SetActivitiyActivity.this,"请选择正确的时间",Toast.LENGTH_SHORT).show();
-                }
-
+            try {
+                date1 =sdf.parse(datestring);
             }
-        });
+            catch (ParseException e2){
+                e2.getMessage();
+            }
+            long  choosetime2 = date1.getTime();
+
+            endTime= choosetime2;
+
+            day=(int) (choosetime2-choosetime)/(1000*3600*24);
+
+            if (day>=0&&day<=1) {
+
+                TimePickerDialog tpd = TimePickerDialog.newInstance(
+                        SetActivitiyActivity.this,
+                        end.get(Calendar.HOUR),
+                        end.get(Calendar.MINUTE),
+                        false
+                );
+                tpd.setVersion(TimePickerDialog.Version.VERSION_2);
+                tpd.show(getFragmentManager(), "Timepickerdialog");
+            }
+            else {
+                timeE.setText("选择时间(15天内)");
+                Toast.makeText(SetActivitiyActivity.this,"请选择正确的时间",Toast.LENGTH_SHORT).show();
+            }
+
+
+        }
+
+
+
 
 
 

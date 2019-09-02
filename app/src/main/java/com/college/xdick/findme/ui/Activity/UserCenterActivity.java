@@ -21,10 +21,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.UserCenterFragmentStatePagerAdapter;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Base.BaseActivity;
+import com.college.xdick.findme.util.ExpUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,7 +58,7 @@ import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 public class UserCenterActivity extends BaseActivity {
     private ImageView background,avatar;
-    private TextView username,follow_text,fanscount ,followingcount,userschool;
+    private TextView username,follow_text,fanscount ,followingcount,userschool,expText;
     private MyUser myUser =BmobUser.getCurrentUser(MyUser.class);
     private ViewPager mViewPager1;
     private TabLayout mTabLayout;
@@ -105,6 +107,9 @@ public class UserCenterActivity extends BaseActivity {
         if (nowUser.getSchool()!=null){
             userschool.setText(nowUser.getSchool());
         }
+        expText = findViewById(R.id.user_exp);
+        expText.setText(ExpUtil.ConvertExp(nowUser.getExp()));
+        expText=ExpUtil.colorTextView(this,expText,nowUser.getExp());
 
 
 
@@ -255,9 +260,9 @@ public class UserCenterActivity extends BaseActivity {
         background=findViewById(R.id.center_background);
         avatar=findViewById(R.id.center_useravatar);
         username= findViewById(R.id.center_username);
-        Glide.with(this).load(nowUser.getAvatar())
+        Glide.with(this).load(new mGlideUrl(nowUser.getAvatar()+"!/fp/10000"))
                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(avatar);
-        Glide.with(this).load(nowUser.getAvatar())
+        Glide.with(this).load(new mGlideUrl(nowUser.getAvatar()+"!/fp/10000"))
                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new BlurTransformation(9, 7))
         ).into(background);
         message_layout.setOnClickListener(new View.OnClickListener() {

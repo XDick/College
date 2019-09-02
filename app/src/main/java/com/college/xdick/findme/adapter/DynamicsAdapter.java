@@ -39,7 +39,8 @@ import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.ChatActivity;
 import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
-import com.college.xdick.findme.ui.Fragment.DynamicsFragment;
+import com.college.xdick.findme.ui.Fragment.AllDynamicsFragment;
+import com.college.xdick.findme.ui.Fragment.MyDynamicsFragment;
 import com.college.xdick.findme.ui.Fragment.UserCenterDynamicsFragment;
 
 import com.jaeger.ninegridimageview.NineGridImageView;
@@ -118,8 +119,9 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
            private ViewPagerFixed pager;
        private int flag=0;
-       private     DynamicsFragment fragment1;
+       private MyDynamicsFragment fragment1;
        private UserCenterDynamicsFragment fragment2;
+      private AllDynamicsFragment fragment3;
 
 
 
@@ -180,13 +182,18 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
            this.flag=flag;
        }
 
-       public void setFragment(DynamicsFragment fragment){
+       public void setFragment(MyDynamicsFragment fragment){
         fragment1=fragment;
         fragmentNum=1;
        }
     public void setFragment(UserCenterDynamicsFragment fragment){
         fragment2=fragment;
         fragmentNum=2;
+    }
+
+    public void setFragment(AllDynamicsFragment fragment){
+        fragment3=fragment;
+        fragmentNum=3;
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -317,7 +324,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
       final Dynamics dynamics = mDynamicsList.get(realPos);
 
 
-                    Glide.with(mContext).load(dynamics.getMyUser().getAvatar())
+                    Glide.with(mContext).load(new mGlideUrl(dynamics.getMyUser().getAvatar() +"!/fp/3000"))
                             .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
 
 
@@ -343,7 +350,9 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
             @Override
             protected void onDisplayImage(Context context, ImageView imageView, String photo) {
-                Glide.with(mContext).load(new mGlideUrl(photo)) .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(imageView);
+                Glide.with(mContext).load(new mGlideUrl(photo) +"!/min/150")
+                        .apply(diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
+                        .into(imageView);
             }
 
             @Override
@@ -362,44 +371,61 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
 
         holder.gridImageView.setAdapter(mAdapter);
 
-      if (dynamics.getActivityTitle()==null){
+      if (dynamics.getActivity()==null){
           holder.cardView.setVisibility(GONE);
       }
       else {
+
+
           holder.cardView.setVisibility(View.VISIBLE);
 
-          holder.title.setText(dynamics.getActivityTitle());
+          if (dynamics.getActivity().getHost() == null) {
+              holder.title.setText("该活动已被删除");
 
-          holder.time2.setText(dynamics.getActivityTime());
+              holder.time2.setText("");
 
-          Glide.with(mContext).load(dynamics.getActivityCover())    .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover);
+              Glide.with(mContext).load(mContext.getDrawable(R.drawable.icon)).apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover);
 
-          holder.host.setText("由"+dynamics.getActivityHost()+"发起");
+              holder.host.setText("");
+              holder.cardView.setOnClickListener(new View.OnClickListener() {
+                  @Override
+                  public void onClick(View v) {
+                      //
 
-          holder.cardView.setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View v) {
-                BmobQuery<MyActivity> query = new BmobQuery<>();
-                query.include("host[avatar|username]");
-                query.getObject(dynamics.getActivityId(), new QueryListener<MyActivity>() {
-                    @Override
-                    public void done(MyActivity activity, BmobException e) {
-                   if (e==null){
+                  }
+              });
+          }  else {
 
-                       Intent intent = new Intent(mContext, ActivityActivity.class);
-                       intent.putExtra("ACTIVITY",activity);
-                       mContext.startActivity(intent);
-                   }
-                    }
-                });
+              holder.title.setText(dynamics.getActivity().getTitle());
+
+              holder.time2.setText(dynamics.getActivity().getTime());
+
+              Glide.with(mContext).load(new mGlideUrl(dynamics.getActivity().getCover() + "!/fp/5000")).apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover);
+
+              holder.host.setText("由" + dynamics.getActivity().getHost().getUsername() + "发起");
+
+              holder.cardView.setOnClickListener(new View.OnClickListener() {
+                  @Override
+                  public void onClick(View v) {
+                      BmobQuery<MyActivity> query = new BmobQuery<>();
+                      query.include("host[avatar|username|Exp]");
+                      query.getObject(dynamics.getActivity().getObjectId(), new QueryListener<MyActivity>() {
+                          @Override
+                          public void done(MyActivity activity, BmobException e) {
+                              if (e == null) {
+
+                                  Intent intent = new Intent(mContext, ActivityActivity.class);
+                                  intent.putExtra("ACTIVITY", activity);
+                                  mContext.startActivity(intent);
+                              }
+                          }
+                      });
 
 
-
-
-              }
-          });
+                  }
+              });
+          }
       }
-
 
 
 
@@ -428,7 +454,17 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                        }
                    });
 
-           if (dynamics.getMyUser().getUsername().equals(myUser.getUsername())|| myUser.isGod()){
+
+                   String username="";
+                  try{
+                      username=dynamics.getMyUser().getUsername();
+                  }
+                  catch (NullPointerException e){
+                      e.printStackTrace();
+                  }
+
+
+           if (username.equals(myUser.getUsername())|| myUser.isGod()){
 
                delete.setVisibility(View.VISIBLE);
                delete.setOnClickListener(new View.OnClickListener() {
@@ -453,13 +489,20 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                                                   case 1:
                                                   {
                                                       fragment1.setSize(0);
-                                                      fragment1.initData(DynamicsFragment.REFRESH);
+                                                      fragment1.initData(MyDynamicsFragment.REFRESH);
                                                       break;
                                                   }
                                                   case 2:
                                                       fragment2.setSize(0);
                                                       fragment2.initData(UserCenterDynamicsFragment.REFRESH);
                                                       break;
+
+                                                  case 3:
+                                                  {
+                                                      fragment3.setSize(0);
+                                                      fragment3.initData(MyDynamicsFragment.REFRESH);
+                                                      break;
+                                                  }
 
                                                       default:break;
 
@@ -565,6 +608,8 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                     if (dynamics.getPicture() == null) {
                         holder.gridImageView.setVisibility(GONE);
                     } else {
+
+
                         holder.gridImageView.setImagesData(Arrays.asList(dynamics.getPicture()));
                     }
 
@@ -820,6 +865,20 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                  savePop.showAtAnchorView(pager,YGravity.CENTER, XGravity.CENTER, 0, 0);
 
                  LinearLayout savepic = savePop.findViewById(R.id.save_pic);
+                LinearLayout downloadpic = savePop.findViewById(R.id.download_pic);
+                downloadpic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                downloadFile(mListPicPath.get(mPosition));
+                            }
+                        }).start();
+
+                        savePop.dismiss();
+                    }
+                });
                  savepic.setOnClickListener(new View.OnClickListener() {
                      @Override
                      public void onClick(View v) {
@@ -827,7 +886,7 @@ public class DynamicsAdapter extends RecyclerView.Adapter<DynamicsAdapter.ViewHo
                          new Thread(new Runnable() {
                              @Override
                              public void run() {
-                                 downloadFile(mListPicPath.get(mPosition));
+                                 downloadFile(mListPicPath.get(mPosition)+"!/scale/80");
                              }
                          }).start();
 

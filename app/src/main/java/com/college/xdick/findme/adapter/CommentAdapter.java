@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.MyActivity;
@@ -145,6 +146,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                                    myActivity.setDate(activity2.getDate());
                                    myActivity.increment("commentCount",-1);
                                    myActivity.update();
+
+                                /*   if (comment.getReplyComment()!=null){
+                                       Comment comment2 = new Comment();
+                                       comment2.setObjectId(comment.getReplyComment().getObjectId());
+                                       comment2.increment("replyNum",-1);
+                                       comment2.update();
+                                   }*/
                                    activity.myfragment.setSize(0);
                                    activity.myfragment.setCount(0);
                                    activity.myfragment.initComment(StartActivityFragment.REFRESH);
@@ -152,7 +160,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                                    deletePop.dismiss();
                                    Toast.makeText(mContext,"删除成功",Toast.LENGTH_SHORT).show();
                                }else {
-                                   Toast.makeText(mContext,"删除失败",Toast.LENGTH_SHORT).show();
+                                   Toast.makeText(mContext,"删除失败"+e.getMessage(), Toast.LENGTH_SHORT).show();
                                }
                            }
                        });
@@ -326,7 +334,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                         }
                     });
 
-                    Glide.with(mContext).load(object.getAvatar())
+                    Glide.with(mContext).load(new mGlideUrl(object.getAvatar() +"!/fp/5000"))
                             .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
                             .apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
 

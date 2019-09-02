@@ -5,6 +5,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
             android:fitsSystemWindows="true"
@@ -16,9 +17,13 @@
                 android:layout_height="match_parent"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:contentScrim="#00FFFFFF"
-
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 android:fitsSystemWindows="true">
-               <!-- app:layout_scrollFlags="scroll|exitUntilCollapsed"-->
+
+
+
+
+
                 <ImageView
                     android:id="@+id/background"
                     android:layout_width="match_parent"
@@ -29,24 +34,19 @@
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#C1A71E20">
+                    android:background="#C1A71E20"/>
+
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar_message"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
                     >
-                    <!--app:layout_scrollFlags="scroll|enterAlways|snap">-->
-
-                    <Button
-                        android:id="@+id/clear_button"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_gravity="right|center"
-                        android:layout_marginRight="10dp"
-                        android:background="@drawable/clear" />
-
+         <FrameLayout
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -54,6 +54,15 @@
                         android:text="消息"
                         android:textColor="#fff"
                         android:textSize="20sp" />
+                    <Button
+                        android:id="@+id/clear_button"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="right|center"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/clear" />
+         </FrameLayout>
+
                 </android.support.v7.widget.Toolbar>
 
 
@@ -68,7 +77,7 @@
                 app:tabTextColor="#e4e4e4"/>
 
 
-                </FrameLayout>
+
 
             </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -86,11 +95,13 @@
                 android:id="@+id/mViewPager1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginBottom="56dp"
                 >
 
             </android.support.v4.view.ViewPager>
 
         </RelativeLayout>
+
 
 
 

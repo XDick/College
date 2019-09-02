@@ -3,14 +3,18 @@ package com.college.xdick.findme.ui.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Base.BaseActivity;
+import com.college.xdick.findme.util.AppManager;
 import com.college.xdick.findme.util.SelectSchoolUtil;
 
 import org.json.JSONObject;
@@ -29,7 +33,8 @@ public class ModifyNameActivity extends BaseActivity {
     private Button signup,sendIdentifyButton,confirmIdentityButton;
     private boolean ifConfirm=false;
     private String number;
-    private String nickName=null;
+    private String nickName=BmobUser.getCurrentUser(MyUser.class).getUsername();
+    private ImageView background;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +52,10 @@ public class ModifyNameActivity extends BaseActivity {
 
     }
     private void initView(){
+        if (!TextUtils.isEmpty(getIntent().getStringExtra("NICKNAME"))){
+            nickName= getIntent().getStringExtra("NICKNAME");
+        }
 
-        nickName= getIntent().getStringExtra("NICKNAME");
         final String accessToken = getIntent().getStringExtra("ACCESSTOKEN");
         final String expires = getIntent().getStringExtra("EXPIRES");
         final String openID = getIntent().getStringExtra("OPENID");
@@ -65,7 +72,10 @@ public class ModifyNameActivity extends BaseActivity {
         mTextInputLayoutPhone.setCounterMaxLength(11);
         accountEdit.setText(nickName);
 
-
+        background = findViewById(R.id.background);
+        Glide.with(this).load(R.drawable.findme_background)
+                /*.apply(bitmapTransform(new BlurTransformation(6, 6)))*/
+                .into(background);
 
 
         sendIdentifyButton.setOnClickListener(new View.OnClickListener() {
@@ -126,7 +136,9 @@ public class ModifyNameActivity extends BaseActivity {
                 bu.setBannedReason("");
                 bu.setAvatar("http://bmob-cdn-18038.b0.upaiyun.com/2018/05/18/425ce45f40a6b2208074aa1dbce9f76c.png");
                 bu.setSchool("");
+                bu.setRegisterTime("");
                 bu.setSetAcCount(0);
+                bu.setExp(0);
                 bu.setDynamicsCount(0);
 
 
@@ -134,7 +146,7 @@ public class ModifyNameActivity extends BaseActivity {
                     if (ifConfirm && phoneEdit.getText().toString().equals(number)) {
                         bu.setMobilePhoneNumberVerified(true);
                         bu.setEmailVerified(false);
-                        bu.setFollowChartId("");
+
 
                         bu.update(BmobUser.getCurrentUser(MyUser.class).getObjectId(), new UpdateListener() {
                             @Override
@@ -149,9 +161,9 @@ public class ModifyNameActivity extends BaseActivity {
                                         @Override
                                         public void done(JSONObject userAuth,BmobException e) {
                                             if (e==null){
-                                                //Toast.makeText(ModifyNameActivity.this,"修改成功",Toast.LENGTH_SHORT).show();
+                                                AppManager.getAppManager().finishAllActivity();
                                                 startActivity(new Intent(ModifyNameActivity.this, MainActivity.class));
-                                                finish();
+
 
 
                                             }
@@ -179,12 +191,10 @@ public class ModifyNameActivity extends BaseActivity {
     }
     @Override
     public void onBackPressed() {
-        if (nickName==null){
+
             BmobUser.logOut();
             startActivity(new Intent(ModifyNameActivity.this,LoginActivity.class));
-        }
 
-        //
 
     }
 

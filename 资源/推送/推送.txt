@@ -1,0 +1,9 @@
+{"title":"好活动",
+
+"alert":"一定要参加",
+
+"type":"activity",
+
+"url":"d7e642fdad",
+
+"cover":"null"}

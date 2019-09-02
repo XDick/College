@@ -26,11 +26,13 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.college.xdick.findme.MyClass.DownLoadImageService;
 import com.college.xdick.findme.MyClass.ImageDownLoadCallBack;
 import com.college.xdick.findme.MyClass.PicDynamicsMap;
 import com.college.xdick.findme.MyClass.PicturePageAdapter;
 import com.college.xdick.findme.MyClass.ViewPagerFixed;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.MyActivity;
@@ -39,6 +41,7 @@ import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.GalleryActivity;
 import com.college.xdick.findme.ui.Activity.LoginActivity;
 import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
+import com.college.xdick.findme.util.AppManager;
 import com.zyyoona7.popup.EasyPopup;
 import com.zyyoona7.popup.XGravity;
 import com.zyyoona7.popup.YGravity;
@@ -232,14 +235,14 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
 
         if (realPos==0){
-            Glide.with(mContext).load(picUri)
+            Glide.with(mContext).load(new mGlideUrl(picUri +"!/fp/1000"))
                     .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new BlurTransformation(10, 8))).into(holder.pic);
 
             holder.more.setVisibility(View.VISIBLE);
         }
         else {
             holder.more.setVisibility(View.INVISIBLE);
-            Glide.with(mContext).load(picUri)
+            Glide.with(mContext).load(new mGlideUrl(picUri +"!/scale/40"))
                     .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.pic);
         }
 
@@ -315,7 +318,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         //创建dialog
         mDialog = new Dialog(mContext, R.style.PictureDialog);
         final Window window1 = mDialog.getWindow() ;
-        WindowManager m = ((Activity)mContext).getWindowManager();
+        final WindowManager m = ((Activity)mContext).getWindowManager();
         Display d = m.getDefaultDisplay(); // 获取屏幕宽、高用
         WindowManager.LayoutParams p = window1.getAttributes(); // 获取对话框当前的参数值
         p.height = (int) (d.getHeight() * 1.0); // 改变的是dialog框在屏幕中的位置而不是大小
@@ -354,8 +357,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                public void onClick(View v) {
 
                    if (MyUser.getCurrentUser(MyUser.class)==null){
+                      AppManager.getAppManager().finishAllActivity();
                        mContext.startActivity(new Intent(mContext,LoginActivity.class));
-                       ((Activity)mContext).finish();
                       // Toast.makeText(mContext,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                        return;
                    }
@@ -494,6 +497,20 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                 savePop.showAtAnchorView(pager, YGravity.CENTER, XGravity.CENTER, 0, 0);
 
                 LinearLayout savepic = savePop.findViewById(R.id.save_pic);
+                LinearLayout downloadpic = savePop.findViewById(R.id.download_pic);
+                downloadpic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                downloadFile(mListPicPath.get(mPosition));
+                            }
+                        }).start();
+
+                        savePop.dismiss();
+                    }
+                });
                 savepic.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -501,7 +518,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                downloadFile(mListPicPath.get(mPosition));
+                                downloadFile(mListPicPath.get(mPosition)+"!/scale/80");
                             }
                         }).start();
 

@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="59dp"
+    android:layout_marginBottom="56dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 <LinearLayout
     android:layout_width="match_parent"
@@ -21,17 +21,17 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="160dp">
+            android:layout_height="150dp">
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="160dp"
+                android:layout_height="150dp"
                 android:scaleType="centerCrop"
                 android:id="@+id/user_background"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#C1A71E20">
+                android:background="#5EA71E20">
 
             <com.college.xdick.findme.MyClass.WaveView3
                 android:id="@+id/wave_view"
@@ -43,8 +43,8 @@
 
             <ImageView
                 android:id="@+id/user_avatar"
-                android:layout_width="65dp"
-                android:layout_height="65dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:layout_gravity="center|bottom"
                 />
             </FrameLayout>
@@ -75,27 +75,111 @@
     android:layout_height="wrap_content"
     android:background="#fff"
     android:orientation="vertical">
-    <TextView
-        android:id="@+id/user_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#454545"
-        android:textSize="16sp"
-        android:layout_margin="15dp"
-        android:layout_gravity="center"
-        android:text="请先登录" />
 
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/relative"
+        android:layout_margin="2dp"
+        >
+        <TextView
+            android:id="@+id/user_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_centerInParent="true"
+            android:layout_alignParentBottom="true"
+            android:text="请先登录" />
+        <TextView
+            android:id="@+id/user_exp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#6D6D6D"
+            android:textSize="13sp"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@id/user_username"
+            android:layout_alignParentBottom="true"
+            android:text="Lv.0" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="1dp"
+        >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:id="@+id/layout"
+            android:orientation="vertical">
+        <ProgressBar
+            android:id="@+id/exp_progress"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="80dp"
+            android:layout_height="10dp"
+           android:progressDrawable="@drawable/progress_red"
+           android:visibility="visible"
+            android:max="100"
+            />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/exp_figure"
+                android:textSize="10sp"
+                android:textColor="#B9B9B9"/>
+        </LinearLayout>
+        <Button
+            android:id="@+id/button_register"
+            android:layout_width="40dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/join_button_radius_false"
+            android:textColor="@color/white"
+            android:layout_toEndOf="@id/layout"
+            android:textSize="10sp"
+            android:text="签到"/>
+
+
+    </RelativeLayout>
+
+
+
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+  >
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/userschool"
         android:textSize="13sp"
-        android:textColor="#4664f9"
+        android:layout_centerInParent="true"
+        android:textColor="#666666"
         android:layout_marginBottom="10dp"
-        android:layout_gravity="center"
         android:text="学校"/>
+    <ImageView
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="center"
+        android:id="@+id/userschool_edit"
+        android:layout_toRightOf="@+id/userschool"
 
+        android:layout_margin="5dp"
+        android:background="@drawable/edit_grey"/>
 
+</RelativeLayout>
 
 
     <LinearLayout
@@ -116,18 +200,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:id="@+id/user_set_count"
                 android:textColor="#f11d1d"
+                android:textStyle="bold"
                 android:layout_gravity="center"
                 android:layout_margin="5dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_margin="7dp"
                 android:text="我的活动"
-                android:textSize="15dp"
-                android:textColor="#1b1b1b"
+                android:textSize="15sp"
+                android:textColor="#363636"
                 android:layout_gravity="center" />
         </LinearLayout>
 
@@ -153,7 +238,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
-                android:textSize="20dp"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:id="@+id/user_dynamics_count"
                 android:textColor="#f11d1d"
                 android:layout_gravity="center"
@@ -162,19 +248,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="我的动态"
-                android:textSize="15dp"
-                android:textColor="#1b1b1b"
+                android:textSize="15sp"
+                android:textColor="#363636"
                 android:layout_gravity="center"
-                android:layout_margin="10dp"
+                android:layout_margin="7dp"
                />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
+
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="30dp"
+
+        android:layout_marginBottom="30dp"
+        android:elevation="15dp"
+        app:cardCornerRadius="8dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/user_join"
-        android:layout_marginTop="30dp"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
@@ -185,10 +286,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <ImageView
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_gravity="center"
-                android:background="@drawable/laptop"
+                android:background="@drawable/event_grey"
                 android:layout_margin="20dp"
                 />
             <TextView
@@ -211,8 +312,8 @@
 
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:background="@drawable/arrow_right"
                 android:layout_gravity="center"/>
         </LinearLayout>
@@ -235,10 +336,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <ImageView
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_gravity="center"
-                android:background="@drawable/like2"
+                android:background="@drawable/favorite_grey"
                 android:layout_margin="20dp"
                 />
             <TextView
@@ -261,8 +362,8 @@
 
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:background="@drawable/arrow_right"
                 android:layout_gravity="center"/>
         </LinearLayout>
@@ -284,8 +385,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <ImageView
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_gravity="center"
                 android:background="@drawable/mytag"
                 android:layout_margin="20dp"
@@ -308,13 +409,62 @@
             android:layout_weight="7"
             android:orientation="horizontal">
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:background="@drawable/arrow_right"
                 android:layout_gravity="center"/>
 
         </LinearLayout>
     </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/user_upgrade"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/update_grey"
+                        android:layout_margin="20dp"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="检查更新"
+                        android:textSize="15dp"
+                        android:textColor="#1b1b1b"
+                        android:layout_gravity="center"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="7"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/arrow_right"
+                        android:layout_gravity="center"/>
+
+                </LinearLayout>
+            </LinearLayout>
+
+</LinearLayout>
+    </android.support.v7.widget.CardView>
 
 </LinearLayout>
 

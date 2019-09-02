@@ -12,7 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="13dp"
         android:orientation="horizontal">
 
 
@@ -27,70 +27,43 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="8dp"
             android:orientation="vertical">
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="2dp"
-    android:layout_marginLeft="2dp"
-    android:layout_marginRight="2dp"
-    android:orientation="horizontal">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="horizontal">
+
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/activity_comment_username"
                  android:textColor="#262626"
-                android:textSize="15dp"
+                android:textStyle="bold"
+                android:layout_marginBottom="3dp"
+                android:textSize="15sp"
                />
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:layout_weight="1"
-        android:layout_height="wrap_content">
-<!--<ImageView
-    android:layout_width="15dp"
-    android:layout_height="15dp"
-    android:layout_gravity="end"
-    android:layout_marginRight="10dp"
-    android:background="@drawable/thumb_up"/>-->
 
-    </LinearLayout>
-</LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/activity_comment_time"
-                android:textSize="10dp"
-                android:layout_marginLeft="2dp"/>
+                android:layout_marginBottom="3dp"
+                android:textSize="10sp" />
 
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/activity_comment_content"
-                android:layout_marginLeft="3dp"
-                android:textIsSelectable="true"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="10dp"/>
-
+                android:textIsSelectable="true" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:layout_marginTop="5dp"
                 android:id="@+id/comment_replylayout"
-                android:layout_margin="10dp"
                 android:background="@drawable/recycler_decoration">
 
                 <TextView

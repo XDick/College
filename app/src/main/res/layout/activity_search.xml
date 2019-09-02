@@ -86,17 +86,43 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     >
-                <android.support.v7.widget.RecyclerView
-                    android:layout_width="match_parent"
-                    android:id="@+id/recyclerview_acplace"
-                    android:layout_height="wrap_content"/>
-            </RelativeLayout>
+                    <android.support.v7.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:id="@+id/recyclerview_acplace"
+                        android:layout_height="wrap_content"/>
+                </RelativeLayout>
 
 
 
             </LinearLayout>
 
 
+
+        <!--    <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:id="@+id/search_dynamics"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="参与者动态"
+                    android:layout_margin="10dp"
+                    android:textSize="15dp"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+                    <android.support.v7.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:id="@+id/recyclerview_dynamics"
+                        android:layout_height="wrap_content"/>
+                </RelativeLayout>
+
+
+
+            </LinearLayout>-->
 
         </LinearLayout>
 

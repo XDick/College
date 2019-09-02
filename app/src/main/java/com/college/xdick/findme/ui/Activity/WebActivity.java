@@ -25,16 +25,17 @@ public class WebActivity extends BaseActivity {
         setContentView(R.layout.activity_web);
         String url=getIntent().getStringExtra("URL");
         WebView webView =findViewById(R.id.webview);
-        webView.setInitialScale(150);//为25%，最小缩放等级
+        //webView.setInitialScale(150);//为25%，最小缩放等级
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         webView.getSettings().setJavaScriptEnabled(true);
         //支持屏幕缩放
         settings.setSupportZoom(true);
-        //settings.setBuiltInZoomControls(true);
+        settings.setBuiltInZoomControls(true);
         //不显示webview缩放按钮
         settings.setDisplayZoomControls(false);
 
+        settings.setLoadWithOverviewMode(true);
         webView.setWebViewClient(new WebViewClient());
         webView.loadUrl(url);
 

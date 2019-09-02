@@ -112,7 +112,7 @@ public class UserCenterActivityFragment extends BaseFragment {
         query.order("-createdAt");
         query.setLimit(10);
         query.setSkip(size);
-        query.include("host[username|avatar]");
+        query.include("host[username|avatar|Exp]");
         final int listsize = activityList.size();
 
         query.findObjects(new FindListener<MyActivity>() {

@@ -6,13 +6,24 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.widget.Toast;
 
+import com.college.xdick.findme.MyClass.BackHandlerHelper;
+import com.college.xdick.findme.MyClass.Screensaver;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Activity.InterestActivity;
+import com.college.xdick.findme.ui.Activity.LoginActivity;
 import com.college.xdick.findme.ui.Activity.MainActivity;
+import com.college.xdick.findme.ui.Activity.ModifyNameActivity;
+import com.college.xdick.findme.ui.Activity.SignupActivity;
+import com.college.xdick.findme.ui.Activity.SplashActivity;
 import com.college.xdick.findme.util.AppManager;
 
 import cn.bmob.newim.BmobIM;
@@ -23,100 +34,135 @@ import cn.bmob.newim.listener.ConnectStatusChangeListener;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity /*implements Screensaver.OnTimeOutListener*/ {
     private ProgressDialog dialog=null;
     private AlertDialog.Builder builder=null ;
     private  AlertDialog dialog2=null;
-    static private long bmobTime=0;
+    static protected long bmobTime;
+    static int pushNum=0;
+
+   // static private Screensaver mScreensaver;
+   // static private boolean TIMEOUT=false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //将Activity实例添加到AppManager的堆栈
+    /*    TIMEOUT=false;
+
+            mScreensaver = new Screensaver(1000*10); //定时5秒
+            mScreensaver.setOnTimeOutListener(this); //监听
+            mScreensaver.start(); //开始计时*/
+
+
+
         AppManager.getAppManager().addActivity(this);
+        if (!(this instanceof MainActivity)&&!(this instanceof ModifyNameActivity)
+        &&!(this instanceof InterestActivity)
+                &&!(this instanceof LoginActivity)
+                &&!(this instanceof SignupActivity)){
 
+            //将Activity实例添加到AppManager的堆栈
 
-        if (BmobIM.getInstance().getCurrentStatus().equals(ConnectionStatus.DISCONNECT)){
-            IMconnectBomob();
-        }
-        BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
-            @Override
-            public void onChange(ConnectionStatus status) {
-               if (getBaseContext()==null){
-                   return;
-               }
-
-                if (BmobUser.getCurrentUser()!=null){
-                    if (status.getMsg().equals("connected")) {
-                        try {
-                            if (dialog!=null){
-                                dialog.dismiss();}
-                            if (dialog2!=null){
-                                dialog2.dismiss();}
-
-                        }catch (Exception e1){
-                            e1.printStackTrace();
-                        }
-
-
-                    }
-                    else if (status.getMsg().equals("connecting")) {
-
-
-                        try {
-                            if (dialog==null){
-                                initDialog1();
-                            }
-                            dialog.show();
-                            if (dialog2==null){
-                                initDialog2();
-                            }
-                            if (dialog2!=null) {
-                                dialog2.dismiss();
-                            }
-
-                        }catch (Exception e1){
-                            e1.printStackTrace();
-                        }
-
-                    }
-
-
-
-                    else {
-
-                        IMconnectBomob();
-
-
-                        try {
-                            if (dialog!=null){
-                                dialog.dismiss();
-                            }
-
-                            if (dialog2==null){
-                                initDialog2();
-                            }
-                            dialog2.show();
-
-
-                        }catch (Exception e1){
-                            e1.printStackTrace();
-                        }
-                    }
-                }
-               // Toast.makeText(getBaseContext(),status.getMsg(),Toast.LENGTH_SHORT).show();
-
-
+            if (bmobTime==0){
+                AppManager.getAppManager().finishAllActivity();
+               startActivity(new Intent(this, MainActivity.class));
             }
-        });
+
+
+
+
+            if (BmobIM.getInstance().getCurrentStatus().getMsg().equals("disconnect")){
+                IMconnectBomob();
+            }
+
+            BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
+                @Override
+                public void onChange(ConnectionStatus status) {
+                    if (getBaseContext()==null){
+                        return;
+                    }
+
+                    if (BmobUser.getCurrentUser()!=null){
+                        if (status.getMsg().equals("connected")) {
+                            try {
+                                if (dialog!=null){
+                                    dialog.dismiss();}
+                                if (dialog2!=null){
+                                    dialog2.dismiss();}
+
+                            }catch (Exception e1){
+                                e1.printStackTrace();
+                            }
+
+
+                        }
+                        else if (status.getMsg().equals("connecting")) {
+
+
+                            try {
+                                if (dialog==null){
+                                    initDialog1();
+                                }
+                                dialog.show();
+                                if (dialog2==null){
+                                    initDialog2();
+                                }
+                                if (dialog2!=null) {
+                                    dialog2.dismiss();
+                                }
+
+                            }catch (Exception e1){
+                                e1.printStackTrace();
+                            }
+
+                        }
+
+
+
+                        else {
+
+                            IMconnectBomob();
+
+
+                            try {
+                                if (dialog!=null){
+                                    dialog.dismiss();
+                                }
+
+                                if (dialog2==null){
+                                    initDialog2();
+                                }
+                                dialog2.show();
+
+
+                            }catch (Exception e1){
+                                e1.printStackTrace();
+                            }
+                        }
+                    }
+                    // Toast.makeText(getBaseContext(),status.getMsg(),Toast.LENGTH_SHORT).show();
+
+
+                }
+            });
+        }
+
 
     }
 
 
     @Override
     protected void onDestroy() {
+
+       // TIMEOUT=false;
+        if (!this.getClass().getName().equals("MainActivity")){
+
+            //将Activity实例从AppManager的堆栈中移除
+            AppManager.getAppManager().finishActivity(this);
+        }
+        //mScreensaver.stop(); //停止计时
         super.onDestroy();
-        //将Activity实例从AppManager的堆栈中移除
-        AppManager.getAppManager().finishActivity(this);
+
     }
 
     private void initDialog1() {
@@ -200,10 +246,13 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        if (BmobIM.getInstance().getCurrentStatus().equals(ConnectionStatus.DISCONNECT)){
+
+        if (BmobIM.getInstance().getCurrentStatus().getMsg()
+                .equals("disconnected")){
             IMconnectBomob();
         }
-        else if (BmobIM.getInstance().getCurrentStatus().equals(ConnectionStatus.CONNECTED))
+        else if (BmobIM.getInstance().getCurrentStatus().getMsg()
+                .equals("connected"))
         {  try {   if (dialog!=null){
             dialog.dismiss();}
             if (dialog2!=null){
@@ -214,17 +263,82 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
 
         }
+
+     /*   if (TIMEOUT)
+        {
+            TIMEOUT=false;
+            Intent intent=new Intent(this, SplashActivity.class);
+            String className = this.getLocalClassName();
+            intent.putExtra("CLASS",className);
+            Log.d("aaaa",this.getLocalClassName());
+            startActivity(intent);
+            mScreensaver.start();
+        }*/
         super.onResume();
     }
 
 
+
     @Override
     protected void onStart() {
-
-        if (BmobIM.getInstance().getCurrentStatus().equals(ConnectionStatus.DISCONNECT)){
-            IMconnectBomob();
+        pushNum=0;
+        if (!this.getClass().getName().equals("MainActivity")){
+            if (BmobIM.getInstance().getCurrentStatus().getMsg()
+                    .equals("disconnected")){
+                IMconnectBomob();
+            }
         }
+
+
         super.onStart();
 
     }
+    public long getBmobTime(){
+         return bmobTime;
+    }
+
+    public void setBmobTime(long bmobTime1){
+       bmobTime=bmobTime1;
+    }
+  /*  *//**
+     * 当触摸就会执行此方法
+     *//*
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        mScreensaver.resetTime(); //重置时间
+        TIMEOUT=false;
+        return super.dispatchTouchEvent(ev);
+    }
+
+  *//*  *//**//**
+     * 当使用键盘就会执行此方法
+     *//*
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        mScreensaver.resetTime(); //重置时间
+         TIMEOUT=false;
+        return super.dispatchKeyEvent(event);
+
+    }
+
+    *//**
+     * 时间到就会执行此方法
+     *//*
+    @Override
+    public void onTimeOut(Screensaver screensaver) {
+
+        TIMEOUT=true;
+        mScreensaver.stop();
+
+    }*/
+
+
+    @Override
+    public void onBackPressed() {
+        //TIMEOUT=false;
+        super.onBackPressed();
+    }
 }
+
+
+

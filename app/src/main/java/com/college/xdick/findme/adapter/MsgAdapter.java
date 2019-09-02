@@ -51,6 +51,7 @@ import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.ChatActivity;
 import com.college.xdick.findme.ui.Activity.MainDynamicsActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
+import com.college.xdick.findme.util.ClassFileHelper;
 import com.sqk.emojirelease.EmojiUtil;
 import com.zyyoona7.popup.EasyPopup;
 import com.zyyoona7.popup.XGravity;
@@ -78,6 +79,7 @@ import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListener;
+import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 import static android.view.View.GONE;
@@ -118,12 +120,13 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
 
          LinearLayout leftLayout,rightLayout,rightBackGround,leftBackGround;
 
-        TextView leftMsg,rightMsg,time,title,time2,host;
+        TextView leftMsg,rightMsg,time,title,time2,host,
+                time3,title2,host2;
 
-         ImageView avatar_me,avatar_you,cover
+         ImageView avatar_me,avatar_you,cover,cover2
                  ,rightImage,leftImage,sendError;
-        ContentLoadingProgressBar image_progress;
-        CardView cardView;
+        ContentLoadingProgressBar image_progress,image_progress2;
+        CardView cardView,cardView2;
 
 
         public viewHolder(View view) {
@@ -141,11 +144,17 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
              leftBackGround =view.findViewById(R.id.left_msg_layout);
             sendError= view.findViewById(R.id.send_error);
             title = view.findViewById(R.id.title_ac);
+            title2 = view.findViewById(R.id.title_ac2);
             cardView = view.findViewById(R.id.cardview_ac);
+            cardView2 = view.findViewById(R.id.cardview_ac2);
             cover = view.findViewById(R.id.cover_ac);
             time2 = view.findViewById(R.id.time_ac);
+            cover2 = view.findViewById(R.id.cover_ac2);
+            time3 = view.findViewById(R.id.time_ac2);
             image_progress= view.findViewById(R.id.image_progress);
+            image_progress2= view.findViewById(R.id.image_progress_left);
             host = view.findViewById(R.id.host_ac);
+            host2 = view.findViewById(R.id.host_ac2);
         }
         }
 
@@ -282,7 +291,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
         }
 
 
-        Glide.with(mContext).load(TextUtils.isEmpty(conversation.getConversationIcon()) ? msg.getBmobIMUserInfo().getAvatar():conversation.getConversationIcon())
+        Glide.with(mContext).load(new mGlideUrl(TextUtils.isEmpty(conversation.getConversationIcon()) ? msg.getBmobIMUserInfo().getAvatar():conversation.getConversationIcon()))
                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())
         .error(R.drawable.head)).into(holder.avatar_you);
 
@@ -312,90 +321,47 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
            }
        });
 
-        Glide.with(mContext).load(BmobUser.getCurrentUser(MyUser.class)
-                .getAvatar())
+        Glide.with(mContext).load(new mGlideUrl(BmobUser.getCurrentUser(MyUser.class)
+                .getAvatar() +"!/fp/2000"))
                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE).error(R.drawable.head)).apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(holder.avatar_me);
 
 
 
 
 
-        if (!msg.getExtra().contains("activityid")){
-            holder.cardView.setVisibility(GONE);
-        }
-        else {
-            holder.leftMsg.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
-                    , ViewGroup.LayoutParams.WRAP_CONTENT));
-            holder.cardView.setVisibility(View.VISIBLE);
-            try {
-                JSONObject json = new JSONObject( msg.getExtra());
-                String cover = json.getString("activitycover");
-                String title = json.getString("activitytitle");
-                String host = json.getString("activityhost");
-                String time2 = json.getString("activitytime");
-                final String id = json.getString("activityid");
-                holder.title.setText(title);
-
-                holder.time2.setText(time2);
-
-                Glide.with(mContext).load(cover)
-                        .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover);
-
-                holder.host.setText("由"+host+"发起");
-
-                holder.cardView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        BmobQuery<MyActivity> query = new BmobQuery<>();
-                        query.getObject(id, new QueryListener<MyActivity>() {
-                            @Override
-                            public void done(MyActivity activity, BmobException e) {
-                                if (e==null){
-
-                                    Intent intent = new Intent(mContext, ActivityActivity.class);
-                                    intent.putExtra("ACTIVITY",activity);
-                                    mContext.startActivity(intent);
-                                }
-                            }
-                        });
-
-
-
-
-                    }
-                });
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-
-
-
-        }
 
          holder.sendError.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View v) {
-                conversation.resendMessage(msg, new MessageSendListener() {
+                 BmobIMImageMessage message=null;
+                 if (msg.getMsgType().equals(BmobIMMessageType.IMAGE.getType())){
+                     message = BmobIMImageMessage.buildFromDB(true, msg);
+
+                  message.setExtra(msg.getExtra());
+
+                 }
+
+                conversation.resendMessage(message==null?msg:message, new MessageSendListener() {
                      @Override
                      public void onStart(BmobIMMessage msg) {
 
                          holder.sendError.setVisibility(View.GONE);
-                         holder.rightBackGround.setBackgroundResource(R.drawable.bubble_right_not);
+
+                        // holder.rightBackGround.setBackgroundResource(R.drawable.bubble_right_not);
 
                      }
 
                      @Override
                      public void done(BmobIMMessage bmobIMMessage, BmobException e) {
                          if (e==null){
-                             holder.rightBackGround.setBackgroundResource(R.drawable.bubble_right);
+
+
                          }
                          else {
-                             holder.sendError.setVisibility(View.VISIBLE);
+                             Toast.makeText(mContext,e.getMessage(),Toast.LENGTH_SHORT).show();
+                             notifyDataSetChanged();
                          }
                      }
-
-
 
 
                  });
@@ -403,11 +369,65 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
          });
         if(msg.getFromId().equals(currentUid)) {
 
+            if (!msg.getExtra().contains("activityid")){
+                holder.cardView2.setVisibility(GONE);
+            }
+            else {
+         /*   holder.leftMsg.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
+                    , ViewGroup.LayoutParams.WRAP_CONTENT));*/
+                holder.cardView2.setVisibility(View.VISIBLE);
+                try {
+                    JSONObject json = new JSONObject( msg.getExtra());
+                    String cover = json.getString("activitycover");
+                    String title = json.getString("activitytitle");
+                    String host = json.getString("activityhost");
+                    String time2 = json.getString("activitytime");
+                    final String id = json.getString("activityid");
+                    holder.title2.setText(title);
+
+                    holder.time3.setText(time2);
+
+                    Glide.with(mContext).load(new mGlideUrl(cover +"!/fp/2000"))
+                            .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover2);
+
+                    holder.host2.setText("由"+host+"发起");
+
+                    holder.cardView2.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            BmobQuery<MyActivity> query = new BmobQuery<>();
+                            query.include("host[avatar|username|Exp]");
+                            query.getObject(id, new QueryListener<MyActivity>() {
+                                @Override
+                                public void done(MyActivity activity, BmobException e) {
+                                    if (e==null){
+
+                                        Intent intent = new Intent(mContext, ActivityActivity.class);
+                                        intent.putExtra("ACTIVITY",activity);
+                                        mContext.startActivity(intent);
+                                    }
+                                }
+                            });
+
+
+
+
+                        }
+                    });
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+
+
+
+            }
+
             try {
 
                 if (msg.getMsgType().equals(BmobIMMessageType.IMAGE.getType()))
                 {
-                    holder.rightBackGround.setVisibility(GONE);
+                    holder.rightMsg.setVisibility(GONE);
                     holder.rightImage.setVisibility(View.VISIBLE);
                    final  List<String> localPath = new ArrayList<>();
                    localPath.add(null);
@@ -425,8 +445,9 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
                     if (msg.getSendStatus()== BmobIMSendStatus.SEND_FAILED.getStatus() ||msg.getSendStatus() == BmobIMSendStatus.UPLOAD_FAILED.getStatus()) {
                         holder.sendError.setVisibility(View.VISIBLE);
                         holder.image_progress.setVisibility(View.GONE);
+
                         Glide.with(mContext).
-                                load(localPath.get(localPath.size()-1))
+                                load(new mGlideUrl(localPath.get(localPath.size()-1) ))
                                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE).error(R.drawable.image_failed)).
                                 listener(new RequestListener<Drawable>() {
                                     @Override
@@ -447,7 +468,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
                                         holder.rightImage.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                showPictureDialog(position,
+                                                showPictureDialog(
                                                         localPath.get(localPath.size()-1));
                                             }
                                         });
@@ -459,7 +480,9 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
                     }
                     else if (msg.getSendStatus()== BmobIMSendStatus.SENDING.getStatus()) {
                            holder.image_progress.setVisibility(View.VISIBLE);
-                           Glide.with(mContext).load(R.drawable.black_pic).into(holder.rightImage);
+
+                           Glide.with(mContext).load(new mGlideUrl(localPath.get(localPath.size()-1))).apply(RequestOptions.bitmapTransform(new BlurTransformation())).
+                                   into(holder.rightImage);
                             holder.rightImage.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -490,7 +513,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
                                         holder.rightImage.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                showPictureDialog(position,
+                                                showPictureDialog(
                                                         localPath.get(localPath.size()-1));
                                             }
                                         });
@@ -527,21 +550,79 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
             holder.leftLayout.setVisibility(View.GONE);
         }
         else {
+
+
+            if (!msg.getExtra().contains("activityid")){
+                holder.cardView.setVisibility(GONE);
+            }
+            else {
+         /*   holder.leftMsg.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
+                    , ViewGroup.LayoutParams.WRAP_CONTENT));*/
+                holder.cardView.setVisibility(View.VISIBLE);
+                try {
+                    JSONObject json = new JSONObject( msg.getExtra());
+                    String cover = json.getString("activitycover");
+                    String title = json.getString("activitytitle");
+                    String host = json.getString("activityhost");
+                    String time2 = json.getString("activitytime");
+                    final String id = json.getString("activityid");
+                    holder.title.setText(title);
+
+                    holder.time2.setText(time2);
+
+                    Glide.with(mContext).load(new mGlideUrl(cover +"!/fp/2000"))
+                            .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover);
+
+                    holder.host.setText("由"+host+"发起");
+
+                    holder.cardView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            BmobQuery<MyActivity> query = new BmobQuery<>();
+                            query.include("host[avatar|username|Exp]");
+                            query.getObject(id, new QueryListener<MyActivity>() {
+                                @Override
+                                public void done(MyActivity activity, BmobException e) {
+                                    if (e==null){
+
+                                        Intent intent = new Intent(mContext, ActivityActivity.class);
+                                        intent.putExtra("ACTIVITY",activity);
+                                        mContext.startActivity(intent);
+                                    }
+                                }
+                            });
+
+
+
+
+                        }
+                    });
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+
+
+
+            }
             try {
                 if (msg.getMsgType().equals(BmobIMMessageType.IMAGE.getType()))
                 {  final  BmobIMImageMessage message = BmobIMImageMessage.buildFromDB(true, msg);
-                    holder.leftBackGround.setVisibility(GONE);
+                    holder.leftMsg.setVisibility(GONE);
                     holder.leftImage.setVisibility(View.VISIBLE);
+                    holder.image_progress2.setVisibility(View.VISIBLE);
 
                     Glide.with(mContext).
-                            load(new mGlideUrl(TextUtils.isEmpty(message.getRemoteUrl()) ? message.getLocalPath():message.getRemoteUrl()))
-                            .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE).error(R.drawable.image_failed)).
+                            load(message.getRemoteUrl()/*+"!/scale/80"*/ )
+                            .apply(diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC).error(R.drawable.image_failed)).
                             listener(new RequestListener<Drawable>() {
                              @Override
-                             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                             public boolean onLoadFailed(@Nullable final GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                 holder.image_progress2.setVisibility(View.GONE);
                                  holder.leftImage.setOnClickListener(new View.OnClickListener() {
                                      @Override
                                      public void onClick(View v) {
+                                     e.logRootCauses("失败了");
 
                                      }
                                  });
@@ -550,12 +631,12 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
 
                              @Override
                              public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-
+                                 holder.image_progress2.setVisibility(View.GONE);
                                  holder.leftImage.setOnClickListener(new View.OnClickListener() {
                                      @Override
                                      public void onClick(View v) {
-                                         showPictureDialog(position,
-                                                 TextUtils.isEmpty(message.getRemoteUrl()) ? message.getLocalPath():message.getRemoteUrl());
+                                         showPictureDialog(
+                                                 message.getRemoteUrl());
                                      }
                                  });
                                  return false;
@@ -604,7 +685,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
 
 
 
-    public void showPictureDialog(final int mPosition, final String uri) {
+    public void showPictureDialog( final String uri) {
 
 
 
@@ -647,7 +728,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
         PicturePageAdapter adapter = new PicturePageAdapter((ArrayList<String>) mListPicPath, mContext);
         pager.setAdapter(adapter);
         pager.setPageMargin(0);
-        pager.setCurrentItem(mPosition);
+        pager.setCurrentItem(0);
         window1.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         mDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
@@ -680,6 +761,20 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
 
                 savePop.showAtAnchorView(pager, YGravity.CENTER, XGravity.CENTER, 0, 0);
 
+                LinearLayout downloadpic = savePop.findViewById(R.id.download_pic);
+                downloadpic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                downloadFile(uri);
+                            }
+                        }).start();
+
+                        savePop.dismiss();
+                    }
+                });
                 LinearLayout savepic = savePop.findViewById(R.id.save_pic);
                 savepic.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -688,7 +783,7 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.viewHolder> {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                downloadFile(uri);
+                                downloadFile(uri+"!/scale/50");
                             }
                         }).start();
 

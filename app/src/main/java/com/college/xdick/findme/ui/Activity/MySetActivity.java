@@ -22,7 +22,7 @@ public class MySetActivity extends MyBaseActivity {
         query.order("-date");
         query.setLimit(10);
         query.setSkip(size);
-        query.include("host[username|avatar]");
+        query.include("host[username|avatar|Exp]");
         return query;
     }
 }

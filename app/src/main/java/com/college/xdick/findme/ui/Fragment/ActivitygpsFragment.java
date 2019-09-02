@@ -34,6 +34,7 @@ public class ActivitygpsFragment extends ActivityBaseFragment {
             ifEmpty=true;
             adapter.notifyDataSetChanged();
             swipeRefresh.setRefreshing(false);
+
             return null;
         }
         q2.addWhereEqualTo("hostSchool","泛觅");
@@ -41,7 +42,7 @@ public class ActivitygpsFragment extends ActivityBaseFragment {
         queries.add(q2);
         query.or(queries);
         if (order.equals("date")) {
-            query.addWhereGreaterThan("date", aLong * 1000L - 60 * 60 * 24 * 1000);
+            query.addWhereGreaterThan("endDate", aLong  );
         }
         query.order(order);
         query.setSkip(size);

@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
 
 import com.college.xdick.findme.bean.MyActivity;
@@ -29,6 +30,7 @@ import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.DetailActivityActivity;
 import com.college.xdick.findme.ui.Activity.MainActivity;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -72,7 +74,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
     private View mHeaderView;
     private View mFooterView;
     private View mEmptyView;
-    private DateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日");
+
 
 
 
@@ -81,8 +83,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
     static class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView place,title,host,time,join,gps,tag1,
-                tag2,tag3,tag4,date,comment;
+        TextView place,title,host,time,join,gps,tag1,endTime,
+        tag2,tag3,tag4,date,comment,endDate;
         ImageView cover,avatar,finish;
         CardView cardView;
 
@@ -105,6 +107,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
             avatar = view.findViewById(R.id.host_avatar);
             comment = view.findViewById(R.id.comment_ac);
             finish=view.findViewById(R.id.finished_ac);
+            endDate = view. findViewById(R.id.end_date_ac);
+            endTime = view.findViewById(R.id.end_time_ac);
         }
     }
 
@@ -226,24 +230,49 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
        String time = rawTime.substring(rawTime.indexOf(" "));
        String date = rawTime.substring(0,rawTime.indexOf(" "));
 
+        String endTime = activity.getEndTime().substring(activity.getEndTime().indexOf(" "));
+        String endDate = activity.getEndTime().substring(0,activity.getEndTime().indexOf(" "));
+
 
 
         final DateFormat sdf = new SimpleDateFormat("yyyy");
         String  nowYear = sdf.format(new Date( ));
         String year = date.substring(0,4);
         if (nowYear.equals(year)) {
-            holder.date.setText(date.substring(5));
+
+            if (date.equals(endDate)){
+                holder.date.setText(date.substring(5));
+                holder.endDate.setText( endDate.substring(5));
+                holder.endDate.setVisibility(View.INVISIBLE);
+            }
+            else {
+                holder.date.setText(date.substring(5));
+                holder.endDate.setText( endDate.substring(5));
+                holder.endDate.setVisibility(View.VISIBLE);
+            }
+
         }
         else
         {
-            holder.date.setText(date);
+            if (date.equals(endDate)){
+                holder.date.setText(date);
+                holder.endDate.setText( endDate);
+                holder.endDate.setVisibility(View.INVISIBLE);
+            }
+            else {
+                holder.date.setText(date);
+                holder.endDate.setText(endDate);
+                holder.endDate.setVisibility(View.VISIBLE);
+            }
+
         }
 
         holder.time.setText(time);
+        holder.endTime.setText(endTime);
         holder.title.setText(activity.getTitle());
         holder.place.setText(activity.getPlace());
         holder.host.setText(activity.getHost().getUsername());
-        Glide.with(mContext).load(activity.getHost().getAvatar())
+        Glide.with(mContext).load(new mGlideUrl(activity.getHost().getAvatar()+"!/fp/10000"))
                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
                 .apply(bitmapTransform(new CircleCrop())).into(holder.avatar);
 
@@ -269,7 +298,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
        if (gps!=null){
         holder.gps.setText(gps[2]);}
-        Glide.with(mContext).load(activity.getCover())
+        Glide.with(mContext).load(new mGlideUrl(activity.getCover()+"!/fp/20000"))
                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))/*.apply(bitmapTransform(new BlurTransformation(9, 3)))*/.into(holder.cover);
 
            holder.join.setText( joincount +"人参与");
@@ -277,7 +306,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
 
 
-        if (activity.getDate()+0.9*60*60*24*1000<((DetailActivityActivity)mContext).bmobTime){
+        if (activity.getEndDate()< ((BaseActivity)mContext).getBmobTime()){
                holder.finish.setBackground(mContext.getDrawable(R.drawable.finish));
         }
 
@@ -286,12 +315,18 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         }
 
 
-          if (sdf2.format(new Date(((DetailActivityActivity)mContext).bmobTime)).equals(sdf2.format(activity.getDate())))
+          if (activity.getDate()<=  ((BaseActivity)mContext).getBmobTime()
+                  && ((BaseActivity)mContext).getBmobTime()<=activity.getEndDate())
         {
             holder.time.setTextColor(Color.parseColor("#e91111"));
             holder.date.setTextColor(Color.parseColor("#e91111"));
             holder.time.setTypeface(Typeface.DEFAULT_BOLD);
             holder.date.setTypeface(Typeface.DEFAULT_BOLD);
+
+            holder.endTime.setTextColor(Color.parseColor("#e91111"));
+            holder.endDate.setTextColor(Color.parseColor("#e91111"));
+            holder.endTime.setTypeface(Typeface.DEFAULT_BOLD);
+            holder.endDate.setTypeface(Typeface.DEFAULT_BOLD);
 
         }
         else {
@@ -299,6 +334,11 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
               holder.date.setTextColor(Color.parseColor("#000000"));
               holder.time.setTypeface(Typeface.DEFAULT);
               holder.date.setTypeface(Typeface.DEFAULT);
+
+              holder.endTime.setTextColor(Color.parseColor("#000000"));
+              holder.endDate.setTextColor(Color.parseColor("#000000"));
+              holder.endTime.setTypeface(Typeface.DEFAULT);
+              holder.endDate.setTypeface(Typeface.DEFAULT);
           }
 
 

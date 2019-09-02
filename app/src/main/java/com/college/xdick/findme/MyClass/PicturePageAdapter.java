@@ -1,6 +1,7 @@
 package com.college.xdick.findme.MyClass;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v4.view.PagerAdapter;
 import android.util.SparseArray;
 import android.view.View;
@@ -8,12 +9,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.chrisbanes.photoview.OnPhotoTapListener;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.github.chrisbanes.photoview.PhotoViewAttacher;
 
 import java.util.ArrayList;
+
+import jp.wasabeef.glide.transformations.BlurTransformation;
+
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
 
 public class PicturePageAdapter extends PagerAdapter {
@@ -55,12 +62,25 @@ public class PicturePageAdapter extends PagerAdapter {
             //引入photoView
             PhotoView img = new PhotoView(mContext);
             try {
-                img.setBackgroundColor(0xff000000);
+               // img.setBackgroundColor(0xff000000);
+
+
+
+
                 //Glide需要自己去引入了
-                Glide
-                        .with(mContext)
-                        .load(mListUrls.get(arg1))
-                        .into(img);
+              /*  if (mListUrls.get(arg1).contains("http://bmob-cdn-18038.b0.upaiyun.com")){
+                    Glide.with(mContext)
+                            .load(mListUrls.get(arg1)*//*+"!/scale/80"*//*)
+                            .apply(diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
+                            .into(img);
+
+            }
+                else {*/
+                    Glide.with(mContext)
+                            .load(mListUrls.get(arg1))
+                            .apply(diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
+                            .into(img);
+                /*}*/
 
                 img.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 img.setOnPhotoTapListener(new OnPhotoTapListener() {

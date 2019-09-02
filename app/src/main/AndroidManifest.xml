@@ -95,6 +95,7 @@
         android:configChanges="orientation|screenSize|keyboardHidden"
         />
         <activity android:name=".ui.Activity.MapActivity"/>
+        <activity android:name=".ui.Activity.GoodsActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.LoginActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.SignupActivity"/>
         <activity android:name="com.college.xdick.findme.ui.Activity.SetDynamicsActivity"/>
@@ -124,7 +125,12 @@
         <activity android:name=".ui.Activity.MySetActivity"/>
         <activity android:name=".ui.Activity.MyLikeActivity"/>
 
-        <activity android:name="com.college.xdick.findme.ui.Activity.SplashActivity">
+        <activity android:name=".ui.Activity.SetGoodsActivity"/>
+
+        <activity android:name="com.college.xdick.findme.ui.Activity.SplashActivity"
+
+
+            >
         <intent-filter >
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
@@ -222,7 +228,6 @@
                  tools:replace="android:resource"
                 android:resource="@xml/file_paths" />
     </provider>
-
 
     </application>
 </manifest>

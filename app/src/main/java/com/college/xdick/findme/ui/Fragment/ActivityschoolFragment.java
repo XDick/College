@@ -22,7 +22,7 @@ public class ActivityschoolFragment extends ActivityBaseFragment {
 
         query.addWhereEqualTo("hostSchool",  BmobUser.getCurrentUser(MyUser.class).getSchool());
         if (order.equals("date")) {
-            query.addWhereGreaterThan("date", aLong * 1000L - 60 * 60 * 24 * 1000);
+            query.addWhereGreaterThan("endDate", aLong );
         }
         query.order(order);
         query.setSkip(size);

@@ -1,6 +1,7 @@
 package com.college.xdick.findme.ui.Activity;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.support.annotation.Nullable;
@@ -16,6 +17,7 @@ import com.college.xdick.findme.bean.AddTagBean;
 import com.college.xdick.findme.bean.MainTagBean;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Base.BaseActivity;
+import com.college.xdick.findme.util.AppManager;
 import com.donkingliang.labels.LabelsView;
 
 import java.util.ArrayList;
@@ -46,7 +48,19 @@ public class InterestActivity extends BaseActivity {
         setContentView(R.layout.activity_interest);
         final LabelsView labelsView =  findViewById(R.id.main_labels);
         final LabelsView labelsView2 = findViewById(R.id.add_labels);
-        final LabelsView labelsView_sub = findViewById(R.id.setac_sub_labels);
+        final LabelsView labelsView_sub1,labelsView_sub2 ,labelsView_sub3 ,
+                labelsView_sub4 ;
+        final List<LabelsView> labelsViewList = new ArrayList<>();
+        labelsView_sub1= findViewById(R.id.setac_sub_labels1);
+        labelsView_sub2= findViewById(R.id.setac_sub_labels2);
+        labelsView_sub3= findViewById(R.id.setac_sub_labels3);
+        labelsView_sub4= findViewById(R.id.setac_sub_labels4);
+
+        labelsViewList.add(labelsView_sub1);
+        labelsViewList.add(labelsView_sub2);
+        labelsViewList.add(labelsView_sub3);
+        labelsViewList.add(labelsView_sub4);
+
         Button confirm = findViewById(R.id.interest_confirm_button);
 
 
@@ -66,7 +80,13 @@ public class InterestActivity extends BaseActivity {
                 myUser1.update(new UpdateListener() {
                     @Override
                     public void done(BmobException e) {
-                       finish();
+                        Toast.makeText(InterestActivity.this,
+                                "提示:部分手机(如OV手机)需要系统里打开本应用通知权限才能接收消息o(╥﹏╥)o",
+                                Toast.LENGTH_LONG).show();
+
+                        AppManager.getAppManager().finishAllActivity();
+                        startActivity(new Intent(InterestActivity.this, MainActivity.class));
+
 
                     }
                 });
@@ -179,7 +199,7 @@ public class InterestActivity extends BaseActivity {
 
 
                     BmobQuery<MainTagBean> query = new BmobQuery<MainTagBean>();
-
+                    query.order("order");
                     query.findObjects(new FindListener<MainTagBean>() {
 
 
@@ -195,6 +215,10 @@ public class InterestActivity extends BaseActivity {
                                         return data.getMainTag();
                                     }
                                 });
+
+                                for (MainTagBean bean:object){
+                                    labelsViewList.get(bean.getOrder()-1).setLabels(Arrays.asList(bean.getSubTag()));
+                                }
 
                             } else {
 
@@ -235,15 +259,54 @@ public class InterestActivity extends BaseActivity {
                         public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
                             if (isSelect) {
 
-                                labelsView_sub.setLabels(Arrays.asList(mainTagBeanList.get(position).getSubTag()));
-                                Log.d("TAG", "数据" + label.getText().toString());
+                               labelsViewList.get(position).setVisibility(View.VISIBLE);
+                              //  Log.d("TAG", "数据" + label.getText().toString());
+                            }else {
+                                labelsViewList.get(position).setVisibility(View.GONE);
+
                             }
 
                         }
                     });
 
 
-        labelsView_sub.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
+        labelsView_sub1.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
+            @Override
+            public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
+                if (isSelect) {
+                    selectTagList.add(label.getText().toString());
+                    Log.d("TAG", "数据" + label.getText().toString());
+                } else {
+                    selectTagList.remove(label.getText().toString());
+                }
+
+            }
+        });
+        labelsView_sub2.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
+            @Override
+            public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
+                if (isSelect) {
+                    selectTagList.add(label.getText().toString());
+                    Log.d("TAG", "数据" + label.getText().toString());
+                } else {
+                    selectTagList.remove(label.getText().toString());
+                }
+
+            }
+        });
+        labelsView_sub3.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
+            @Override
+            public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
+                if (isSelect) {
+                    selectTagList.add(label.getText().toString());
+                    Log.d("TAG", "数据" + label.getText().toString());
+                } else {
+                    selectTagList.remove(label.getText().toString());
+                }
+
+            }
+        });
+        labelsView_sub4.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
             @Override
             public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
                 if (isSelect) {

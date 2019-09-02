@@ -55,6 +55,7 @@ public class ActivityMessage extends BmobIMExtraMessage {
                 acmsg.setActivityname(activityname);
                 String objectType = json.getString("type");
                 acmsg.setType(objectType);
+
             } else {
                 Log.d("","AddFriendMessage的extra为空");
             }

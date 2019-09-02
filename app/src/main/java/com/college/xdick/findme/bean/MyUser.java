@@ -39,10 +39,12 @@ public class MyUser extends BmobUser implements Serializable {
     private Integer dynamicsCount;
 
 
-    private String followChartId;
 
     private String bannedReason;
 
+    private Integer Exp;
+
+    private String registerTime;
 
 
 
@@ -136,9 +138,7 @@ public class MyUser extends BmobUser implements Serializable {
         this.dynamicsCount = dynamicsCount;
     }
 
-    public String getFollowChartId() {
-        return followChartId;
-    }
+
 
     public Boolean getBanned() {
         return isBanned;
@@ -148,9 +148,7 @@ public class MyUser extends BmobUser implements Serializable {
         isBanned = banned;
     }
 
-    public void setFollowChartId(String followChartId) {
-        this.followChartId = followChartId;
-    }
+
 
     public String getBannedReason() {
         return bannedReason;
@@ -158,6 +156,22 @@ public class MyUser extends BmobUser implements Serializable {
 
     public void setBannedReason(String bannedReason) {
         this.bannedReason = bannedReason;
+    }
+
+    public Integer getExp() {
+        return Exp;
+    }
+
+    public void setExp(Integer exp) {
+        Exp = exp;
+    }
+
+    public String getRegisterTime() {
+        return registerTime;
+    }
+
+    public void setRegisterTime(String registerTime) {
+        this.registerTime = registerTime;
     }
 }
 

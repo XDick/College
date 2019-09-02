@@ -54,7 +54,7 @@ public class MyGlideEngine implements ImageEngine {
     @Override
     public void loadImage(Context context, int resizeX, int resizeY, ImageView imageView, Uri uri) {
         RequestOptions options = new RequestOptions()
-                .centerCrop()
+               // .centerCrop()
                 .override(resizeX, resizeY)
                 .priority(Priority.HIGH);
         Glide.with(context)

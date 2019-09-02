@@ -13,7 +13,9 @@ import android.widget.TextView;
 
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.adapter.SearchActivityAdapter;
+import com.college.xdick.findme.adapter.SearchDynamicsAdapter;
 import com.college.xdick.findme.adapter.SearchUserAdapter;
+import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Base.BaseActivity;
@@ -36,11 +38,13 @@ public class SearchActivity extends BaseActivity {
 
      List<MyActivity> placeActivityList = new ArrayList<>();
      List<MyUser> userList = new ArrayList<>();
+    List<Dynamics> dynamicsList = new ArrayList<>();
      String searchMark;
      SearchActivityAdapter adapterPlace;
      SearchUserAdapter adapterUser;
+      SearchDynamicsAdapter adapterDynamics;
 
-    RecyclerView recyclerViewAcplace,recyclerViewUser;
+    RecyclerView recyclerViewAcplace,recyclerViewUser,recyclerViewDynamics;
 
 
 
@@ -73,7 +77,7 @@ public class SearchActivity extends BaseActivity {
         initRecyclerView();
         initUser();
         initPlace();
-
+       // initDynamics();
 
     }
 
@@ -105,6 +109,15 @@ public class SearchActivity extends BaseActivity {
         recyclerViewUser.setNestedScrollingEnabled(false);
         recyclerViewUser.setAdapter(adapterUser);
 
+
+       /* recyclerViewDynamics = findViewById(R.id.recyclerview_dynamics);
+        LinearLayoutManager layoutManager4 = new LinearLayoutManager(this);
+        recyclerViewDynamics.setLayoutManager(layoutManager4);
+
+        adapterDynamics = new SearchDynamicsAdapter(dynamicsList);
+        adapterDynamics.setSearchMark(searchMark);
+        recyclerViewDynamics.setNestedScrollingEnabled(false);
+        recyclerViewDynamics.setAdapter(adapterDynamics);*/
 
 
 
@@ -183,7 +196,7 @@ public class SearchActivity extends BaseActivity {
         BmobQuery<MyActivity> query = new BmobQuery<>();
         query.or(queries);
         query.setLimit(10);
-        query.include("host[username|avatar]");
+        query.include("host[username|avatar|Exp]");
         query.findObjects(new FindListener<MyActivity>() {
             @Override
             public void done(List<MyActivity> list, BmobException e) {
@@ -218,6 +231,62 @@ public class SearchActivity extends BaseActivity {
         });
 
     }
+
+   /* private void initDynamics(){
+
+        BmobQuery<Dynamics> q1 = new BmobQuery<>();
+        q1.addWhereEqualTo("activity[title]",searchMark);
+
+
+
+        BmobQuery<Dynamics> q4 = new BmobQuery<>();
+        q4.addWhereContainsAll("tag",Arrays.asList(searchMark));
+
+        List<BmobQuery<Dynamics>> queries = new ArrayList<>();
+        queries.add(q1);
+        //queries.add(q2);
+      //  queries.add(q3);
+    //    queries.add(q4);
+
+        BmobQuery<Dynamics> query = new BmobQuery<>();
+        query.or(queries);
+        query.setLimit(10);
+        query.include("myUser[avatar|username|school],activity[title|time|cover|].host.[username]");
+        query.findObjects(new FindListener<Dynamics>() {
+            @Override
+            public void done(List<Dynamics> list, BmobException e) {
+                if(e==null){
+
+
+                    if (list.size()>3){
+                        View footer = LayoutInflater.from(SearchActivity.this).inflate(R.layout.item_footer_search,recyclerViewAcplace, false);
+                        TextView more= footer.findViewById(R.id.footer_text);
+                        adapterDynamics.addFooterView(footer);
+                        adapterDynamics.setList(list);
+                        recyclerViewAcplace.setAdapter(adapterPlace);
+                        more.setText("查看更多");
+                    }
+                    Collections.reverse(list);
+                    for (Dynamics activity:list){
+
+                        dynamicsList.add(activity);
+                        if (placeActivityList.size()==3){
+                            break;
+                        }
+                        adapterPlace.notifyDataSetChanged();
+
+                    }
+
+
+
+
+
+                }
+            }
+        });
+
+    }*/
+
 
     @Override                //ToolBar上面的按钮事件
     public boolean onOptionsItemSelected(MenuItem item) {

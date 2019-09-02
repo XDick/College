@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -89,15 +90,17 @@ public class MessageFragment extends BaseFragment implements MessageListHandler 
     }
 
 
-    private void initRecyclerView(){
+    public void initRecyclerView(){
         RecyclerView recyclerView = rootView.findViewById(R.id.recyclerview_message);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new ActivityMessageAdapter(activityList);
+        adapter.setFragment(this);
         recyclerView.setAdapter(adapter);
+
     }
 
-    private void initData(){
+    public void initData(){
         try{
 
             activityList.clear();

@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.MyActivity;
@@ -214,7 +215,7 @@ public class ActivityAdapter3 extends RecyclerView.Adapter<ActivityAdapter3.View
 
 
 
-        Glide.with(mContext).load(activity.getCover())
+        Glide.with(mContext).load(new mGlideUrl(activity.getCover()+"!/fp/5000"))
                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new BlurTransformation(10, 8))).into(holder.cover);
 
 

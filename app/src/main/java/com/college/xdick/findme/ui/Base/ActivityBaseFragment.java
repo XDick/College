@@ -46,12 +46,14 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
     protected ActivityAdapter adapter;
     private String tag=null;
     private String subTag=null;
+    private long bmobTime =0;
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView =inflater.inflate(R.layout.fragment_activity,container,false);
         if (((DetailActivityActivity)getActivity()).tagBean!=null){
             tag = ((DetailActivityActivity)getActivity()).tagBean.getMainTag();
         }
+        bmobTime=((BaseActivity) getActivity()).getBmobTime();
 
 
         initBaseView();
@@ -158,18 +160,18 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
             swipeRefresh.setRefreshing(false);
             return;
         }*/
-        Bmob.getServerTime(new QueryListener<Long>() {
-            @Override
-            public void done(Long aLong, BmobException e) {
 
-                if (e==null){
-                    if (getContext()!=null) {
-                        ((DetailActivityActivity) getContext()).setBmobTime(aLong * 1000L);
-                    }
+
                     final int listsize = activityList.size();
                     BmobQuery<MyActivity> query ;
                     if(BmobUser.getCurrentUser(MyUser.class) !=null) {
-                        query = condition(order, aLong);
+                        query = condition(order,bmobTime);
+                        if (query==null){
+                            ifEmpty=true;
+                            adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                            adapter.notifyDataSetChanged();
+                            return;
+                        }
                     }
                         else {
                             query = new BmobQuery<>();
@@ -185,7 +187,7 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
                             query.addWhereContainsAll("tag", Arrays.asList(subTag));
                         }
 
-                        query.include("host[avatar|username]");
+                        query.include("host[avatar|username|Exp]");
                         query.findObjects(new FindListener<MyActivity>() {
                             @Override
                             public void done(List<MyActivity> object, BmobException e) {
@@ -237,11 +239,10 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
                             }
                         });
 
-                    }
 
 
-            }
-        });
+
+
     }
 
 

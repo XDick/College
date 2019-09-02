@@ -82,6 +82,7 @@
         android:background="@drawable/select_popup"
         android:clickable="true"
         android:id="@+id/update_setting"
+        android:visibility="gone"
         android:focusable="true"
         android:orientation="vertical">
 
@@ -90,6 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="15dp"
+
             android:text="检查更新"
             android:textSize="15sp" />
         <TextView

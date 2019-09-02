@@ -13,9 +13,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
+import com.college.xdick.findme.ui.Activity.MainActivity;
 
 import java.util.List;
 
@@ -122,6 +124,7 @@ public class ActivityAdapter4 extends RecyclerView.Adapter<ActivityAdapter4.View
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     int position = holder.getAdapterPosition();
                     MyActivity activity = mActivityList.get(position);
                     Intent intent = new Intent(mContext, ActivityActivity.class);
@@ -204,17 +207,18 @@ public class ActivityAdapter4 extends RecyclerView.Adapter<ActivityAdapter4.View
              holder.hostInfo.setText(activity.getHost().getUsername());
          }
 
-         try {
+         if (activity.getJoinUser()==null){
+             holder.join.setText("0人参与");
+         }else {
              holder.join.setText(activity.getJoinUser().length+"人参与");
          }
-         catch (Exception e){
-             e.printStackTrace();
-         }
 
 
 
 
-        Glide.with(mContext).load(activity.getCover())
+
+
+        Glide.with(mContext).load(new mGlideUrl(activity.getCover()+"!/fp/2000"))
                 .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new BlurTransformation(5, 4))).into(holder.cover);
 
 

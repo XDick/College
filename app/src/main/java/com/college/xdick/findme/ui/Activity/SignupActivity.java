@@ -142,9 +142,16 @@ public class SignupActivity  extends BaseActivity {
                 bu.setEmailVerified(false);
                 bu.setGod(false);
                 bu.setBanned(false);
+                bu.setExp(0);
+                bu.setRegisterTime("");
                 bu.setBannedReason("");
                 bu.setAvatar("http://bmob-cdn-18038.b0.upaiyun.com/2018/05/18/425ce45f40a6b2208074aa1dbce9f76c.png");
-                bu.setSchool("北京大学");
+                if (selectSchoolButton.getText().toString().equals("选择学校")){
+                    bu.setSchool(selectSchoolButton.getText().toString());
+                }
+                else {
+                    bu.setSchool("");
+                }
                 bu.setSetAcCount(0);
                 bu.setDynamicsCount(0);
                 if (password.length()<8){
@@ -155,7 +162,6 @@ public class SignupActivity  extends BaseActivity {
                    if (ifConfirm && phoneEdit.getText().toString().equals(number)) {
                         bu.setMobilePhoneNumberVerified(true);
                         bu.setEmailVerified(false);
-                        bu.setFollowChartId("");
                         bu.signUp(new SaveListener<MyUser>() {
                             @Override
                             public void done(final MyUser s, BmobException e) {

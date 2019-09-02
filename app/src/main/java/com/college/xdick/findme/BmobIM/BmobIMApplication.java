@@ -43,6 +43,9 @@ import cn.bmob.v3.exception.BmobException;
 //TODO 集成：1.7、自定义Application，并在AndroidManifest.xml中配置
 public class BmobIMApplication extends Application {
     private static BmobIMApplication INSTANCE;
+    private static int pushNum=0;
+    private static int pushNum_chat=0;
+
 
     public static BmobIMApplication INSTANCE() {
         return INSTANCE;
@@ -110,6 +113,22 @@ public class BmobIMApplication extends Application {
     }
 
 
+    public void clearPushNum(){
+        pushNum=0;
+        pushNum_chat=0;
+    }
+
+
+    public int addPushNum(){
+        return ++pushNum;
+    }
+
+
+
+
+    public int addPushNum_chat(){
+        return ++pushNum_chat;
+    }
 
 
 

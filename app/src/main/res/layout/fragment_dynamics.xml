@@ -17,18 +17,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-
-        <android.support.v7.widget.Toolbar
+   <!-- <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:id="@+id/toolbar_main"
+        android:background="@color/colorPrimary"
+        android:theme="@style/FullToolbarTheme"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:layout_scrollFlags="scroll|enterAlways|snap">
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:id="@+id/toolbar_main"
-            android:background="@color/colorPrimary"
-            android:theme="@style/FullToolbarTheme"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:layout_scrollFlags="scroll|enterAlways|snap">
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            android:layout_height="match_parent">
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
@@ -38,17 +37,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#C1A71E20">
-       <TextView
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="动态"
-           android:textSize="20sp"
-           android:layout_gravity="center"
-           android:textColor="#fff" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="动态"
+                    android:textSize="20sp"
+                    android:layout_gravity="center"
+                    android:textColor="#fff" />
             </FrameLayout>
-            </FrameLayout>
+        </FrameLayout>
 
-        </android.support.v7.widget.Toolbar>
+    </android.support.v7.widget.Toolbar>-->
+
 
 
 
@@ -72,17 +72,7 @@
 
 
 
-        <android.support.design.widget.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="75dp"
-            android:layout_gravity="bottom|end"
-            android:elevation="10dp"
-            app:backgroundTint="@color/colorPrimary"
-            android:src="@drawable/add_white"
-            android:id="@+id/floatactionbutton"
-            app:layout_behavior="com.college.xdick.findme.MyClass.FabBehavior"/>
+
     </android.support.design.widget.CoordinatorLayout>
 
 

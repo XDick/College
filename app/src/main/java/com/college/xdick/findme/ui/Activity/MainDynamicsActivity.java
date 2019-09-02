@@ -15,6 +15,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -133,6 +134,7 @@ public class MainDynamicsActivity extends BaseActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_dynamics);
         initRecycler();
@@ -245,7 +247,7 @@ public class MainDynamicsActivity extends BaseActivity {
         });
 
                     avatar=findViewById(R.id.dynamics_main_avatar);
-                    Glide.with(this).load(nowUser.getAvatar())
+                    Glide.with(this).load(new mGlideUrl(nowUser.getAvatar()+"!/fp/10000"))
                             .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new CropCircleTransformation())).into(avatar);
                     avatar.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -277,27 +279,45 @@ public class MainDynamicsActivity extends BaseActivity {
         host = findViewById(R.id.host_ac);
         join = findViewById(R.id.join_ac);
 
-        if (dynamics.getActivityTitle()==null){
+        if (dynamics.getActivity()==null){
             cardView.setVisibility(GONE);
         }
         else {
+
            cardView.setVisibility(View.VISIBLE);
+            if (dynamics.getActivity().getHost() == null) {
+                title.setText("该活动已被删除");
 
-            title.setText(dynamics.getActivityTitle());
+                time2.setText("");
 
-            time2.setText(dynamics.getActivityTime());
+                Glide.with(this).load(getDrawable(R.drawable.icon)).apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
+                        .into(cover);
 
-            Glide.with(this).load(dynamics.getActivityCover())
+                host.setText("");
+                cardView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //
+
+                    }
+                });
+            }
+            else {
+            title.setText(dynamics.getActivity().getTitle());
+
+            time2.setText(dynamics.getActivity().getTime());
+
+            Glide.with(this).load(new mGlideUrl(dynamics.getActivity().getCover()+"!/fp/5000"))
                     .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(cover);
 
-            host.setText("由"+dynamics.getActivityHost()+"发起");
+            host.setText("由"+dynamics.getActivity().getHost().getUsername()+"发起");
 
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     BmobQuery<MyActivity> query = new BmobQuery<>();
-                    query.include("host[avatar|username]");
-                    query.getObject(dynamics.getActivityId(), new QueryListener<MyActivity>() {
+                    query.include("host[avatar|username|Exp]");
+                    query.getObject(dynamics.getActivity().getObjectId(), new QueryListener<MyActivity>() {
                         @Override
                         public void done(MyActivity activity, BmobException e) {
                             if (e==null){
@@ -315,13 +335,14 @@ public class MainDynamicsActivity extends BaseActivity {
                 }
             });
         }
+        }
 
 
         mAdapter = new NineGridImageViewAdapter<String>() {
             @Override
             protected void onDisplayImage(Context context, ImageView imageView, String photo) {
-                Glide.with(MainDynamicsActivity.this).load(new mGlideUrl(photo))
-                        .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(imageView);
+                Glide.with(MainDynamicsActivity.this).load(new mGlideUrl(photo)+"!/min/150")
+                        .apply(diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC)).into(imageView);
             }
 
             @Override
@@ -393,16 +414,20 @@ public class MainDynamicsActivity extends BaseActivity {
         sendComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (editComment.getText().toString().isEmpty()){
+                if (TextUtils.isEmpty(editComment
+                        .getText().toString())){
                     return;
                 }
-
+                if (editComment
+                        .getText().toString().length()>150){
+                    Toast.makeText(MainDynamicsActivity.this,"字数不能大于150",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
                 if(ifReply){
                     replyComment.setContent(editComment.getText().toString());
                     replyComment.setUser(myUser);
                     replyComment.setReplyNum(0);
-                    fromComment.update();
                     final String content=editComment.getText().toString();
                     editComment.setText("");
                     replyComment.save(new SaveListener<String>() {
@@ -672,8 +697,8 @@ public class MainDynamicsActivity extends BaseActivity {
 
             case R.id.menu_delete_dynamics:
             {     MyUser myUser1 = new MyUser();
-                myUser1.setObjectId(myUser1.getObjectId());
-                myUser1.removeAll("dynamics", Arrays.asList(dynamics.getObjectId()));
+                myUser1.setObjectId(myUser.getObjectId());
+                myUser1.increment("dynamicsCount",-1);
                 myUser1.update(new UpdateListener() {
                     @Override
                     public void done(BmobException e) {
@@ -688,7 +713,7 @@ public class MainDynamicsActivity extends BaseActivity {
                                         Toast.makeText(MainDynamicsActivity.this,"成功删除",Toast.LENGTH_SHORT).show();
                                         finish();
                                         BmobQuery<DynamicsComment> query = new BmobQuery<>();
-                                        query.addWhereEqualTo("dynamicsID", dynamics.getObjectId());
+                                        query.addWhereEqualTo("dynamics", dynamics.getObjectId());
                                         query.findObjects(new FindListener<DynamicsComment>() {
                                             @Override
                                             public void done(List<DynamicsComment> list, BmobException e) {
@@ -759,7 +784,7 @@ public class MainDynamicsActivity extends BaseActivity {
                   public void done(List<MyUser> list, BmobException e) {
                       if (e==null){
                           if(!list.isEmpty()){  for (int i =0; i<list.size();i++) {
-                              Glide.with(MainDynamicsActivity.this).load(list.get(i).getAvatar())
+                              Glide.with(MainDynamicsActivity.this).load(new mGlideUrl(list.get(i).getAvatar()+"!/fp/5000"))
                                       .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).apply(bitmapTransform(new CropCircleTransformation())).into(avatarView[i]);
                               Log.d("","头像"+list.get(i).getAvatar());
                               if (i==5){
@@ -859,6 +884,20 @@ public class MainDynamicsActivity extends BaseActivity {
                 savePop.showAtAnchorView(pager, YGravity.CENTER, XGravity.CENTER, 0, 0);
 
                 LinearLayout savepic = savePop.findViewById(R.id.save_pic);
+                LinearLayout downloadpic = savePop.findViewById(R.id.download_pic);
+                downloadpic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                downloadFile(mListPicPath.get(mPosition));
+                            }
+                        }).start();
+
+                        savePop.dismiss();
+                    }
+                });
                 savepic.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -866,7 +905,7 @@ public class MainDynamicsActivity extends BaseActivity {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                downloadFile(mListPicPath.get(mPosition));
+                                downloadFile(mListPicPath.get(mPosition)+"!/scale/50");
                             }
                         }).start();
 

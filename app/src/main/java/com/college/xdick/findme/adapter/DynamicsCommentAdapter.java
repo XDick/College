@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Dynamics;
 import com.college.xdick.findme.bean.DynamicsComment;
@@ -73,14 +74,14 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
 
         public ViewHolder(View view){
             super(view);
-             username= view.findViewById(R.id.dynamics_comment_username);
-             content= view.findViewById(R.id.dynamics_comment_content);
-             time = view.findViewById(R.id.dynamics_comment_time);
-             avatar = view.findViewById(R.id.dynamics_comment_avatar);
-             replyto = view.findViewById(R.id.comment_fromwho_dynamics);
-             replycontent = view.findViewById(R.id.comment_fromcontent_dynamics);
-             replylayout=  view. findViewById(R.id.comment_replylayout_dynamics);
-             layout = view.findViewById(R.id.comment_layout_dynamics);
+            username= view.findViewById(R.id.activity_comment_username);
+            content= view.findViewById(R.id.activity_comment_content);
+            time = view.findViewById(R.id.activity_comment_time);
+            avatar = view.findViewById(R.id.activity_comment_avatar);
+            replyto = view.findViewById(R.id.comment_fromwho);
+            replycontent = view.findViewById(R.id.comment_fromcontent);
+            replylayout=  view. findViewById(R.id.comment_replylayout);
+            layout = view.findViewById(R.id.comment_layout);
 
         }
     }
@@ -104,7 +105,7 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
             return new ViewHolder(mFooterView);
         } else {
             View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_dynamics_comment,parent,false);
+                .inflate(R.layout.item_comment,parent,false);
        final   ViewHolder holder = new  DynamicsCommentAdapter.ViewHolder(view);
 
 
@@ -291,7 +292,7 @@ public class DynamicsCommentAdapter extends RecyclerView.Adapter<DynamicsComment
 
                         }
                     });
-                    Glide.with(mContext).load(comment.getUser().getAvatar())
+                    Glide.with(mContext).load(new mGlideUrl(comment.getUser().getAvatar() +"!/fp/5000"))
                             .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
                             .apply(bitmapTransform(new CropCircleTransformation())).into(holder.avatar);
 

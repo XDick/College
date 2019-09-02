@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.college.xdick.findme.R;
+import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.ui.Activity.ChatActivity;
 
 import java.util.List;
@@ -20,7 +21,7 @@ import cn.bmob.newim.bean.BmobIMMessageType;
  * Created by Administrator on 2018/5/22.
  */
 
-public class PrivateConversation extends Conversation{
+public class PrivateConversation extends Conversation {
 
     private BmobIMConversation conversation;
     private BmobIMMessage lastMsg;
@@ -65,7 +66,7 @@ public class PrivateConversation extends Conversation{
         if(lastMsg!=null){
             String content =lastMsg.getContent();
              if(lastMsg.getExtra().contains("activityid")){
-                return "[活动通知]";
+                return "[活动]";
             }
             else if(lastMsg.getMsgType().equals(BmobIMMessageType.TEXT.getType()) ){
                 return content;

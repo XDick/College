@@ -13,7 +13,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBar_activity"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="230dp"
         android:fitsSystemWindows="true">
 
         <android.support.design.widget.CollapsingToolbarLayout
@@ -98,7 +98,7 @@
 
 
             <com.donkingliang.labels.LabelsView
-                android:layout_margin="10dp"
+                android:layout_margin="5dp"
                 android:id="@+id/labels"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
@@ -152,19 +152,39 @@
 
 
     </android.support.v4.widget.NestedScrollView>
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="26dp"
-        android:layout_gravity="bottom|end"
-        android:elevation="10dp"
-        app:backgroundTint="@color/colorPrimary"
-        android:src="@drawable/add_white"
-        android:id="@+id/floatactionbutton"
-        app:layout_behavior="com.college.xdick.findme.MyClass.FabBehavior"/>
 
 
+      <LinearLayout
+          android:orientation="vertical"
+          android:layout_width="wrap_content"
+          android:layout_gravity="bottom|end"
+          android:layout_height="wrap_content">
+          <android.support.design.widget.FloatingActionButton
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginEnd="16dp"
+              android:layout_marginBottom="26dp"
+              android:elevation="10dp"
+              app:backgroundTint="@color/liji_c_blue"
+              android:visibility="gone"
+              android:src="@drawable/add_white"
+              android:id="@+id/floatactionbutton2"
+              app:layout_behavior="com.college.xdick.findme.MyClass.FabBehavior"/>
+
+          <android.support.design.widget.FloatingActionButton
+              android:id="@+id/floatactionbutton"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginEnd="16dp"
+              android:layout_marginBottom="26dp"
+
+              android:elevation="10dp"
+              android:src="@drawable/add_white"
+              app:backgroundTint="@color/colorPrimary"
+              app:layout_behavior="com.college.xdick.findme.MyClass.FabBehavior" />
+
+
+      </LinearLayout>
 
 
 

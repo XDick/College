@@ -10,19 +10,23 @@ import cn.bmob.v3.BmobObject;
 
 public class MyActivity extends BmobObject implements Serializable ,Comparable<MyActivity>{
 
-    String title;
-     String hostSchool;
-     String time;
-     String place;
-     String content;
-     String cover;
-     String[] gps;
-     String[]joinUser;
-     String[] picture;
-    String[] tag;
-    Integer commentCount;
-    MyUser host;
-    long date;
+    private String title;
+    private String hostSchool;
+    private  String time;
+    private String endTime;
+    private String place;
+    private  String content;
+    private   String cover;
+    private  String[] gps;
+    private  String[]joinUser;
+    private  String[] picture;
+    private String[] tag;
+    private Integer commentCount;
+    private MyUser host;
+    private long date;
+    private long endDate;
+    private String[] editTime;
+    private String[] editContent;
 
     public String[] getGps() {
         return gps;
@@ -132,14 +136,31 @@ public class MyActivity extends BmobObject implements Serializable ,Comparable<M
     @Override
     public int compareTo(MyActivity activity) {
         //自定义比较方法，如果认为此实体本身大则返回1，否则返回-1
-        if(this.date >= activity.getDate()){
+        if(this.date <= activity.getDate()){
             return 1;
         }
         return -1;
     }
 
+    public String getEndTime() {
+        return endTime;
+    }
 
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
 
+    public void setCommentCount(Integer commentCount) {
+        this.commentCount = commentCount;
+    }
+
+    public long getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(long endDate) {
+        this.endDate = endDate;
+    }
 
     public int getCommentCount() {
         return commentCount;
@@ -147,5 +168,21 @@ public class MyActivity extends BmobObject implements Serializable ,Comparable<M
 
     public void setCommentCount(int commentCount) {
         this.commentCount = commentCount;
+    }
+
+    public String[] getEditTime() {
+        return editTime;
+    }
+
+    public void setEditTime(String[] editTime) {
+        this.editTime = editTime;
+    }
+
+    public String[] getEditContent() {
+        return editContent;
+    }
+
+    public void setEditContent(String[] editContent) {
+        this.editContent = editContent;
     }
 }

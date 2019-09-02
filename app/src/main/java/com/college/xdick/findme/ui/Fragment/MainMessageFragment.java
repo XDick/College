@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -27,10 +28,12 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.college.xdick.findme.MyClass.ReadEvent;
 import com.college.xdick.findme.R;
+import com.college.xdick.findme.adapter.CommentAdapter;
 import com.college.xdick.findme.adapter.MessageFragmentStatePagerAdapter;
 import com.college.xdick.findme.adapter.MyFragmentStatePagerAdapter;
 import com.college.xdick.findme.bean.ActivityMessageBean;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Activity.ActivityActivity;
 import com.college.xdick.findme.ui.Activity.MainActivity;
 import com.college.xdick.findme.ui.Base.BaseFragment;
 import com.college.xdick.findme.util.AppManager;
@@ -65,7 +68,6 @@ public class MainMessageFragment extends BaseFragment implements MessageListHand
     private int position=0;
     private AlertDialog.Builder builder=null ;
     private AlertDialog dialog2=null;
-
     private MessageFragment messageFragment;
     private PrivateConversationFragment privateConversationFragment;
 

@@ -13,7 +13,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBar_activity"
         android:layout_width="match_parent"
-        android:layout_height="140dp"
+        android:layout_height="180dp"
         android:fitsSystemWindows="true">
 
         <android.support.design.widget.CollapsingToolbarLayout
@@ -21,10 +21,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:contentScrim="?attr/colorPrimary"
+            app:contentScrim="#00FFFFFF"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:expandedTitleGravity="center"
             app:expandedTitleTextAppearance="@style/StartActivity_Title_Style"
+
             android:fitsSystemWindows="true">
 
             <ImageView
@@ -67,38 +68,38 @@
 
                 <ImageView
                     android:id="@+id/ac_main_avatar1"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_margin="5dp"/>
 
                 <ImageView
                     android:id="@+id/ac_main_avatar2"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_margin="5dp"/>
 
                 <ImageView
                     android:id="@+id/ac_main_avatar3"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_margin="5dp"/>
 
                 <ImageView
                     android:id="@+id/ac_main_avatar4"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_margin="5dp"/>
 
                 <ImageView
                     android:id="@+id/ac_main_avatar5"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_margin="5dp"/>
 
                 <ImageView
                     android:id="@+id/ac_main_avatar6"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_margin="5dp"/>
 
 
@@ -111,8 +112,8 @@
                 android:id="@+id/join_num_layout"
                 android:layout_marginRight="25dp"
                 android:layout_marginLeft="25dp"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="7dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="2dp"
                 >
 
                 <TextView
@@ -120,7 +121,7 @@
                     android:layout_height="wrap_content"
                     android:text="已经有"
                     android:textSize="13sp"
-                    android:textStyle="bold"
+
                     android:textColor="#000000"
                     />
 
@@ -138,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:text="人参与"
                     android:textSize="13sp"
-                    android:textStyle="bold"
+
                     android:textColor="#000000"
                     />
             </LinearLayout>
@@ -146,14 +147,14 @@
             <Button
                 android:id="@+id/join_ac_button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
+                android:layout_height="46dp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="#fff"
                 android:background="@drawable/join_button_radius_false"
-                android:layout_marginBottom="8dp"
-                android:layout_marginRight="25dp"
-                android:layout_marginLeft="25dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginLeft="15dp"
                 />
 
 
@@ -166,8 +167,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_marginTop="10dp"
-                    android:layout_marginStart="25dp"
-                    android:layout_marginEnd="25dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                    >
 
 
@@ -192,10 +193,11 @@
                     <TextView
                         android:id="@+id/activity_date_text"
                         android:layout_width="wrap_content"
+                        android:textStyle="bold"
                         android:layout_height="wrap_content"
                         android:textIsSelectable="true"
                         android:layout_marginLeft="10dp"
-                        android:textColor="#262626"
+                        android:textColor="#1F1F1F"
                         android:textSize="17sp" />
                     <TextView
                         android:id="@+id/activity_time_text"
@@ -210,7 +212,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginBottom="8dp"
                     android:id="@+id/activity_map_layout"
                     android:background="?attr/selectableItemBackground"
                     android:orientation="horizontal">
@@ -224,10 +226,11 @@
                     <TextView
                         android:id="@+id/activity_place_text"
                         android:layout_width="wrap_content"
+                        android:textStyle="bold"
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
                         android:textIsSelectable="true"
-                        android:textColor="#262626"
+                        android:textColor="#1F1F1F"
                         android:textSize="17sp" />
                 </LinearLayout>
                 <LinearLayout
@@ -238,30 +241,46 @@
                     android:background="?attr/selectableItemBackground"
                     android:orientation="horizontal">
 
-
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:orientation="vertical">
                     <ImageView
                         android:layout_width="27dp"
                         android:layout_height="27dp"
                         android:id="@+id/host_avatar"
                         android:layout_gravity="center"
-                        android:layout_marginRight="5dp"/>
+                        />
+
+                    <TextView
+                        android:id="@+id/user_exp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#6D6D6D"
+                        android:textSize="12sp"
+                        android:text="Lv.0" />
+                </LinearLayout>
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_gravity="center"
                         android:orientation="vertical">
                     <TextView
                         android:id="@+id/activity_host_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
+
+                        android:textStyle="bold"
                         android:textSize="17sp"
-                        android:textColor="#262626" />
+                        android:textColor="#1F1F1F"
+                        />
                     <TextView
                         android:id="@+id/activity_school_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textIsSelectable="true"
-                        android:layout_marginLeft="10dp"
                         android:textColor="#6c6c6c"
                         android:textSize="13sp" />
                     </LinearLayout>
@@ -294,7 +313,44 @@
                    android:layout_marginTop="15dp"
                    >
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
 
+                  <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:id="@+id/edit_time_text"
+                      android:visibility="gone"
+                      android:textSize="12sp"
+                      android:textColor="#253BD5"/>
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+                   <LinearLayout
+                       android:layout_width="wrap_content"
+                       android:layout_height="match_parent"
+                       android:layout_gravity="end"
+                       android:clickable="true"
+                       android:focusable="true"
+                       android:visibility="gone"
+                       android:background="?android:attr/selectableItemBackground"
+                       android:id="@+id/edit_activity">
+                     <!--  <ImageView
+                           android:layout_width="20dp"
+                           android:layout_height="20dp"
+                           android:background="@drawable/setting_grey"/>-->
+                       <TextView
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:text="编辑" />
+
+                   </LinearLayout>
+                        </FrameLayout>
+
+
+                    </LinearLayout>
                    <TextView
                        android:id="@+id/activity_findme_text"
                        android:layout_marginBottom="10dp"
@@ -303,6 +359,7 @@
                        android:textSize="15sp"
                        android:textColor="#810303"
                        android:textStyle="bold"
+                       android:layout_marginTop="5dp"
                        android:visibility="gone"
                        android:text="注：『泛觅活动』为泛觅官方发起，当参与人数达到10人时，泛觅会帮参与者拉起一个微信群，注意私信里加群的通知。"/>
                     <TextView
@@ -311,9 +368,10 @@
                         android:layout_height="wrap_content"
                         android:maxLines="7"
                         android:textIsSelectable="true"
-                        android:textSize="15sp"
+                        android:textSize="16sp"
                         android:textColor="#000000"
-                        android:lineSpacingExtra="3dp"/>
+                        android:layout_marginTop="5dp"
+                        android:lineSpacingExtra="2.5dp"/>
                 <LinearLayout
                     android:id="@+id/activity_loadmore"
                     android:layout_width="match_parent"
@@ -392,9 +450,8 @@
             <android.support.v7.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:id="@+id/gallery"
-                android:layout_height="300dp"
+                android:layout_height="250dp"
                 android:layout_marginTop="20dp"
-
                 android:visibility="gone"
                 android:layout_marginBottom="10dp" />
 
@@ -402,8 +459,8 @@
       <android.support.v7.widget.CardView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginRight="15dp"
-          android:layout_marginLeft="15dp"
+          android:layout_marginRight="5dp"
+          android:layout_marginLeft="5dp"
           android:layout_marginTop="20dp">
 
          <LinearLayout
@@ -421,7 +478,7 @@
              android:text="讨论"
               android:textSize="17sp"
                  android:layout_marginTop="20dp"
-                 android:layout_marginBottom="20dp"
+                 android:layout_marginBottom="15dp"
               android:layout_marginLeft="20dp"/>
 
               <TextView

@@ -1,16 +1,27 @@
 package com.college.xdick.findme.adapter;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Display;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,9 +29,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
+import com.college.xdick.findme.BmobIM.newClass.PrivateConversation;
+import com.college.xdick.findme.MyClass.DownLoadImageService;
+import com.college.xdick.findme.MyClass.ImageDownLoadCallBack;
+import com.college.xdick.findme.MyClass.PicturePageAdapter;
 import com.college.xdick.findme.MyClass.ReadEvent;
+import com.college.xdick.findme.MyClass.ViewPagerFixed;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.ActivityMessageBean;
 import com.college.xdick.findme.bean.Dynamics;
@@ -34,12 +55,19 @@ import com.college.xdick.findme.ui.Activity.MyLikeActivity;
 import com.college.xdick.findme.ui.Activity.MySetActivity;
 import com.college.xdick.findme.ui.Activity.SetDynamicsActivity;
 import com.college.xdick.findme.ui.Activity.UserCenterActivity;
+import com.college.xdick.findme.ui.Fragment.MessageFragment;
+import com.college.xdick.findme.ui.Fragment.PrivateConversationFragment;
+import com.zyyoona7.popup.EasyPopup;
+import com.zyyoona7.popup.XGravity;
+import com.zyyoona7.popup.YGravity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.litepal.crud.DataSupport;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -60,6 +88,7 @@ import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
+import static cn.bmob.v3.Bmob.getApplicationContext;
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
 
@@ -84,7 +113,9 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
     private View mFooterView;
     private View mEmptyView;
 
-
+    private Dialog mDialog;
+    private ViewPagerFixed pager;
+    private MessageFragment fragment;
 
 
 
@@ -92,7 +123,7 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
     static class ViewHolder extends RecyclerView.ViewHolder{
 
         TextView title,time,content,acname;
-        ImageView cover;
+        ImageView cover,notifyPic;
         CardView cardView;
         Button delete;
         LinearLayout askLayout,acceptLayout,rejectLayout;
@@ -110,6 +141,7 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
             acceptLayout= view.findViewById(R.id.pic_accept);
             rejectLayout= view.findViewById(R.id.pic_reject);
             askLayout=view.findViewById(R.id.pic_ask_layout);
+            notifyPic = view.findViewById(R.id.notify_pic);
         }
 
         public void setVisibility(boolean isVisible){
@@ -130,8 +162,9 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
         mActivityList = activity;
     }
 
-
-
+    public void setFragment(MessageFragment fragment) {
+        this.fragment = fragment;
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -188,7 +221,7 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
 
 
     @Override
-    public void onBindViewHolder(final ActivityMessageAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final ActivityMessageAdapter.ViewHolder holder, final int position) {
 
         final int type = getItemViewType(position);
 
@@ -202,8 +235,10 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
         int realPos = getRealItemPosition(position);
 
         final ActivityMessageBean activity = mActivityList.get(realPos);
-
-
+        holder.notifyPic.setVisibility(View.GONE);
+        holder.title.setTextColor(mContext.getResources().getColor(R.color.black));
+        holder.time.setTextColor(mContext.getResources().getColor(R.color.black));
+        holder.content.setTextColor(mContext.getResources().getColor(R.color.black));
         if (activity.getType().equals("dynamics_picture")) {
             holder.acname.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
             holder.askLayout.setVisibility(View.VISIBLE);
@@ -263,9 +298,51 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
         } else if (activity.getType().equals("user")) {
             holder.acname.setTextColor(Color.parseColor("#e21fec"));
         }
-        holder.title.setTextColor(mContext.getResources().getColor(R.color.black));
-        holder.time.setTextColor(mContext.getResources().getColor(R.color.black));
-        holder.content.setTextColor(mContext.getResources().getColor(R.color.black));
+        else if (activity.getType().equals("notify")){
+            holder.title.setTextColor(Color.parseColor("#032483"));
+
+        }
+        else if (activity.getType().equals("notifyPic")){
+            holder.title.setTextColor(Color.parseColor("#032483"));
+            final String url =activity.getContent()
+                    .substring(activity.getContent()
+                            .indexOf("[URL]")+5) ;
+            holder.notifyPic.setVisibility(View.VISIBLE);
+
+            Glide.with(mContext).
+                    load(new mGlideUrl(url+"!/fp/30000"))
+                    .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE).error(R.drawable.image_failed)).
+                    listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            holder.notifyPic.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                }
+                            });
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+
+                            holder.notifyPic.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    showPictureDialog(0,
+                                            url);
+                                }
+                            });
+                            return false;
+                        }
+                    }).into(holder.notifyPic);
+
+
+
+        }
+
+
 
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -288,7 +365,11 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
                 final ActivityMessageBean activity = mActivityList.get(position);
                 DataSupport.deleteAll(ActivityMessageBean.class, "username=?and time=?", activity.getUsername(), activity.getTime());
 
-                holder.setVisibility(false);
+                fragment.initData();
+                fragment.initRecyclerView();
+
+
+
             }
 
 
@@ -304,12 +385,23 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
         }
 
             }
+            else if (activity.getType().equals("notify")){
+           holder.title.setText(activity.getUsername());
+           holder.acname.setText(activity.getActivityname());
+       }
+       else if (activity.getType().equals("notifyPic")){
+           holder.acname.setText(activity.getUsername());
+           holder.acname.setText(activity.getActivityname());
+           holder.content.setText(activity.getContent().substring(0,activity.getContent().indexOf("[URL]")));
+
+       }
             else {
             holder.acname.setText(activity.getActivityname());
         }
 
 
-         Glide.with(mContext).load(activity.getUserAvatar())
+         Glide.with(mContext).load(new mGlideUrl(activity.getUserAvatar() +"!/fp/10000")
+         )
                  .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE).error(R.drawable.head)).apply(bitmapTransform(new CropCircleTransformation())).into(holder.cover);
 
       holder.cover.setOnClickListener(new View.OnClickListener() {
@@ -330,9 +422,11 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
       holder.cardView.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
-              if (activity.getType().equals("activity")){
+              if (activity.getType().equals("activity")||
+                      activity.getType().equals("notify")
+              ||activity.getType().equals("notifyPic")){
                  BmobQuery<MyActivity> query = new BmobQuery<>();
-                 query.include("host[username|avatar]");
+                 query.include("host[username|avatar|Exp]");
                   query.getObject(activity.getActivityId(), new QueryListener<MyActivity>() {
                       @Override
                       public void done(MyActivity activity, BmobException e) {
@@ -346,7 +440,7 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
               else if (activity.getType().equals("dynamics")){
 
                                    final BmobQuery<Dynamics> query = new BmobQuery<>();
-                                   query.include("myUser[avatar|username]");
+                  query.include("myUser[avatar|username|school],activity[title|time|cover|].host.[username]");
                                    query.getObject(activity.getActivityId(), new QueryListener<Dynamics>() {
                                        @Override
                                        public void done(final Dynamics dynamics, BmobException e) {
@@ -373,7 +467,7 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
               }
               else if (activity.getType().equals("dynamics_picture")){
                   final BmobQuery<Dynamics> query = new BmobQuery<>();
-                  query.include("myUser[avatar|username]");
+                  query.include("myUser[avatar|username|school],activity[title|time|cover|].host.[username]");
                   query.getObject(activity.getActivityId().substring(0,activity.getActivityId().lastIndexOf(";")), new QueryListener<Dynamics>() {
                       @Override
                       public void done(final Dynamics dynamics, BmobException e) {
@@ -494,8 +588,139 @@ public class ActivityMessageAdapter extends RecyclerView.Adapter<ActivityMessage
         }
     }
 
+    public void showPictureDialog(final int mPosition, final String uri) {
 
 
+
+
+        //创建dialog
+        mDialog = new Dialog(mContext, R.style.PictureDialog);
+        final Window window1 = mDialog.getWindow() ;
+        WindowManager m = ((Activity)mContext).getWindowManager();
+        Display d = m.getDefaultDisplay(); // 获取屏幕宽、高用
+        WindowManager.LayoutParams p = window1.getAttributes(); // 获取对话框当前的参数值
+        p.height = (int) (d.getHeight() * 1.0); // 改变的是dialog框在屏幕中的位置而不是大小
+        p.width = (int) (d.getWidth() * 1.0); // 宽度设置为屏幕
+        window1.setAttributes(p);
+        View inflate = View.inflate(mContext, R.layout.chat_picture_dialog, null);//该layout在后面po出
+        int screenWidth = mContext.getResources().getDisplayMetrics().widthPixels;
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(screenWidth, ViewGroup.LayoutParams.MATCH_PARENT);
+        mDialog.setContentView(inflate, layoutParams);
+
+
+
+        pager = inflate.findViewById(R.id.gallery01);
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        final List<String> mListPicPath = new ArrayList<>();
+        mListPicPath.add(uri);
+        PicturePageAdapter adapter = new PicturePageAdapter((ArrayList<String>) mListPicPath, mContext);
+        pager.setAdapter(adapter);
+        pager.setPageMargin(0);
+        pager.setCurrentItem(mPosition);
+        window1.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        mDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                return false;
+            }
+        });
+        mDialog.show();
+        adapter.setOnPictureClickListener(new PicturePageAdapter.OnPictureClickListener() {
+            @Override
+            public void OnClick() {
+                window1.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                mDialog.dismiss();
+            }
+        });
+        //长按图片保存
+        adapter.setOnPictureLongClickListener(new PicturePageAdapter.OnPictureLongClickListener() {
+            @Override
+            public void OnLongClick() {
+                //展示保存取消dialog
+                final EasyPopup savePop = EasyPopup.create()
+                        .setContentView(mContext, R.layout.popup_savepic)
+                        .setWidth(400)
+                        .setBackgroundDimEnable(true)
+                        //变暗的透明度(0-1)，0为完全透明
+                        .setDimValue(0.4f)
+                        //变暗的背景颜色
+                        .apply();
+
+
+                savePop.showAtAnchorView(pager, YGravity.CENTER, XGravity.CENTER, 0, 0);
+
+                LinearLayout savepic = savePop.findViewById(R.id.save_pic);
+                savepic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                downloadFile(uri);
+                            }
+                        }).start();
+
+                        savePop.dismiss();
+                    }
+                });
+            }
+        });
+    }
+
+
+    public void downloadFile(final String url) {
+        DownLoadImageService service = new DownLoadImageService(getApplicationContext(),
+                url,
+                new ImageDownLoadCallBack() {
+
+                    @Override
+                    public void onDownLoadSuccess(File file) {
+                    }
+                    @Override
+                    public void onDownLoadSuccess(Bitmap bitmap) {
+                        // 在这里执行图片保存方法
+                        ((Activity)mContext).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext,"保存成功",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onDownLoadFailed() {
+                        // 图片保存失败
+                        ((Activity)mContext).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext,"保存失败",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+
+                    }
+                });
+        //启动图片下载线程
+        new Thread(service).start();
+
+
+    }
 
 
 }

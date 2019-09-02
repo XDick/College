@@ -56,7 +56,7 @@
     <GridView
            android:id="@+id/choosegrid"
            android:background="#fff"
-           android:numColumns="4"
+           android:numColumns="3"
 
            android:horizontalSpacing="6dp"
            android:columnWidth="60dp"

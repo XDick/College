@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:focusable="true"
+
     android:padding="10dp">
 
        <TextView
@@ -30,12 +30,7 @@
         android:layout_margin="3dp"
 
         />
-     <ImageView
-         android:layout_width="120dp"
-         android:layout_height="170dp"
-         android:scaleType="centerCrop"
-         android:id="@+id/image_left"
-         android:visibility="gone"/>
+
 
     <LinearLayout
 
@@ -51,12 +46,36 @@
             android:id="@+id/left_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+
             android:textIsSelectable="true"
             android:padding="10dp"
            />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="170dp"
+                android:scaleType="centerCrop"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:id="@+id/image_left"
+                android:visibility="gone"/>
+
+            <android.support.v4.widget.ContentLoadingProgressBar
+                android:layout_width="wrap_content"
+                style="@style/Widget.AppCompat.ProgressBar"
+                android:visibility="gone"
+                android:max="100"
+                android:progress="0"
+                android:layout_gravity="center"
+                android:id="@+id/image_progress_left"
+                android:layout_height="wrap_content" />
+
+        </FrameLayout>
+
         <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
+            android:layout_width="175dp"
             android:layout_height="wrap_content"
             app:cardCornerRadius="4dp"
             app:cardBackgroundColor="#fafafa"
@@ -132,59 +151,125 @@
 
 
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_weight="1">
-          <ImageView
-              android:layout_width="25dp"
-              android:layout_height="25dp"
-              android:id="@+id/send_error"
-              android:background="@drawable/error_red"
-              android:visibility="gone"
-              android:layout_gravity="center"/>
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-        <ImageView
-            android:layout_width="120dp"
-            android:layout_height="170dp"
-            android:id="@+id/image_right"
-            android:scaleType="centerCrop"
-            android:visibility="gone"/>
-
-              <android.support.v4.widget.ContentLoadingProgressBar
-                  android:layout_width="wrap_content"
-                  style="@style/Widget.AppCompat.ProgressBar"
-                  android:visibility="gone"
-                  android:max="100"
-                  android:progress="0"
-                  android:layout_gravity="center"
-                  android:id="@+id/image_progress"
-                  android:layout_height="wrap_content" />
-
-            </FrameLayout>
-
     <LinearLayout
         android:id="@+id/right_msg_layout"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
         android:background="@drawable/bubble_right">
 
         <TextView
             android:id="@+id/right_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+
             android:padding="10dp"
             android:textColor="#fff"
             android:textIsSelectable="true" />
 
 
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:id="@+id/send_error"
+
+                android:background="@drawable/error_red"
+                android:visibility="gone"
+                android:layout_gravity="center"/>
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="170dp"
+                    android:id="@+id/image_right"
+                    android:layout_margin="3dp"
+                    android:layout_gravity="center"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"/>
+
+                <android.support.v4.widget.ContentLoadingProgressBar
+                    android:layout_width="wrap_content"
+                    style="@style/Widget.AppCompat.ProgressBar"
+                    android:visibility="gone"
+                    android:max="100"
+                    android:progress="0"
+                    android:layout_gravity="center"
+                    android:id="@+id/image_progress"
+                    android:layout_height="wrap_content" />
+
+            </FrameLayout>
         </LinearLayout>
+        <android.support.v7.widget.CardView
+            android:layout_width="175dp"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="4dp"
+            app:cardBackgroundColor="#A73636"
+            android:layout_margin="8dp"
+            android:elevation="5dp"
+            android:layout_gravity="center"
+            android:id="@+id/cardview_ac2"
+            android:foreground="?attr/selectableItemBackground"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp">
+
+
+                <ImageView
+                    android:layout_width = "45dp"
+                    android:layout_height = "45dp"
+                    android:scaleType="centerCrop"
+                    android:layout_gravity="center"
+                    android:id="@+id/cover_ac2"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/title_ac2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        />
+
+
+                    <TextView
+                        android:layout_marginTop="2dp"
+                        android:id="@+id/host_ac2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#ACCDF8"
+                        android:textSize="12sp"
+
+                        />
+                    <TextView
+                        android:layout_marginTop="2dp"
+                        android:id="@+id/time_ac2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#CFAEAE"
+                        android:textSize="12sp"
+                        />
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
 
 
 

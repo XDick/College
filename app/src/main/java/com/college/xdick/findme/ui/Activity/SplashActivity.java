@@ -19,6 +19,7 @@ import com.college.xdick.findme.R;
 
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 
 
 import java.io.Serializable;
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMUserInfo;
@@ -58,23 +61,44 @@ public class SplashActivity extends Activity {
         intent= new Intent(SplashActivity.this, MainActivity.class);
         intent.putExtra("TIME", 0);
 
+      if(bmobUser!=null)
+        if (BmobIM.getInstance().getCurrentStatus().getMsg().equals("connected")) {
+
+            Timer timer=new Timer();
+
+            TimerTask task=new TimerTask()
+            {
+                @Override
+                public void run(){
+                    startActivity(intent);
+                    finish();
+        }
+            };
+
+            timer.schedule(task,2000);
+
+        }
+
+
+
+
+
+
+
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         askPermissions();
-
-
     }
 
 
     private void initData(){
 
-
-
                     if (bmobUser != null) {
-                        IMconnectBomob();
+
                         BmobIM.getInstance().setOnConnectStatusChangeListener(new ConnectStatusChangeListener() {
                             @Override
                             public void onChange(ConnectionStatus status) {
@@ -89,32 +113,27 @@ public class SplashActivity extends Activity {
                                 }
                             }
                         });
+                        IMconnectBomob();
+
                     } else {
 
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Thread.sleep(2000);
-                                }catch (Exception e){
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+                        Timer timer=new Timer();
 
-                        startActivity(intent);
-                        finish();
+                        TimerTask task=new TimerTask()
+                        {
+                            @Override
+                            public void run(){
+                                startActivity(intent);
+                                finish();
+                            }
+                        };
+
+                        timer.schedule(task,2000);
 
                     }
 
 
                 }
-
-
-
-
-
-
 
 
 

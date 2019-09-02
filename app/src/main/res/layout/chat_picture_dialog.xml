@@ -4,7 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
+    <android.support.v4.widget.ContentLoadingProgressBar
+        android:layout_width="wrap_content"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:max="100"
+        android:progress="0"
+        android:layout_gravity="center"
+        android:id="@+id/loading_dynamics"
+        android:layout_height="wrap_content" />
     <com.college.xdick.findme.MyClass.ViewPagerFixed
         android:id="@+id/gallery01"
         android:layout_width="match_parent"

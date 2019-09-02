@@ -21,6 +21,7 @@ public class ActivityMessageBean extends DataSupport implements Comparable< Acti
     String ifCheck ="false";
     String type;
 
+
     public String getUserId() {
         return userId;
     }

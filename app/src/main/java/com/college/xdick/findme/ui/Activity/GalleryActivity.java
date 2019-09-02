@@ -114,8 +114,8 @@ public class GalleryActivity extends BaseActivity {
         BmobQuery<Dynamics> q1 = new BmobQuery<>();
         q1.addWhereEqualTo("ifAdd2Gallery",true);
         query.and(Arrays.asList(q1));
-
-        query.addWhereEqualTo("activityId",activityId);
+        query.include("myUser[avatar|username|school|Exp],activity[title|time|cover|].host.[username]");
+        query.addWhereEqualTo("activity",activityId);
         query.order("-createdAt");
         query.setLimit(LIMIT);
         query.setSkip(size);

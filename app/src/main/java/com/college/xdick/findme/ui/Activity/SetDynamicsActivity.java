@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -91,6 +92,7 @@ public class SetDynamicsActivity extends BaseActivity {
 
 
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +106,7 @@ public class SetDynamicsActivity extends BaseActivity {
         initPopView(this);
         contentEdit = findViewById(R.id.dynamics_content_edittext);
         adapter = new GridViewAddImagesAdapter(mSelected, this);
+        adapter.setMaxImages(10);
         Toolbar toolbar = findViewById(R.id.toolbar_dynamics);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -167,10 +170,11 @@ public class SetDynamicsActivity extends BaseActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                 Matisse.from(SetDynamicsActivity.this)
                         .choose(MimeType.ofImage())
                         .countable(true)
-                        .maxSelectable(9)
+                        .maxSelectable(10-adapter.getCount())
                         .gridExpectedSize((int) (120 * scale + 0.5f))
                         .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
                         .thumbnailScale(0.6f)
@@ -200,16 +204,16 @@ public class SetDynamicsActivity extends BaseActivity {
 
 
                 if (mSelected.isEmpty()) {
+
+                    if(TextUtils.isEmpty(contentEdit.getText().toString()))
+                        return false;
+
                     Toast.makeText(SetDynamicsActivity.this, "正在发送...", Toast.LENGTH_SHORT).show();
 
                     String content = contentEdit.getText().toString();
                     Dynamics dynamics = new Dynamics();
                     if(myActivity!=null){
-                        dynamics.setActivityTitle(myActivity.getTitle());
-                        dynamics.setActivityCover(myActivity.getCover());
-                        dynamics.setActivityTime(myActivity.getTime());
-                        dynamics.setActivityHost(myActivity.getHost().getUsername());
-                        dynamics.setActivityId(myActivity.getObjectId());
+                        dynamics.setActivity(myActivity);
                     }
                     dynamics.setContent(content);
                     dynamics.setIfAdd2Gallery(false);
@@ -261,6 +265,8 @@ public class SetDynamicsActivity extends BaseActivity {
                     }
                            finish();
                         BmobFile.uploadBatch(picPath.toArray(new String[picPath.size()]), new UploadBatchListener() {
+
+
                             @Override
                             public void onSuccess(List<BmobFile> list, List<String> list1) {
 
@@ -275,11 +281,7 @@ public class SetDynamicsActivity extends BaseActivity {
                                     final Dynamics dynamics = new Dynamics();
                                     dynamics.setContent(content);
                                     if(myActivity!=null){
-                                    dynamics.setActivityTitle(myActivity.getTitle());
-                                        dynamics.setActivityCover(myActivity.getCover());
-                                        dynamics.setActivityTime(myActivity.getTime());
-                                        dynamics.setActivityHost(myActivity.getHost().getUsername());
-                                        dynamics.setActivityId(myActivity.getObjectId());
+                                    dynamics.setActivity(myActivity);
                                         if (myActivity.getHost().getObjectId().equals(myUser.getObjectId())){
                                             dynamics.setIfAdd2Gallery(ifAddPic2Ac);
                                         }else {
@@ -322,7 +324,7 @@ public class SetDynamicsActivity extends BaseActivity {
 
                             @Override
                             public void onProgress(int i, int i1, int i2, int i3) {
-
+                               // Toast.makeText(SetDynamicsActivity.this, i1+"%", Toast.LENGTH_SHORT).show();
                             }
 
                             @Override

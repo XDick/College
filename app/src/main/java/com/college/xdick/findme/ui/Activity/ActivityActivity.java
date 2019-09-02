@@ -2,10 +2,12 @@ package com.college.xdick.findme.ui.Activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,12 +21,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.college.xdick.findme.BmobIM.newClass.ActivityMessage;
+import com.college.xdick.findme.Listener.SoftKeyBoardListener;
+import com.college.xdick.findme.MyClass.KeyboardStatusDetector;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
 import com.college.xdick.findme.ui.Base.BaseActivity;
 import com.college.xdick.findme.ui.Fragment.StartActivityFragment;
+import com.college.xdick.findme.util.AppManager;
+import com.college.xdick.findme.util.FileUtil;
+import com.zhihu.matisse.Matisse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,7 +87,17 @@ public class ActivityActivity extends BaseActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.activity_activity);
          imm = (InputMethodManager) getSystemService (Context.INPUT_METHOD_SERVICE);
+        SoftKeyBoardListener.setListener(this, new SoftKeyBoardListener.OnSoftKeyBoardChangeListener() {
+            @Override
+            public void keyBoardShow(int height) {
+                activityStatusBar.setVisibility(View.VISIBLE);
+            }
 
+            @Override
+            public void keyBoardHide(int height) {
+
+            }
+        });
 
 
         myfragment=new StartActivityFragment();
@@ -101,8 +118,11 @@ public class ActivityActivity extends BaseActivity {
             public void onClick(View v) {
 
                 if (MyUser.getCurrentUser(MyUser.class)==null){
+
+                    AppManager.getAppManager().finishAllActivity();
                     startActivity(new Intent(ActivityActivity.this,LoginActivity.class));
-                    finish();
+
+
                   //  Toast.makeText(ActivityActivity.this,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -159,8 +179,10 @@ public class ActivityActivity extends BaseActivity {
             public void onClick(View v) {
 
                 if (MyUser.getCurrentUser(MyUser.class)==null){
+
+                    AppManager.getAppManager().finishAllActivity();
                     startActivity(new Intent(ActivityActivity.this,LoginActivity.class));
-                   finish();
+
                    // Toast.makeText(ActivityActivity.this,"请先登录（*＾-＾*）",Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -212,13 +234,30 @@ public class ActivityActivity extends BaseActivity {
         sendComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (TextUtils.isEmpty(editComment
+                        .getText().toString())){
+                    return;
+                }
+
+                if (editComment
+                        .getText().toString().length()>150){
+                    Toast.makeText(ActivityActivity.this,"字数不能大于150",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
                 imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
                if(ifReply){
                    replyComment.setContent(editComment.getText().toString());
                    replyComment.setUser(myUser);
                    replyComment.setReplyNum(0);
-                   fromComment.addReply();
-                   fromComment.update();
+                 /*  if (fromComment.getReplyComment()==null){
+                       Comment comment = new Comment();
+                       comment.setObjectId(fromComment.getObjectId());
+                       comment.increment("replyNum");
+                       comment.update();
+                   }*/
+
                    final String content=editComment.getText().toString();
                    editComment.setText("");
 
@@ -329,7 +368,7 @@ public class ActivityActivity extends BaseActivity {
 
                                         }
                                         BmobQuery<Comment>query =new BmobQuery<>();
-                                        query.addWhereEqualTo("ActivityID",activity.getObjectId());
+                                        query.addWhereEqualTo("activity",activity.getObjectId());
                                         query.findObjects(new FindListener<Comment>() {
                                             @Override
                                             public void done(List<Comment> list, BmobException e) {
@@ -376,7 +415,9 @@ public class ActivityActivity extends BaseActivity {
             }
             case R.id.menu_upload_pic:{
                 if (myUser==null){
+                    AppManager.getAppManager().finishAllActivity();
                     startActivity(new Intent(ActivityActivity.this,LoginActivity.class));
+
                     return true;
                 }
                 if (activity.getHost().getObjectId().equals(MyUser.getCurrentUser(MyUser.class).getObjectId())){
@@ -534,7 +575,17 @@ public class ActivityActivity extends BaseActivity {
         }
 
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode ==1 && resultCode == RESULT_OK) {
+            for (Uri u: Matisse.obtainResult(data)){
 
+                myfragment.sendLocalImageMessage(FileUtil.uriToFile(u,this));
+            }
+
+        }
+    }
 }
 
 

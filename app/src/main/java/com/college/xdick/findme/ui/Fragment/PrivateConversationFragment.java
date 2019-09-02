@@ -21,6 +21,7 @@ import com.college.xdick.findme.ui.Activity.MainActivity;
 import com.college.xdick.findme.ui.Base.BaseFragment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import cn.bmob.newim.BmobIM;
@@ -86,7 +87,6 @@ public class PrivateConversationFragment extends BaseFragment implements Message
         adapter.setFragment(this);
         recyclerView.setAdapter(adapter);
 
-
     }
 
 
@@ -100,7 +100,7 @@ public class PrivateConversationFragment extends BaseFragment implements Message
                    conversationList.add(new PrivateConversation(c));
 
                }
-
+               Collections.sort(conversationList);
                adapter.notifyDataSetChanged();
                swipeRefresh.setRefreshing(false);
            }

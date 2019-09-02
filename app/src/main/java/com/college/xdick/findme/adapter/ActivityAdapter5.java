@@ -16,6 +16,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.ui.Activity.ActivityActivity;
+import com.college.xdick.findme.ui.Activity.DetailActivityActivity;
+import com.college.xdick.findme.ui.Activity.MainActivity;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 
 import java.util.List;
 
@@ -60,6 +63,7 @@ public class ActivityAdapter5 extends RecyclerView.Adapter<ActivityAdapter5.View
 
         TextView title,date,join,hostInfo,place,time;
         CardView cardView;
+        ImageView finish;
 
 
 
@@ -73,6 +77,7 @@ public class ActivityAdapter5 extends RecyclerView.Adapter<ActivityAdapter5.View
             hostInfo = view.findViewById(R.id.host_info);
             place = view.findViewById(R.id.place_info);
             time = view.findViewById(R.id.time_ac);
+            finish = view.findViewById(R.id.finished_ac);
         }
 
         public void setVisibility(boolean isVisible){
@@ -190,7 +195,13 @@ public class ActivityAdapter5 extends RecyclerView.Adapter<ActivityAdapter5.View
         int realPos = getRealItemPosition(position);
 
         final MyActivity activity = mActivityList.get(realPos);
+        if (activity.getEndDate()< ((BaseActivity)mContext).getBmobTime()){
+            holder.finish.setBackground(mContext.getDrawable(R.drawable.finish));
+        }
 
+        else {
+            holder.finish.setBackground(mContext.getDrawable(R.drawable.blank_pic));
+        }
 
          holder.title.setText(activity.getTitle());
 
@@ -204,12 +215,13 @@ public class ActivityAdapter5 extends RecyclerView.Adapter<ActivityAdapter5.View
              holder.hostInfo.setText(activity.getHost().getUsername());
          }
 
-         try {
-             holder.join.setText("("+activity.getJoinUser().length+"人参与)");
-         }
-         catch (Exception e){
-             e.printStackTrace();
-         }
+        if (activity.getJoinUser()==null){
+            holder.join.setText("0人参与");
+        }else {
+            holder.join.setText(activity.getJoinUser().length+"人参与");
+        }
+
+
 
 
 

@@ -25,14 +25,18 @@ import com.college.xdick.findme.ui.Base.BaseActivity;
 import com.college.xdick.findme.ui.Fragment.ActivityFollowFragment;
 import com.college.xdick.findme.ui.Fragment.ActivitygpsFragment;
 import com.college.xdick.findme.ui.Fragment.ActivityschoolFragment;
+import com.college.xdick.findme.ui.Fragment.GoodsFragment;
 import com.donkingliang.labels.LabelsView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.b.V;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.QueryListener;
 import jp.wasabeef.glide.transformations.BlurTransformation;
@@ -41,10 +45,9 @@ import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
 
 public class DetailActivityActivity extends BaseActivity {
-   public long bmobTime ;
     private ViewPager mViewPager1;
     private TabLayout mTabLayout;
-    private String[] tabTitle = {"关注","同校", "同城", };
+    private String[] tabTitle = {"商城","同校", "同城","关注" };
     private Toolbar toolbar;
     private ImageView background;
     private MyFragmentStatePagerAdapter adapter;
@@ -55,8 +58,9 @@ public class DetailActivityActivity extends BaseActivity {
     private int picPath;
     private String titleText="泛觅";
     private LabelsView labelsView;
-    private FloatingActionButton floatingActionButton;
+    private FloatingActionButton floatingActionButton,floatingActionButton2;
     String subTag=null;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,29 +70,39 @@ public class DetailActivityActivity extends BaseActivity {
 
             tagBean = (MainTagBean)getIntent().getSerializableExtra("TAG");
             if (tagBean!=null){
-                titleText=tagBean.getMainTag();
                 labelsView = findViewById(R.id.labels);
-                labelsView.setLabels(Arrays.asList(tagBean.getSubTag()));
+                titleText=tagBean.getMainTag();
+                List<String>labels =new ArrayList<>();
+                labels.add("全部");
+                labels.addAll(Arrays.asList(tagBean.getSubTag()));
+
+                labelsView.setLabels(labels);
+                labelsView.setSelects(0);
+                labelsView.setSelectType(LabelsView.SelectType.SINGLE_IRREVOCABLY);
+
+
                 labelsView.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
                     @Override
-                    public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
+                    public void onLabelSelectChange(TextView label, Object data, boolean isSelect,
+                                                    int position) {
                         if (isSelect){
-                            subTag=label.getText().toString();
 
+                            subTag=label.getText().toString().equals("全部")?null:label.getText().toString();
+                            refreshFragment(ifSort,subTag);
                         }
-                        else {
-                            subTag=null;
-                        }
-                        refreshFragment(ifSort,subTag);
+
+
                     }
+
+
                 });
+
 
             }
 
             picPath = getIntent().getIntExtra("IMG",R.drawable.findme_all_activity);
 
 
-        bmobTime = getIntent().getLongExtra("TIME",0);
         initView();
 
 
@@ -97,16 +111,39 @@ public class DetailActivityActivity extends BaseActivity {
 
 
     private void initView(){
+        final MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
         floatingActionButton = findViewById(R.id.floatactionbutton);
+        floatingActionButton2 = findViewById(R.id.floatactionbutton2);
+        if (bmobUser.isGod()){
+            floatingActionButton2.setVisibility(View.VISIBLE);
+            floatingActionButton2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                   startActivity(new Intent(DetailActivityActivity.this,
+                           SetGoodsActivity.class));
+                }
+            });
+        }
+
+
+
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               final MyUser bmobUser = BmobUser.getCurrentUser(MyUser.class);
+
 
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                         String date = sdf.format(new Date(bmobTime));
                         if (bmobUser != null) {
+
+                            if (bmobUser.getGps()==null){
+                                Toast.makeText(DetailActivityActivity.this, "请先定位", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+
                             if (!date.equals(bmobUser.getSetAcTime()) || bmobUser.isGod()) {
+
                                 Intent intent = new Intent(DetailActivityActivity.this, SetActivitiyActivity.class);
                                 startActivity(intent);
                             } else {
@@ -167,7 +204,7 @@ public class DetailActivityActivity extends BaseActivity {
 
         adapter = new MyFragmentStatePagerAdapter(getSupportFragmentManager(), tabTitle);
         mViewPager1.setAdapter(adapter);
-        mViewPager1 .setOffscreenPageLimit(2);
+        mViewPager1 .setOffscreenPageLimit(3);
 
 
         mViewPager1.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
@@ -211,7 +248,12 @@ public class DetailActivityActivity extends BaseActivity {
         return true;
     }
     private void refreshFragment (boolean ifsort,String subTag) {
-                ActivityFollowFragment fragment1 = ((ActivityFollowFragment) adapter.instantiateItem(mViewPager1, 0));
+
+
+       GoodsFragment fragment0 = ((  GoodsFragment) adapter.instantiateItem(mViewPager1, 0));
+
+
+        ActivityFollowFragment fragment1 = ((ActivityFollowFragment) adapter.instantiateItem(mViewPager1, 3));
                 fragment1.setSORT(ifsort);
 
                 ActivityschoolFragment fragment2 = ((ActivityschoolFragment) adapter.instantiateItem(mViewPager1, 1));
@@ -220,11 +262,12 @@ public class DetailActivityActivity extends BaseActivity {
                 ActivitygpsFragment fragment3 = ((ActivitygpsFragment) adapter.instantiateItem(mViewPager1, 2));
                 fragment3.setSORT(ifsort);
 
+                    fragment0.setSubTag(subTag);
                     fragment1.setSubTag(subTag);
                     fragment2.setSubTag(subTag);
                     fragment3.setSubTag(subTag);
 
-
+               fragment0.refresh();
                fragment1.refresh();
                 fragment2.refresh();
                 fragment3.refresh();
@@ -232,7 +275,5 @@ public class DetailActivityActivity extends BaseActivity {
 
 
 
-    public  void setBmobTime(long bmobTime) {
-        this.bmobTime = bmobTime;
-    }
+
 }

@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
@@ -218,7 +219,7 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Vi
 
         holder.school.setText(myUser.getSchool());
 
-         Glide.with(mContext).load(myUser.getAvatar())
+         Glide.with(mContext).load(new mGlideUrl(myUser.getAvatar() +"!/fp/15000"))
                  .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
                  .apply(RequestOptions.bitmapTransform(new CropCircleTransformation())).into(holder.cover);
 

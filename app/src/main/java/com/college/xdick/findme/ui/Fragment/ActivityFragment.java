@@ -28,7 +28,7 @@ public class ActivityFragment extends ActivityBaseFragment {
         BmobQuery<MyActivity> query = new BmobQuery<MyActivity>();
         List<BmobQuery<MyActivity>> queries = new ArrayList<>();
          if (order.equals("date")){
-             query.addWhereGreaterThan("date", aLong*1000L-60*60*24*1000);
+             query.addWhereGreaterThan("date", aLong);
          }
 
 

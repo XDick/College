@@ -166,7 +166,7 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
         }
         int realPos = getRealItemPosition(position);
             String uri =picList.get(realPos);
-            Glide.with(mContext).load(new mGlideUrl(uri))
+            Glide.with(mContext).load(new mGlideUrl(uri)+"!/fp/25000")
                     .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE))
                     .into(holder.image);
 
@@ -374,6 +374,20 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
                 savePop.showAtAnchorView(pager, YGravity.CENTER, XGravity.CENTER, 0, 0);
 
                 LinearLayout savepic = savePop.findViewById(R.id.save_pic);
+                LinearLayout downloadpic = savePop.findViewById(R.id.download_pic);
+                downloadpic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                downloadFile(mListPicPath.get(mPosition));
+                            }
+                        }).start();
+
+                        savePop.dismiss();
+                    }
+                });
                 savepic.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -381,7 +395,7 @@ public class MorePicAdapter extends RecyclerView.Adapter<MorePicAdapter.ViewHold
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                downloadFile(mListPicPath.get(mPosition));
+                                downloadFile(mListPicPath.get(mPosition)+"!/scale/80");
                             }
                         }).start();
 

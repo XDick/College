@@ -12,11 +12,7 @@ import cn.bmob.v3.datatype.BmobFile;
 public class Dynamics extends BmobObject implements Serializable {
 
 
-    private String activityId;
-    private String activityTitle;
-    private String activityCover;
-    private String activityTime;
-    private String activityHost;
+    private MyActivity activity;
 
 
     MyUser  myUser;
@@ -73,44 +69,12 @@ public class Dynamics extends BmobObject implements Serializable {
     }
 
 
-    public String getActivityId() {
-        return activityId;
+    public MyActivity getActivity() {
+        return activity;
     }
 
-    public void setActivityId(String activityId) {
-        this.activityId = activityId;
-    }
-
-    public String getActivityTitle() {
-        return activityTitle;
-    }
-
-    public void setActivityTitle(String activityTitle) {
-        this.activityTitle = activityTitle;
-    }
-
-    public String getActivityCover() {
-        return activityCover;
-    }
-
-    public void setActivityCover(String activityCover) {
-        this.activityCover = activityCover;
-    }
-
-    public String getActivityTime() {
-        return activityTime;
-    }
-
-    public void setActivityTime(String activityTime) {
-        this.activityTime = activityTime;
-    }
-
-    public String getActivityHost() {
-        return activityHost;
-    }
-
-    public void setActivityHost(String activityHost) {
-        this.activityHost = activityHost;
+    public void setActivity(MyActivity activity) {
+        this.activity = activity;
     }
 
     public boolean isIfAdd2Gallery() {

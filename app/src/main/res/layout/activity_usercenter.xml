@@ -22,7 +22,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBar_activity"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="310dp"
         android:fitsSystemWindows="true">
 
         <android.support.design.widget.CollapsingToolbarLayout
@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:contentScrim="?attr/colorPrimary"
+            app:contentScrim="#00FFFFFF"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             android:fitsSystemWindows="true">
 
@@ -74,14 +74,34 @@
 
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/center_username"
-                android:layout_gravity="center"
-                android:textSize="20sp"
-                android:textColor="#fff"
-                android:layout_marginTop="7dp"/>
+<RelativeLayout
+    android:layout_marginTop="7dp"
+    android:layout_width="match_parent"
+    android:layout_height="30sp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/center_username"
+            android:textSize="20sp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"
+            android:textColor="#fff"
+           />
+
+    <TextView
+        android:id="@+id/user_exp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+         android:layout_toRightOf="@+id/center_username"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="5dp"
+        android:text="Lv.0"
+        android:textColor="@color/white"
+        android:textSize="13sp" />
+
+</RelativeLayout>
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -107,7 +127,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 
-                    android:text="关注"
+                    android:text="追随"
                     android:id="@+id/center_following"
                     android:textColor="#fff"
                     android:layout_margin="8dp"

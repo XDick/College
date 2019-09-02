@@ -26,6 +26,8 @@
             app:contentInsetLeft="0dp"
             app:contentInsetRight="0dp"
             app:contentInsetStart="0dp"
+            android:elevation="50dp"
+
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:layout_scrollFlags="scroll|enterAlways|snap">
 
@@ -121,6 +123,7 @@
             <com.youth.banner.Banner
                 android:id="@+id/banner"
                 android:layout_width="match_parent"
+                android:layout_margin="2dp"
                 android:layout_height="125dp"
               />
             <LinearLayout

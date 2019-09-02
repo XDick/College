@@ -133,7 +133,8 @@ public class UserCenterDynamicsFragment extends BaseFragment {
         query.addWhereEqualTo("myUser",nowUser.getObjectId());
         query.order("-createdAt");
         query.setLimit(20);
-        query.include("myUser[avatar|username]");
+        query.include("myUser[avatar|username|school|Exp]" +
+                ",activity[title|time|cover].host.[username]");
         query.setSkip(size);
         final int listsize = dynamicsList.size();
                     query.findObjects(new FindListener<Dynamics>() {

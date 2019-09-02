@@ -10,6 +10,7 @@ import com.college.xdick.findme.ui.Fragment.ActivityFollowFragment;
 import com.college.xdick.findme.ui.Fragment.ActivityFragment;
 import com.college.xdick.findme.ui.Fragment.ActivitygpsFragment;
 import com.college.xdick.findme.ui.Fragment.ActivityschoolFragment;
+import com.college.xdick.findme.ui.Fragment.GoodsFragment;
 
 /**
  * Created by Administrator on 2018/5/6.
@@ -29,11 +30,13 @@ public class MyFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new ActivityFollowFragment();//第1页面的fragment
+                return new GoodsFragment();
             case 1:
                 return new ActivityschoolFragment();
             case 2:
-                return new ActivitygpsFragment();//第3页面的fragment
+                return new ActivitygpsFragment();
+            case 3:
+               return new ActivityFollowFragment();
 
         }
         return null;

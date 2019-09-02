@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.college.xdick.findme.MyClass.ItemTouchHelperAdapter;
+import com.college.xdick.findme.MyClass.mGlideUrl;
 import com.college.xdick.findme.R;
 import com.college.xdick.findme.bean.Comment;
 import com.college.xdick.findme.bean.MyActivity;
@@ -226,7 +227,7 @@ public class ActivityAdapter2 extends RecyclerView.Adapter<ActivityAdapter2.View
 
          holder.time.setText(activity.getTime());
 
-         Glide.with(mContext).load(activity.getCover())
+         Glide.with(mContext).load(new mGlideUrl(activity.getCover()+"!/fp/2000"))
                  .apply(diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)).into(holder.cover);
 
           holder.host.setText("由"+activity.getHost().getUsername()+"发起");

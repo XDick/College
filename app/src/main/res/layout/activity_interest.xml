@@ -127,7 +127,7 @@
                 app:labelTextPaddingTop="5dp"
                 app:lineMargin="10dp"
                 app:wordMargin="10dp"
-                app:selectType="MULTI"
+                app:selectType="SINGLE"
                 app:maxSelect="0" />
 
             <View
@@ -138,20 +138,68 @@
                 android:layout_margin="10dp"/>
             <com.donkingliang.labels.LabelsView
                 android:layout_margin="10dp"
-                android:id="@+id/setac_sub_labels"
+                android:id="@+id/setac_sub_labels1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:labelBackground="@drawable/label_bg"
                 app:labelTextColor="@drawable/label_text_color"
                 app:labelTextSize="14sp"
+                android:visibility="gone"
                 app:labelTextPaddingBottom="5dp"
                 app:labelTextPaddingLeft="10dp"
                 app:labelTextPaddingRight="10dp"
                 app:labelTextPaddingTop="5dp"
                 app:lineMargin="10dp"
                 app:wordMargin="10dp"
-                app:selectType="MULTI"
-                app:maxSelect="1" />
+                app:selectType="MULTI" />
+            <com.donkingliang.labels.LabelsView
+                android:layout_margin="10dp"
+                android:id="@+id/setac_sub_labels2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:labelBackground="@drawable/label_bg"
+                app:labelTextColor="@drawable/label_text_color"
+                app:labelTextSize="14sp"
+                android:visibility="gone"
+                app:labelTextPaddingBottom="5dp"
+                app:labelTextPaddingLeft="10dp"
+                app:labelTextPaddingRight="10dp"
+                app:labelTextPaddingTop="5dp"
+                app:lineMargin="10dp"
+                app:wordMargin="10dp"
+                app:selectType="MULTI" />
+            <com.donkingliang.labels.LabelsView
+                android:layout_margin="10dp"
+                android:id="@+id/setac_sub_labels3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:labelBackground="@drawable/label_bg"
+                app:labelTextColor="@drawable/label_text_color"
+                app:labelTextSize="14sp"
+                android:visibility="gone"
+                app:labelTextPaddingBottom="5dp"
+                app:labelTextPaddingLeft="10dp"
+                app:labelTextPaddingRight="10dp"
+                app:labelTextPaddingTop="5dp"
+                app:lineMargin="10dp"
+                app:wordMargin="10dp"
+                app:selectType="MULTI" />
+            <com.donkingliang.labels.LabelsView
+                android:layout_margin="10dp"
+                android:id="@+id/setac_sub_labels4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:labelBackground="@drawable/label_bg"
+                app:labelTextColor="@drawable/label_text_color"
+                app:labelTextSize="14sp"
+                android:visibility="gone"
+                app:labelTextPaddingBottom="5dp"
+                app:labelTextPaddingLeft="10dp"
+                app:labelTextPaddingRight="10dp"
+                app:labelTextPaddingTop="5dp"
+                app:lineMargin="10dp"
+                app:wordMargin="10dp"
+                app:selectType="MULTI" />
 
             <TextView
                 android:layout_width="wrap_content"

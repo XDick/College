@@ -33,7 +33,7 @@ public class ActivityFollowFragment extends ActivityBaseFragment {
 
             list.add(myUser.getObjectId());
 
-            query.addWhereContainedIn("hostId", list);}
+            query.addWhereContainedIn("host", list);}
         else {
             ifEmpty=true;
             adapter.notifyDataSetChanged();
@@ -41,7 +41,7 @@ public class ActivityFollowFragment extends ActivityBaseFragment {
             return null;
         }
         if (order.equals("date")) {
-            query.addWhereGreaterThan("date", aLong * 1000L - 60 * 60 * 24 * 1000);
+            query.addWhereGreaterThan("endDate", aLong );
         }
         query.order(order);
         query.setSkip(size);

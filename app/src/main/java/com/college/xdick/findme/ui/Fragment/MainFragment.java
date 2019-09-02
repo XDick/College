@@ -34,6 +34,7 @@ import com.college.xdick.findme.adapter.ActivityAdapter2;
 import com.college.xdick.findme.adapter.ActivityAdapter3;
 import com.college.xdick.findme.adapter.ActivityAdapter4;
 import com.college.xdick.findme.adapter.ActivityAdapter5;
+import com.college.xdick.findme.adapter.CommentAdapter;
 import com.college.xdick.findme.adapter.FindNewsAdapter;
 import com.college.xdick.findme.bean.BannerManagement;
 import com.college.xdick.findme.bean.FindNews;
@@ -45,7 +46,9 @@ import com.college.xdick.findme.ui.Activity.DetailActivityActivity;
 import com.college.xdick.findme.ui.Activity.LoginActivity;
 import com.college.xdick.findme.ui.Activity.MainActivity;
 import com.college.xdick.findme.ui.Activity.SearchActivity;
+import com.college.xdick.findme.ui.Activity.SplashActivity;
 import com.college.xdick.findme.ui.Activity.WebActivity;
+import com.college.xdick.findme.ui.Base.BaseActivity;
 import com.college.xdick.findme.ui.Base.BaseFragment;
 import com.college.xdick.findme.ui.Base.MyBaseActivity;
 import com.lljjcoder.Interface.OnCityItemClickListener;
@@ -104,9 +107,13 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
     private List<Integer>  integerList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefresh;
     private int refreshCount=0;
-    protected boolean ifEmpty=false;
-    protected  int size =0;
+    private boolean ifEmpty=false;
+    private   int size =0;
     private long bmobTime=0;
+    private final int ADD =1;
+    private final int REFRESH=2;
+    private List<MyActivity> allRecommentActivities=new ArrayList<>();
+
 
     @Nullable
     @Override
@@ -133,12 +140,17 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
 
     private void initViews(){
 
-
         LinearLayout recommentLayout = rootView.findViewById(R.id.recommend_activity_layout);
         recommentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                initRecommendActivity();
+                activityList_recommend.clear();
+               Collections.shuffle(allRecommentActivities);
+                List<MyActivity> myActivityList = allRecommentActivities.subList(0,(allRecommentActivities.size()<6?allRecommentActivities.size():6));
+                Collections.sort(myActivityList);
+                activityList_recommend.addAll(myActivityList);
+                activityAdapter2.notifyDataSetChanged();
+
             }
         });
 
@@ -193,16 +205,28 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
                } else {
                    ((MainActivity) getActivity()).ifHideBar(false);
                }
+
+               if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
+                   if (ifEmpty) {
+                       adapter.changeMoreStatus(CommentAdapter.NO_MORE);
+
+                   } else {
+                       adapter.changeMoreStatus(CommentAdapter.LOADING_MORE);
+                   }
+
+                   if (ifEmpty) {
+                       //null
+                   } else {
+                       initJoinActivity(ADD);
+                   }
+               }
            }
        });
-        MainActivity activity = (MainActivity) getActivity();
-        final List<MyActivity>list=(List<MyActivity>)activity.getIntent().getSerializableExtra("LISTDATA");;
         LinearLayout allActivityLayout = rootView.findViewById(R.id.all_activity_layout);
         allActivityLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(getContext(), DetailActivityActivity.class);
-                intent.putExtra("TIME",bmobTime);
                 startActivity(intent);
             }
         });
@@ -325,38 +349,31 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
 
 
         View footer = LayoutInflater.from(getContext()).inflate(R.layout.item_footer, recyclerView_join, false);
-        View empty = LayoutInflater.from(getContext()).inflate(R.layout.item_empty, recyclerView_join, false);
+        View empty1 = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_join, recyclerView_join, false);
+        View empty2 = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_activity, recyclerView_join, false);
+        //View empty3 = LayoutInflater.from(getContext()).inflate(R.layout.item_empty_recommend, recyclerView_recommend, false);
 
-        View empty2 = LayoutInflater.from(getContext()).inflate(R.layout.item_empty, recyclerView_recommend, false);
 
-        activityAdapter2.setEmptyView(empty2);
+        if (myUser==null){
+            adapter.setEmptyView(empty1);
+            Button button  = empty1.findViewById(R.id.login_button);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getActivity().finish();
+                    startActivity(new Intent(getContext(),LoginActivity.class));
+                }
+            });
+        }
+        else {
+            adapter.setEmptyView(empty2);
+           // activityAdapter2.setEmptyView(empty3);
+        }
 
-        adapter.setEmptyView(empty);
         adapter.addFooterView(footer);
 
-        recyclerView_join.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
 
-                if(ifEmpty){
-                    adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
-                }else
-                {
-                    adapter.changeMoreStatus(ActivityAdapter.LOADING_MORE);}
-                if (newState == RecyclerView.SCROLL_STATE_IDLE &&  layoutManager.findLastVisibleItemPosition()+1  == adapter.getItemCount()) {
-                    if (ifEmpty){
-                        //null
-                    }
-                    else {initJoinActivity();}
-                }
-            }
 
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });
 
         recyclerView_recommend.setAdapter(activityAdapter2);
         recyclerView_join.setAdapter(adapter);
@@ -365,18 +382,13 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
 
 
     private void initRecommendActivity(){
-
-        if (myUser==null){
-            if (++refreshCount==4){
-                swipeRefresh.setRefreshing(false);
-            }
-        }
         activityList_recommend.clear();
         BmobQuery<MyActivity> query = new BmobQuery<>();
         query.order("-createdAt");
-        query.include("host[username|avatar]");
-        List<BmobQuery<MyActivity>> queries = new ArrayList<>();
+        query.include("host[username|avatar|Exp]");
+
         if(BmobUser.getCurrentUser(MyUser.class)!=null&& BmobUser.getCurrentUser(MyUser.class).getTag()!=null) {
+            List<BmobQuery<MyActivity>> queries = new ArrayList<>();
             String tag[] =  BmobUser.getCurrentUser(MyUser.class).getTag();
             if (tag.length==0){
                 if (++refreshCount==4){
@@ -389,15 +401,21 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
                 q.addWhereContainsAll("tag", Arrays.asList(tag[i]));
                 queries.add(q);
             }
+            query.or(queries);
         }
+
         query.setLimit(30);
-        query.or(queries);
+
         query.findObjects(new FindListener<MyActivity>() {
             @Override
             public void done(List<MyActivity> list, BmobException e) {
                 if (e==null){
+                    allRecommentActivities.clear();
+                    allRecommentActivities.addAll(list);
                     Collections.shuffle(list);
-                    activityList_recommend.addAll(list.subList(0,(list.size()<6?list.size():6)));
+                    List<MyActivity> myActivityList = list.subList(0,(list.size()<6?list.size():6));
+                    Collections.sort(myActivityList);
+                    activityList_recommend.addAll(myActivityList);
                     activityAdapter2.notifyDataSetChanged();
                     if (++refreshCount==4){
                         swipeRefresh.setRefreshing(false);
@@ -410,6 +428,7 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
     }
 
     private void initTag(){
+        tagList.clear();
         BmobQuery<MainTagBean> query = new BmobQuery<MainTagBean>();
         query.order("order");
         query.findObjects(new FindListener<MainTagBean>() {
@@ -427,7 +446,7 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
                                Intent intent = new Intent(getContext(),DetailActivityActivity.class);
                                intent.putExtra("TAG",tagBean);
                                intent.putExtra("IMG",path);
-                               intent.putExtra("TIME",bmobTime);
+
                                startActivity(intent);
                            }
                        });
@@ -500,8 +519,8 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
 
                 if (list.size()<5){
                                 BmobQuery<MyActivity> query = new BmobQuery<>();
-                                query.addWhereGreaterThan("date",(bmobTime-60*60*24*1.5*1000));//60*60*24*1000
-                                query.include("host[username|avatar]");
+                                query.addWhereGreaterThan("endDate",bmobTime);//60*60*24*1000
+                                query.include("host[username|avatar|Exp]");
                                 query.order("-joinUser");
                                 query.setLimit(5-list.size());
                                 query.findObjects(new FindListener<MyActivity>() {
@@ -509,7 +528,7 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
                                     public void done(final List<MyActivity> list, BmobException e) {
                                         if (e==null){
                                             for (MyActivity activity:list){
-                                                Log.d("haha",activity.getTitle());
+                                              //  Log.d("haha",activity.getTitle());
                                                 image.add(activity.getCover());
                                                 title.add(activity.getTitle());
                                                 bannerElement.add(new BannerManagement("activity",
@@ -523,9 +542,7 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
                                                     .setDelayTime(3000)
                                                     .setBannerAnimation(Transformer.DepthPage)
                                                     .setBannerStyle(BannerConfig.CIRCLE_INDICATOR_TITLE_INSIDE)
-                                                    .setIndicatorGravity(BannerConfig.RIGHT)
-
-                                            ;
+                                                    .setIndicatorGravity(BannerConfig.RIGHT);
 
 
 
@@ -539,7 +556,7 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
 
                                                     else if (bannerElement.get(position).getType().equals("activity")){
                                                         BmobQuery<MyActivity>query1 = new BmobQuery<>();
-                                                        query1.include("host[username|avatar]");
+                                                        query1.include("host[username|avatar|Exp]");
                                                         query1.getObject(bannerElement.get(position).getActivity().getObjectId(), new QueryListener<MyActivity>() {
                                                             @Override
                                                             public void done(MyActivity myActivity, BmobException e) {
@@ -593,7 +610,7 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
 
                             else if (bannerElement.get(position).getType().equals("activity")){
                                 BmobQuery<MyActivity>query1 = new BmobQuery<>();
-                                query1.include("host[username|avatar]");
+                                query1.include("host[username|avatar|Exp]");
                                 query1.getObject(bannerElement.get(position).getActivity().getObjectId(), new QueryListener<MyActivity>() {
                                     @Override
                                     public void done(MyActivity myActivity, BmobException e) {
@@ -629,7 +646,7 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
 
     }
 
-    private  void initJoinActivity(){
+    private  void initJoinActivity(final int state){
 
         if (myUser==null){
             if (++refreshCount==4){
@@ -638,39 +655,62 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
             return;
         }
         BmobQuery<MyActivity> query = new BmobQuery<>();
-        query.addWhereContainsAll("joinUser",Arrays.asList(myUser.getObjectId()));
+        List<BmobQuery<MyActivity>> queries = new ArrayList<>();
+
+        BmobQuery<MyActivity> q1 = new BmobQuery<>();
+        BmobQuery<MyActivity> q2 = new BmobQuery<>();
+        q1.addWhereContainsAll("joinUser",Arrays.asList(myUser.getObjectId()));
+        q2.addWhereEqualTo("host",myUser.getObjectId());
+        queries.add(q1);
+        queries.add(q2);
+        query.or(queries);
         query.order("-date");
         query.setLimit(10);
         query.setSkip(size);
-        query.include("host[username|avatar]");
+        query.include("host[username|avatar|Exp]");
         final int listsize = activityList_join.size();
         query.findObjects(new FindListener<MyActivity>() {
             @Override
             public void done(List<MyActivity> list, BmobException e) {
                 if (e == null) {
-                    activityList_join.addAll(list);
-
-                    if (listsize==activityList_join.size()){
-                        ifEmpty=true;
-                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
-                        adapter.notifyDataSetChanged();
-                    }else if (listsize+10>activityList_join.size()){
-                        ifEmpty=true;
-                        adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
-                        adapter.notifyItemInserted(adapter.getItemCount()-1);
-
-                    }
+                    if (state == ADD) {
+                        activityList_join.addAll(list);
+                        if (listsize == activityList_join.size()) {
+                            ifEmpty = true;
+                            adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                            adapter.notifyDataSetChanged();
 
 
-                    else {
-                        adapter.notifyItemInserted(adapter.getItemCount()-1);
-                        size = size + 10;
-                    }
-                    if (++refreshCount==4){
+                        } else if (listsize + 10 > activityList_join.size()) {
+                            ifEmpty = true;
+                            adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                            adapter.notifyItemInserted(adapter.getItemCount() - 1);
+
+                        } else {
+
+                            adapter.changeMoreStatus(ActivityAdapter.PULLUP_LOAD_MORE);
+                            adapter.notifyItemInserted(adapter.getItemCount() - 1);
+                            size = size + 10;
+                        }
+                    } else if (state == REFRESH) {
+                        activityList_join.clear();
+                        if (list.size() < 10) {
+                            ifEmpty = true;
+                            activityList_join.addAll(list);
+                            adapter.changeMoreStatus(ActivityAdapter.NO_MORE);
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            ifEmpty = false;
+                            activityList_join.addAll(list);
+                            adapter.notifyDataSetChanged();
+                        }
+                        size = 10;
                         swipeRefresh.setRefreshing(false);
                     }
 
-                }else{
+                }
+
+                else{
                     if (++refreshCount==4){
                         swipeRefresh.setRefreshing(false);
                     }
@@ -708,8 +748,8 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
 
     public void refresh(){
         refreshCount=0;
+        size =0;
         swipeRefresh.setRefreshing(true);
-
 
         Bmob.getServerTime(new QueryListener<Long>() {
             @Override
@@ -717,13 +757,21 @@ public class MainFragment extends BaseFragment implements FragmentBackHandler {
 
                 if (e == null) {
                     bmobTime=aLong*1000L;
-                    initJoinActivity();
+                    ((BaseActivity)getActivity()).setBmobTime(bmobTime);
+                    initJoinActivity(REFRESH);
                     initRecommendActivity();
                     initBanner();
                     initTag();
 
-                }}
-        });
+                }
+            else {
+                getActivity().finish();
+                startActivity(new Intent(getContext(), SplashActivity.class));
+                }
+            }
+        }
+
+        );
 
 
 

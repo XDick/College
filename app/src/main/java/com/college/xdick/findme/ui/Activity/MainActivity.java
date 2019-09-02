@@ -9,15 +9,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
@@ -28,31 +25,21 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.college.xdick.findme.Listener.MyLocationListener;
+import com.college.xdick.findme.BmobIM.BmobIMApplication;
 import com.college.xdick.findme.MyClass.BackHandlerHelper;
 import com.college.xdick.findme.MyClass.GpsEvent;
 import com.college.xdick.findme.MyClass.IMMLeaks;
 import com.college.xdick.findme.MyClass.ReadEvent;
 import com.college.xdick.findme.bean.ActivityMessageBean;
 
-import com.college.xdick.findme.bean.MyActivity;
 import com.college.xdick.findme.bean.MyUser;
-import com.college.xdick.findme.ui.Fragment.MainActivityFragment;
+import com.college.xdick.findme.ui.Base.BaseActivity;
+import com.college.xdick.findme.ui.Fragment.MainDynamicsFragment;
 import com.college.xdick.findme.ui.Fragment.MainFragment;
 import com.college.xdick.findme.ui.Fragment.MainMessageFragment;
-import com.college.xdick.findme.ui.Fragment.DynamicsFragment;
-import com.college.xdick.findme.ui.Fragment.MessageFragment;
-import com.college.xdick.findme.ui.Fragment.SearchFragment;
+import com.college.xdick.findme.ui.Fragment.MyDynamicsFragment;
 import com.college.xdick.findme.ui.Fragment.UserFragment;
 import com.college.xdick.findme.R;
-import com.college.xdick.findme.util.AppManager;
-import com.lljjcoder.Interface.OnCityItemClickListener;
-import com.lljjcoder.bean.CityBean;
-import com.lljjcoder.bean.DistrictBean;
-import com.lljjcoder.bean.ProvinceBean;
-import com.lljjcoder.citywheel.CityConfig;
-import com.lljjcoder.style.citylist.Toast.ToastUtils;
-import com.lljjcoder.style.citypickerview.CityPickerView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -64,8 +51,6 @@ import org.litepal.crud.DataSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import cn.bmob.newim.BmobIM;
 import cn.bmob.newim.bean.BmobIMUserInfo;
@@ -74,22 +59,19 @@ import cn.bmob.newim.event.MessageEvent;
 import cn.bmob.newim.listener.ConnectListener;
 import cn.bmob.newim.listener.ConnectStatusChangeListener;
 import cn.bmob.newim.listener.MessageListHandler;
-import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FetchUserInfoListener;
-import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.update.BmobUpdateAgent;
 
-public class MainActivity extends AppCompatActivity implements MessageListHandler {
+public class MainActivity extends BaseActivity implements MessageListHandler {
 
 
     private BottomNavigationBar mBottomNavigationBar;
     private TextBadgeItem mBadgeItem;
     public LocationClient mLocationClient;
     private int unReadNum=0;
-    private long bmobTime=0;
     private ProgressDialog dialog=null;
     private AlertDialog.Builder builder=null ;
     private  AlertDialog dialog2=null;
@@ -97,6 +79,9 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
     private List<Fragment> mFragment;
     private String country,province,city,district,street;
     private AlertDialog bannedDialog=null;
+    private static final int PUSH_NOTIFICATION_ID = (0x001);
+    private static final int PUSH_NOTIFICATION_ID_CHAT = (0x002);
+    private static final int PUSH_NOTIFICATION_ID_SYSTEM = (0x003);
 
 
     @Override
@@ -132,14 +117,17 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
             requestLocation();
 
             if (BmobUser.getCurrentUser(MyUser.class).getMobilePhoneNumber()==null) {
-                startActivity(new Intent(this, ModifyNameActivity.class));
+
+                startActivity(new Intent(MainActivity.this, ModifyNameActivity.class));
                 Toast.makeText(this, "完善一下信息吧(#^.^#)", Toast.LENGTH_SHORT).show();
+                finish();
                  return;
             }
 
             if (BmobUser.getCurrentUser(MyUser.class).getTag() == null) {
-                startActivity(new Intent(this, InterestActivity.class));
-                Toast.makeText(this, "请选择喜欢的标签", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(MainActivity.this, InterestActivity.class));
+                Toast.makeText(this, "选择喜欢的标签吧(#^.^#)", Toast.LENGTH_SHORT).show();
+                finish();
             }
 
 
@@ -189,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
                 .hide();
 
 
-        mBottomNavigationBar.setMode(BottomNavigationBar.MODE_FIXED_NO_TITLE);
+        mBottomNavigationBar.setMode(BottomNavigationBar.MODE_FIXED);
         mBottomNavigationBar.setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC);
         // mBottomNavigationBar.setInActiveColor("#FFFFFF");
         mBottomNavigationBar.setActiveColor(R.color.colorPrimary);
@@ -199,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
                 //.addItem(new BottomNavigationItem(R.drawable.find, "发现"))
                 .addItem(new BottomNavigationItem(R.drawable.talk, "动态"))
                 .addItem(new BottomNavigationItem(R.drawable.message, "消息").setBadgeItem(mBadgeItem))
-                .addItem(new BottomNavigationItem(R.drawable.user, "我"))
+                .addItem(new BottomNavigationItem(R.drawable.user, "我的"))
                 .setFirstSelectedPosition(0)
                 .initialise();
 
@@ -301,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
       mFragment = new ArrayList<>();
       mFragment.add(new MainFragment());
      // mFragment.add(new SearchFragment());
-      mFragment.add(new DynamicsFragment());
+      mFragment.add(new MainDynamicsFragment());
       mFragment.add(new MainMessageFragment());
       mFragment.add(new UserFragment());
   }
@@ -443,7 +431,9 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
     protected void onDestroy(){
         super.onDestroy();
         mLocationClient.stop();
+        BmobIM.getInstance().disConnect();
         BmobIM.getInstance().clear();
+
 
     }
 
@@ -451,7 +441,11 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
     @Override
     public void onBackPressed() {
         if (!BackHandlerHelper.handleBackPress(this)) {
-            super.onBackPressed();
+            //super.onBackPressed();
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            startActivity(intent);
         }
     }
 
@@ -459,7 +453,10 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
    private void CancelNotify(){
 
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.cancel(1);    }
+       ((BmobIMApplication)getApplicationContext()).clearPushNum();
+        manager.cancel(PUSH_NOTIFICATION_ID);
+       manager.cancel(PUSH_NOTIFICATION_ID_CHAT);
+       manager.cancel(PUSH_NOTIFICATION_ID_SYSTEM);  }
 
 
 
@@ -666,6 +663,8 @@ public class MainActivity extends AppCompatActivity implements MessageListHandle
         }
 
     }
+
+
 }
 
 
